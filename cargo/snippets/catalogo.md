@@ -53,11 +53,18 @@ CSS, incluido el global de Cargo, así que esto siempre funciona:
 | `--ttx-w-max` | tope de ancho del ítem (para teléfono) | `88vw` |
 | `--ttx-dur` | duración del acordeón | `0.5s` |
 
-Si la barra inferior de Cargo tapa el catálogo, se le resta su alto:
+### Pendiente de calibrar (medido en vivo el 2026-07-27)
+
+En `tratratrax.cargo.site/catalog` la página **scrollea 30px de más**: Cargo
+deja 6px de aire arriba del widget y unos 24px debajo, y el widget mide
+`100svh` completos. Se arregla cambiando el placeholder por:
 
 ```html
-<div data-ttx="catalogo" style="--ttx-alto: calc(100svh - 2rem)"></div>
+<div data-ttx="catalogo" style="--ttx-alto: calc(100svh - 30px)"></div>
 ```
+
+Es el único ajuste que le falta al catálogo en vivo. En teléfono no pasa:
+ahí el widget mide lo que miden las carátulas y no se estira al viewport.
 
 ### Opciones de contenido
 
