@@ -197,6 +197,19 @@
 @media (max-width: 46rem) {
   [data-ttx='catalogo'] {
     --ttx-w-max: 78vw;
+    /* En un teléfono la fila es mucho más alta que ancha: si el ítem
+       siguiera midiendo lo que mide la fila, la carátula cuadrada dejaría
+       media pantalla en blanco. Aquí manda el ancho, y el stack deja de
+       estirarse al viewport. */
+    --ttx-w-item: var(--ttx-w-max);
+  }
+
+  /* La fila del carril va en `max-content`, no en `auto`: el carril es un
+     contenedor de scroll y con `auto` la fila no se entera del alto de las
+     carátulas. */
+  [data-ttx='catalogo'].ttx-stack {
+    grid-template-rows: var(--ttx-visor-h) auto max-content;
+    height: auto;
   }
 
   /* El acordeón se vuelve vertical: el ítem no crece a lo ancho y el panel
@@ -210,20 +223,33 @@
     flex-direction: column;
   }
 
+  /* El ancho va en una longitud, no en `100%`: con `aspect-ratio` un ancho
+     porcentual es cíclico al medir la fila, la carátula aporta cero alto y
+     el ítem colapsa. */
   [data-ttx='catalogo'] .ttx-cover {
     order: -1; /* la carátula arriba, los créditos debajo */
     flex: 0 0 auto;
-    width: 100%;
+    width: var(--ttx-w-item);
     height: auto;
     aspect-ratio: 1 / 1;
   }
 
+  /* Con el stack a alto automático, una fila `1fr` no aporta altura
+     intrínseca y el ítem colapsa: aquí manda el contenido. */
+  [data-ttx='catalogo'] .ttx-item {
+    grid-template-rows: var(--ttx-banda-h) auto;
+  }
+
+  /* El panel crece en el eje vertical, que ahora es el principal. `auto` no
+     se puede interpolar, así que aquí el acordeón no anima — a cambio, no
+     hay una altura calculada en JS. */
   [data-ttx='catalogo'] .ttx-panel {
-    flex: 0 1 0px;
+    flex: 0 0 0;
+    overflow: hidden;
   }
 
   [data-ttx='catalogo'] .ttx-item[data-abierto] .ttx-panel {
-    flex-basis: 100%; /* se encoge hasta lo que sobre bajo la carátula */
+    flex-basis: auto;
   }
 
   [data-ttx='catalogo'] .ttx-panel-col {
