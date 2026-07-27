@@ -1,0 +1,127 @@
+---
+import releases from '../../data/releases.json';
+import artists from '../../data/artists.json';
+
+const visibles = releases.filter((r) => r.visible);
+const sinCatalogo = releases.filter((r) => !r.catalog);
+const sinListen = releases.filter((r) => !r.listenUrl);
+const sinCreditos = releases.filter((r) => r.credits.length === 0);
+
+const usados = new Set(releases.flatMap((r) => r.artists));
+const huerfanos = artists.filter((a) => !usados.has(a.slug));
+
+const nombre = new Map(artists.map((a) => [a.slug, a.display]));
+
+// Números TRA que faltan en la secuencia. Un hueco casi siempre significa
+// un release que nadie registró, no un número que el sello se saltó.
+const nums = releases
+  .map((r) => r.catalog)
+  .filter((c) => /^TRA\d+$/.test(c))
+  .map((c) => Number(c.slice(3)));
+const tope = Math.max(...nums);
+const huecos = Array.from({ length: tope }, (_, i) => i + 1)
+  .filter((n) => !nums.includes(n))
+  .map((n) => 'TRA' + String(n).padStart(3, '0'));
+
+const orden = [...releases].sort((a, b) => b.date.localeCompare(a.date));
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TraTraTrax · datos</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; padding: 2.5rem 1.5rem 6rem;
+        background: #000; color: #fff;
+        font: 400 13px/1.5 ui-monospace, "SF Mono", Menlo, monospace;
+        text-transform: uppercase; letter-spacing: 0.02em;
+      }
+      main { max-width: 68rem; margin: 0 auto; }
+      h1 { font-size: 13px; font-weight: 700; margin: 0 0 2.5rem; }
+      h2 { font-size: 13px; font-weight: 700; margin: 3rem 0 0.75rem; }
+      .cifras { display: flex; flex-wrap: wrap; gap: 2.5rem; margin-bottom: 1rem; }
+      .cifra b { display: block; font-size: 2.5rem; font-weight: 400; letter-spacing: -0.02em; }
+      .cifra span { opacity: 0.5; }
+      .aviso { color: #facc15; }
+      .tabla { width: 100%; overflow-x: auto; }
+      table { border-collapse: collapse; width: 100%; min-width: 46rem; }
+      th, td { text-align: left; padding: 0.4rem 1rem 0.4rem 0; border-bottom: 1px solid #1a1a1a; white-space: nowrap; }
+      th { font-weight: 700; opacity: 0.5; }
+      td.abierto { white-space: normal; text-transform: none; opacity: 0.55; }
+      .falta { opacity: 0.3; }
+      ul { padding-left: 1.2rem; margin: 0.5rem 0; }
+      li { margin: 0.15rem 0; }
+      p { opacity: 0.55; text-transform: none; max-width: 44rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>TraTraTrax — estado de los datos</h1>
+
+      <div class="cifras">
+        <div class="cifra"><b>{releases.length}</b><span>releases</span></div>
+        <div class="cifra"><b>{visibles.length}</b><span>visibles</span></div>
+        <div class="cifra"><b>{artists.length}</b><span>artistas</span></div>
+        <div class="cifra"><b class={sinCatalogo.length ? 'aviso' : ''}>{sinCatalogo.length}</b><span>sin catálogo</span></div>
+        <div class="cifra"><b class={sinListen.length ? 'aviso' : ''}>{sinListen.length}</b><span>sin listen</span></div>
+      </div>
+
+      {huecos.length > 0 && (
+        <>
+          <h2 class="aviso">Huecos en la numeración</h2>
+          <p>
+            Faltan {huecos.length} números entre TRA001 y TRA{String(tope).padStart(3, '0')}:
+            <strong>{huecos.join(' · ')}</strong>. Casi siempre significa que ese release existe
+            pero nadie escribió su número en Bandcamp. Hay {sinCatalogo.length} releases sin número
+            asignado — probablemente son estos.
+          </p>
+        </>
+      )}
+
+      {huerfanos.length > 0 && (
+        <>
+          <h2>Artistas sin release</h2>
+          <p>Están en el filtro del catálogo pero no encabezan ningún lanzamiento. Suelen ser remezcladores o colaboradores.</p>
+          <ul>{huerfanos.map((a) => <li>{a.display}</li>)}</ul>
+        </>
+      )}
+
+      <h2>Catálogo</h2>
+      <div class="tabla">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Cat.</th><th>Álbum</th><th>Artistas</th><th>Créditos</th><th>Listen</th></tr>
+          </thead>
+          <tbody>
+            {orden.map((r) => (
+              <tr>
+                <td>{r.date}</td>
+                <td class={r.catalog ? '' : 'falta'}>{r.catalog || '—'}</td>
+                <td class="abierto">{r.album}</td>
+                <td class="abierto">{r.artists.map((s) => nombre.get(s) ?? s).join(', ')}</td>
+                <td class={r.credits.length ? '' : 'falta'}>{r.credits.length || '—'}</td>
+                <td class={r.listenUrl ? '' : 'falta'}>{r.listenUrl ? 'sí' : '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {sinCreditos.length > 0 && (
+        <>
+          <h2>Sin créditos estructurados</h2>
+          <p>
+            En Bandcamp estos escribieron los créditos como texto corrido, sin la convención
+            <code> Rol__ Valor</code>. El texto está en <code>note</code> y se puede pasar a
+            <code> credits</code> a mano.
+          </p>
+          <ul>{sinCreditos.map((r) => <li>{r.album}</li>)}</ul>
+        </>
+      )}
+    </main>
+  </body>
+</html>

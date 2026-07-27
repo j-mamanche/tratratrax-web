@@ -1,0 +1,64 @@
+/* ============================================================
+   CARGO — MERCH (grid)  [id="X2106740497"]
+   Snapshot 2026-07-27
+
+   ⭐ AQUÍ vive el semáforo real de stock: Cargo pone una clase
+   `tag-<nombre-del-tag>` en cada media-item del thumbnail-index.
+   Los tags de página son: in-stock / few-units / out-of-stock.
+   El script `stockByIndex` del HTML global es código muerto:
+   escribe clases `stock-*` para las que no existe ningún CSS.
+   ============================================================ */
+
+[id="X2106740497"] .page-content {
+  background-color: #ffffff;
+	align-items: flex-start;
+	border-radius: 0rem;
+	border-color: #000000;
+	border-width: 0.1rem;
+	border-bottom-width: 0rem;
+	border-top-left-radius: 1rem;
+	border-top-right-radius: 1rem;
+}
+
+[id="X2106740497"] .page-layout {
+	padding-top: 38rem;
+	align-items: flex-start;
+	max-width: 60%;
+}
+
+/* Stock dots — basado en clases del media-item */
+/* ⚠️ sin prefijo de página: aplica a TODOS los gallery-grid del sitio */
+gallery-grid media-item {
+  position: relative;
+}
+
+gallery-grid media-item.tag-in-stock::after,
+gallery-grid media-item.tag-few-units::after,
+gallery-grid media-item.tag-out-of-stock::after {
+  content: "";
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  z-index: 20;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.75);
+}
+
+gallery-grid media-item.tag-in-stock::after      { background: #22c55e; }
+gallery-grid media-item.tag-few-units::after     { background: #facc15; }
+gallery-grid media-item.tag-out-of-stock::after  { background: #ef4444; }
+
+/* Ocultar tags visualmente */
+gallery-grid .tags {
+  display: none;
+}
+gallery-grid .tag-separator {
+  display: none;
+}
+
+[id="X2106740497"].page {
+	min-height: var(--viewport-height);
+}

@@ -1,0 +1,92 @@
+/* ============================================================
+   CARGO — NAV / MENÚ  [id="B3241791059"]
+   Snapshot 2026-07-27
+   El reveal del logo lo dispara el script "HOVER LOGO" del HTML global
+   (clase .is-open, HOLD_TIME 1500ms antes de cerrar).
+   ============================================================ */
+
+[id="B3241791059"] .page {
+  min-height: var(--viewport-height);
+    z-index: 0;
+}
+
+[id="B3241791059"] .page-content {
+  align-items: flex-end;
+  padding: 3rem;
+  background-color: rgba(0,0,0,0);
+	padding-top: 1.2rem;
+	padding-left: 2rem;
+	padding-bottom: 2rem;
+	padding-right: 2rem;
+}
+
+[id="B3241791059"] .page-layout {
+  align-items: flex-end;
+}
+
+/* ⚠️ SIN PREFIJO DE PÁGINA — estas dos reglas se escapan a TODO el sitio
+   y afectan cada column-set (catálogo, merch, blog incluidos). */
+column-set {
+  display: flex;
+  align-items: stretch;
+}
+
+column-set > column-unit[slot="1"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* SLOT IZQUIERDO */
+/* ⚠️ también globales, aunque los nombres de clase son únicos */
+column-unit.logo-reveal {
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  cursor: pointer;
+}
+
+.logo-reveal-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  width: 100%;
+}
+
+.logo-copy {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transition:
+    max-height 0.35s ease,
+    opacity 0.25s ease,
+    margin-top 0.35s ease;
+}
+
+.logo-mark {
+  display: block;
+  transform: translateY(0);
+  transition: transform 0.35s ease;
+  will-change: transform;
+}
+
+.logo-reveal.is-open .logo-mark {
+  transform: translateY(-0.15rem);
+}
+
+.logo-reveal.is-open .logo-copy {
+  max-height: 8rem;
+  opacity: 1;
+  margin-top: 0.75rem;
+}
+
+[id="B3241791059"].page {
+	min-height: var(--viewport-height);
+}
+
+[id="B3241791059"] {
+  position: relative;
+  z-index: 9999;
+}

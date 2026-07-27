@@ -1,0 +1,79 @@
+/* ============================================================
+   CARGO — HOME  [id="L4057471394"]
+   Snapshot 2026-07-27
+   El scale responsive (100% / 58% / 50%) lo escribe el script
+   "HOVER CARÁTULA" del HTML global como atributo en cada media-item.
+   ============================================================ */
+
+[id="L4057471394"] .hover-system {
+  text-align: center;
+  line-height: 0;
+}
+[id="L4057471394"] .hover-reveal-module {
+  display: inline-block;
+  position: relative;
+  line-height: 0;
+}
+[id="L4057471394"] .hover-reveal-stack {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+[id="L4057471394"] .hover-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+  z-index: 2;
+}
+/* el primer item es el único en flujo: es quien da alto y ancho al stack,
+   aunque esté invisible. Si se borra, el layout colapsa. */
+[id="L4057471394"] .hover-item:first-child {
+  position: relative;
+}
+[id="L4057471394"] .hover-item:first-child:not(.is-visible) {
+  opacity: 0;
+}
+[id="L4057471394"] .hover-item.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+[id="L4057471394"] .hover-item--idle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+  z-index: 0;
+}
+[id="L4057471394"] .hover-item--idle.is-visible {
+  opacity: 1;
+}
+[id="L4057471394"] .hover-overlay-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+[id="L4057471394"] .hover-overlay-item,
+[id="L4057471394"] .hover-overlay-item * {
+  pointer-events: none !important;
+}
+[id="L4057471394"] media-item {
+  display: block;
+  margin: 0;
+}
+
+/* ⚠️ REGLA MUERTA (mismo error que en el blog): `[id="…"] .page` es
+   selector de descendiente, pero el id ES el .page. Falta quitar el espacio. */
+[id="L4057471394"] .page {
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+[id="L4057471394"] .page.is-transitioning {
+  opacity: 0;
+}

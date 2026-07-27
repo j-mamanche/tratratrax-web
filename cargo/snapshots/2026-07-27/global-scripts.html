@@ -1,0 +1,595 @@
+<!-- ============================================================
+     CARGO — HTML GLOBAL (scripts)
+     Snapshot 2026-07-27
+     Módulos referenciados por id:
+       L4057471394  = Home (hover carátula)
+       L3482832595  = Nav / menú (logo + nav-links)
+       E1964764012  = Catálogo (overlay/drawer)
+       C0789380032  = Merch (gallery-grid)
+     ============================================================ -->
+
+<!-- inicio otros scripts-->
+
+<script>
+window.addEventListener('load', function () {
+  var modules = document.querySelectorAll('.hover-reveal-module');
+
+  modules.forEach(function (module) {
+    var items = Array.from(module.querySelectorAll('.hover-item'));
+    if (!items.length) return;
+
+    var currentIndex = -1;
+
+    function hideAll() {
+      items.forEach(function (item) {
+        item.classList.remove('is-visible');
+      });
+    }
+
+    function showRandom() {
+      var nextIndex;
+      do {
+        nextIndex = Math.floor(Math.random() * items.length);
+      } while (items.length > 1 && nextIndex === currentIndex);
+
+      hideAll();
+      items[nextIndex].classList.add('is-visible');
+      currentIndex = nextIndex;
+    }
+
+    module.addEventListener('mouseenter', showRandom);
+    module.addEventListener('mouseleave', hideAll);
+  });
+});
+</script>
+
+<!-- SCRIPT HOVER CARÁTULA -->
+
+<script>
+(function () {
+  const PAGE_ID = "L4057471394";
+
+  function applyResponsiveScale() {
+    const items = document.querySelectorAll('.hover-media, .overlay-media');
+    let scale;
+    if (window.innerWidth <= 768) {
+      scale = '100%';
+    } else if (window.innerWidth <= 1200) {
+      scale = '58%';
+    } else {
+      scale = '50%';
+    }
+    items.forEach(item => item.setAttribute('scale', scale));
+  }
+
+  window.addEventListener('resize', applyResponsiveScale);
+
+  window.addEventListener('load', function () {
+    applyResponsiveScale();
+
+    const root = document.getElementById(PAGE_ID);
+    if (!root) return;
+
+    const stack = root.querySelector(".hover-reveal-stack");
+    const coverItems = Array.from(root.querySelectorAll(".hover-item:not(.hover-item--idle)"));
+    const idleItem = root.querySelector(".hover-item--idle");
+
+    if (!stack || !idleItem) return;
+
+    const isMobile = () => window.matchMedia("(pointer: coarse)").matches;
+
+    function showIdle() {
+      coverItems.forEach(el => el.classList.remove("is-visible"));
+      idleItem.classList.add("is-visible");
+    }
+
+    function hideIdle() {
+      idleItem.classList.remove("is-visible");
+    }
+
+    // — Load flash —
+    requestAnimationFrame(() => {
+      idleItem.style.transition = "none";
+      idleItem.style.opacity = "0";
+      idleItem.style.transform = "scale(0.85)";
+
+      requestAnimationFrame(() => {
+        idleItem.style.transition = "opacity 200ms ease, transform 200ms ease";
+        idleItem.style.opacity = "1";
+        idleItem.style.transform = "scale(1)";
+
+        setTimeout(() => {
+          idleItem.style.transform = "";
+          idleItem.style.transition = "";
+          showIdle();
+        }, 250);
+      });
+    });
+
+    // — Desktop hover —
+    if (!isMobile()) {
+      coverItems.forEach(item => {
+        item.addEventListener("mouseenter", () => {
+          hideIdle();
+          coverItems.forEach(el => el.classList.remove("is-visible"));
+          item.classList.add("is-visible");
+        });
+      });
+
+      stack.addEventListener("mouseleave", () => {
+        coverItems.forEach(el => el.classList.remove("is-visible"));
+        showIdle();
+      });
+    }
+
+    // — Mobile arythmic pops —
+    if (isMobile()) {
+      showIdle();
+
+      function randomBetween(a, b) {
+        return a + Math.random() * (b - a);
+      }
+
+      function pop() {
+        const pick = coverItems[Math.floor(Math.random() * coverItems.length)];
+
+        hideIdle();
+        pick.classList.add("is-visible");
+
+        setTimeout(() => {
+          pick.classList.remove("is-visible");
+          showIdle();
+          setTimeout(pop, randomBetween(800, 2400));
+        }, 600);
+      }
+
+      setTimeout(pop, randomBetween(1200, 2800));
+    }
+  });
+})();
+</script>
+
+<!-- SCRIPT HOVER LOGO -->
+
+<script>
+(function waitForReveal() {
+  const reveal = document.querySelector("column-unit.logo-reveal");
+
+  if (!reveal) {
+    // El elemento aún no existe, reintenta en 100ms
+    setTimeout(waitForReveal, 100);
+    return;
+  }
+
+  let closeTimer = null;
+  const HOLD_TIME = 1500;
+
+  reveal.addEventListener("mouseenter", function () {
+    if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+    reveal.classList.add("is-open");
+  });
+
+  reveal.addEventListener("mouseleave", function () {
+    if (closeTimer) clearTimeout(closeTimer);
+    closeTimer = setTimeout(function () {
+      reveal.classList.remove("is-open");
+      closeTimer = null;
+    }, HOLD_TIME);
+  });
+})();
+</script>
+
+
+<!-- SCRIPT CATALOGO + FILTRACIÓN -->
+<script>
+(function () {
+  const MODULE_ID = "E1964764012";
+  const FADE_MS = 160;
+  const DRAG_THRESHOLD = 8;
+
+  function normalize(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  function getArtistList(value) {
+    return String(value || "")
+      .split(",")
+      .map(function (item) { return normalize(item); })
+      .filter(Boolean);
+  }
+
+  function initCatalog() {
+    const root = document.getElementById(MODULE_ID);
+    if (!root) return false;
+    if (root.dataset.catalogReady === "true") return true;
+
+    const links = Array.from(
+      root.querySelectorAll('.titles-artists a[data-filter], .titles-artists-all a[data-filter]')
+    ).filter(function (link) {
+      return normalize(link.textContent) !== "" ||
+             normalize(link.getAttribute("data-filter")) === "all";
+    });
+
+    const originalMarquee = root.querySelector('.release-strip')?.closest('marquee-set') || null;
+    if (!originalMarquee) return false;
+
+    // Snapshot de atributos del marquee-set original
+    const marqueeAttrs = {};
+    Array.from(originalMarquee.attributes).forEach(function (attr) {
+      marqueeAttrs[attr.name] = attr.value;
+    });
+
+    // Snapshot de todas las cards originales — fuente de verdad permanente
+    const sourceInner = originalMarquee.querySelector('marquee-inner[slot="contents"]');
+    if (!sourceInner) return false;
+
+    const allCardNodes = Array.from(
+      sourceInner.querySelectorAll('.release-card[data-artist]')
+    ).map(function (card) { return card.cloneNode(true); });
+
+    if (!links.length || !allCardNodes.length) return false;
+
+    // Inyectar wrapper div sobre el marquee-set
+    const wrapper = document.createElement('div');
+    wrapper.className = 'release-marquee-wrapper';
+    originalMarquee.parentNode.insertBefore(wrapper, originalMarquee);
+    wrapper.appendChild(originalMarquee);
+
+    root.dataset.catalogReady = "true";
+    root.dataset.currentFilter = "all";
+
+    let isTransitioning = false;
+    let currentMarquee = originalMarquee;
+
+function buildFreshMarquee(filteredCards) {
+  const newMarquee = document.createElement('marquee-set');
+
+  Object.keys(marqueeAttrs).forEach(function (name) {
+    newMarquee.setAttribute(name, marqueeAttrs[name]);
+  });
+
+  // Solo slot="contents" — Cargo crea el clone solo
+  const newInner = document.createElement('marquee-inner');
+  newInner.setAttribute('slot', 'contents');
+
+  const newStrip = document.createElement('div');
+  newStrip.className = 'release-strip';
+
+  filteredCards.forEach(function (card) {
+    const fresh = card.cloneNode(true);
+    fresh.removeAttribute('open');
+    newStrip.appendChild(fresh);
+  });
+
+  newInner.appendChild(newStrip);
+  newMarquee.appendChild(newInner);
+
+  return newMarquee;
+}
+
+    function rebindCards(marqueeEl) {
+      const currentCards = Array.from(marqueeEl.querySelectorAll('.release-card[data-artist]'));
+      let syncingCards = false;
+
+      currentCards.forEach(function (card) {
+        const trigger = card.querySelector('.release-trigger');
+        if (!trigger) return;
+
+        let trackedPointerId = null;
+        let startX = 0;
+        let startY = 0;
+        let didMove = false;
+
+        trigger.addEventListener('pointerdown', function (event) {
+          trackedPointerId = event.pointerId;
+          startX = event.clientX;
+          startY = event.clientY;
+          didMove = false;
+        }, { passive: true });
+
+        trigger.addEventListener('pointermove', function (event) {
+          if (event.pointerId !== trackedPointerId) return;
+          const dx = Math.abs(event.clientX - startX);
+          const dy = Math.abs(event.clientY - startY);
+          if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) didMove = true;
+        }, { passive: true });
+
+        trigger.addEventListener('pointerup', function () {
+          trackedPointerId = null;
+        }, { passive: true });
+
+        trigger.addEventListener('pointercancel', function () {
+          trackedPointerId = null;
+          didMove = true;
+        }, { passive: true });
+
+        trigger.addEventListener('click', function (event) {
+          if (didMove) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }, { passive: false });
+
+        card.addEventListener('toggle', function () {
+          if (syncingCards) return;
+          if (!card.hasAttribute('open')) return;
+          syncingCards = true;
+          currentCards.forEach(function (other) {
+            if (other !== card) other.removeAttribute('open');
+          });
+          syncingCards = false;
+        });
+      });
+    }
+
+    function applyFilter(filterValue) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+
+      const activeFilter = normalize(filterValue || 'all');
+      root.dataset.currentFilter = activeFilter;
+
+      const filteredCards = allCardNodes.filter(function (card) {
+        const artistList = getArtistList(card.getAttribute('data-artist'));
+        return activeFilter === 'all' || artistList.includes(activeFilter);
+      });
+
+      links.forEach(function (link) {
+        const linkFilter = normalize(link.getAttribute('data-filter'));
+        link.classList.toggle('is-active', linkFilter === activeFilter);
+      });
+
+      // Fade out sobre el wrapper — controlado por nosotros, no por Cargo
+      wrapper.style.transition = 'opacity ' + FADE_MS + 'ms ease';
+      wrapper.style.opacity = '0';
+
+      setTimeout(function () {
+        // Reemplazar marquee-set completo — Cargo reinicializa desde posición 0
+        const freshMarquee = buildFreshMarquee(filteredCards);
+        wrapper.removeChild(currentMarquee);
+        wrapper.appendChild(freshMarquee);
+        currentMarquee = freshMarquee;
+
+        rebindCards(currentMarquee);
+
+        // Doble rAF: dar tiempo a Cargo para connectedCallback antes de mostrar
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            wrapper.style.opacity = '1';
+
+            setTimeout(function () {
+              wrapper.style.transition = '';
+              isTransitioning = false;
+            }, FADE_MS);
+          });
+        });
+
+      }, FADE_MS);
+    }
+
+    // ─── Links de artista ──────────────────────────────────────────────────
+    links.forEach(function (link) {
+      let trackedPointerId = null;
+      let startX = 0;
+      let startY = 0;
+      let didMove = false;
+
+      link.addEventListener('pointerdown', function (event) {
+        trackedPointerId = event.pointerId;
+        startX = event.clientX;
+        startY = event.clientY;
+        didMove = false;
+      }, { passive: true });
+
+      link.addEventListener('pointermove', function (event) {
+        if (event.pointerId !== trackedPointerId) return;
+        const dx = Math.abs(event.clientX - startX);
+        const dy = Math.abs(event.clientY - startY);
+        if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) didMove = true;
+      }, { passive: true });
+
+      link.addEventListener('pointerup', function (event) {
+        if (event.pointerId !== trackedPointerId) return;
+        trackedPointerId = null;
+      }, { passive: true });
+
+      link.addEventListener('pointercancel', function () {
+        trackedPointerId = null;
+        didMove = true;
+      }, { passive: true });
+
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (didMove) return;
+        if (isTransitioning) return;
+
+        const clickedFilter = normalize(link.getAttribute('data-filter')) || 'all';
+        applyFilter(clickedFilter);
+      }, { passive: false });
+    });
+
+    function initRender() {
+  root.dataset.currentFilter = 'all';
+
+  links.forEach(function (link) {
+    const linkFilter = normalize(link.getAttribute('data-filter'));
+    link.classList.toggle('is-active', linkFilter === 'all');
+  });
+
+  rebindCards(currentMarquee);
+}
+
+initRender();
+    return true;
+  }
+
+ if (!initCatalog()) {
+    let attempts = 0;
+    const interval = setInterval(function () {
+      attempts += 1;
+      if (initCatalog() || attempts > 40) clearInterval(interval);
+    }, 250);
+  }
+
+  // Re-init en navegación hash (Cargo SPA)
+  function handleNavigation() {
+    const root = document.getElementById(MODULE_ID);
+    if (!root) return;
+
+    // Limpiar wrapper anidado — sacar marquee-set del wrapper y eliminar wrapper
+    const existingWrapper = root.querySelector('.release-marquee-wrapper');
+    if (existingWrapper) {
+      const marqueeInside = existingWrapper.querySelector('marquee-set');
+      if (marqueeInside) {
+        existingWrapper.parentNode.insertBefore(marqueeInside, existingWrapper);
+      }
+      existingWrapper.parentNode.removeChild(existingWrapper);
+    }
+
+    // Resetear flag para permitir reinicialización
+    delete root.dataset.catalogReady;
+
+    if (!initCatalog()) {
+      let attempts = 0;
+      const interval = setInterval(function () {
+        attempts += 1;
+        if (initCatalog() || attempts > 40) clearInterval(interval);
+      }, 250);
+    }
+  }
+
+  window.addEventListener('hashchange', handleNavigation);
+  window.addEventListener('popstate', handleNavigation);
+
+})();
+</script>
+
+<!--SCRIPT STOCK MERCA -->
+
+<script>
+(function () {
+	/*
+	   Define el stock según el ORDEN visible del grid.
+	   0 = primer item
+	   1 = segundo item
+	   2 = tercer item
+	*/
+	const stockByIndex = {
+		0: 'in-stock',
+		1: 'few-units',
+		2: 'out-of-stock',
+		3: 'in-stock',
+		4: 'few-units',
+		5: 'out-of-stock'
+		// sigue completando según necesites
+	};
+
+	function waitForGrid(callback, tries = 0) {
+		const grid = document.querySelector('[id="C0789380032"] gallery-grid');
+		if (grid) {
+			callback(grid);
+			return;
+		}
+
+		if (tries > 40) return;
+		setTimeout(() => waitForGrid(callback, tries + 1), 250);
+	}
+
+	function findCards(grid) {
+		const all = Array.from(grid.querySelectorAll('*'));
+
+		const candidates = all.filter((el) => {
+			if (!el.querySelector('img, media-item, video, picture')) return false;
+			if (!el.parentElement) return false;
+
+			const siblingsSameTag = Array.from(el.parentElement.children).filter(
+				(node) => node.tagName === el.tagName
+			).length;
+
+			return siblingsSameTag > 1;
+		});
+
+		const groups = new Map();
+
+		candidates.forEach((el) => {
+			const key = [
+				el.tagName,
+				(el.className || '').toString().trim(),
+				el.parentElement.tagName,
+				(el.parentElement.className || '').toString().trim()
+			].join(' | ');
+
+			if (!groups.has(key)) groups.set(key, []);
+			groups.get(key).push(el);
+		});
+
+		const bestGroup =
+			Array.from(groups.values()).sort((a, b) => b.length - a.length)[0] || [];
+
+		return bestGroup;
+	}
+
+	function applyStockDots(grid) {
+		const cards = findCards(grid);
+
+		if (!cards.length) {
+			console.log('No pude detectar cards dentro de gallery-grid');
+			return;
+		}
+
+		cards.forEach((card) => {
+			card.classList.remove(
+				'has-stock-dot',
+				'stock-in-stock',
+				'stock-few-units',
+				'stock-out-of-stock'
+			);
+		});
+
+		cards.forEach((card, index) => {
+			const stock = stockByIndex[index];
+			if (!stock) return;
+
+			card.classList.add('has-stock-dot');
+
+			if (stock === 'in-stock') {
+				card.classList.add('stock-in-stock');
+			} else if (stock === 'few-units') {
+				card.classList.add('stock-few-units');
+			} else if (stock === 'out-of-stock') {
+				card.classList.add('stock-out-of-stock');
+			}
+		});
+
+		console.log('Cards detectadas:', cards);
+	}
+
+	function init() {
+		waitForGrid((grid) => {
+			applyStockDots(grid);
+
+			const observer = new MutationObserver(() => {
+				applyStockDots(grid);
+			});
+
+			observer.observe(grid, {
+				childList: true,
+				subtree: true
+			});
+
+			setTimeout(() => applyStockDots(grid), 500);
+			setTimeout(() => applyStockDots(grid), 1500);
+			setTimeout(() => applyStockDots(grid), 3000);
+		});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
+
+	window.addEventListener('load', init);
+})();
+</script>

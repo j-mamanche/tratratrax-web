@@ -1,0 +1,53 @@
+/* ============================================================
+   CARGO — MERCH (item)  [id="I4216454182"] · "Añañay" Beach Towel
+   Snapshot 2026-07-27
+   Geometría de drawer: bordes + radio ARRIBA, radio abajo 0
+   → el cajón sube desde el fondo.
+   ============================================================ */
+
+[id="I4216454182"] .page-content {
+	text-align: left;
+	width: 100%;
+	height: auto;
+	background-color: #ffffff;
+	border-width: 0.1rem;
+	border-color: #000000;
+	border-radius: 1rem;
+	border-bottom-width: 0rem;
+	border-bottom-left-radius: 0rem;
+	border-bottom-right-radius: 0rem;
+	align-items: flex-end;
+	padding: 4rem;
+	padding-right: 2rem;
+	padding-left: 2rem;
+	padding-bottom: 0.0rem;
+	padding-top: 2rem;
+}
+
+[id="I4216454182"].page {
+	min-height: var(--viewport-height);
+}
+
+[id="I4216454182"] .backdrop {
+}
+
+.mobile [id="I4216454182"] .backdrop {
+}
+
+[id="I4216454182"] .page-layout {
+	padding: 0rem;
+	max-width: 60%;
+	align-items: flex-end;
+	padding-top: 4rem;
+}
+
+.mobile [id="I4216454182"] .page-layout {
+}
+
+[id="I4216454182"] column-set {
+  align-items: flex-start;
+}
+[id="I4216454182"] column-set:last-of-type {
+  align-items: center
+      ;
+}

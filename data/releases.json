@@ -1,0 +1,877 @@
+[
+  {
+    "id": "mzansi-bass-compilation",
+    "catalog": "",
+    "album": "Mzansi Bass compilation",
+    "artists": [
+      "various-artists"
+    ],
+    "date": "2026-06-12",
+    "bcImageId": "a1872784260",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/mzansi-bass-compilation",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Unkle Luc"
+      },
+      {
+        "role": "Mastering",
+        "name": "Beau Thomas"
+      }
+    ],
+    "note": "",
+    "order": 1,
+    "visible": true
+  },
+  {
+    "id": "pyrexia",
+    "catalog": "TRA031",
+    "album": "Pyrexia",
+    "artists": [
+      "ehua-flore"
+    ],
+    "date": "2026-04-30",
+    "bcImageId": "a1974794830",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/pyrexia",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Beau Thomas at Ten Eight Seven"
+      }
+    ],
+    "note": "All NRG programmed by Ehua, Flore, dBridge, Martyn between London, Lyon, Phuket, and Washington D.C.",
+    "order": 2,
+    "visible": true
+  },
+  {
+    "id": "tribalista",
+    "catalog": "TRA030",
+    "album": "TRIBALISTA",
+    "artists": [
+      "1oo1o"
+    ],
+    "date": "2026-03-27",
+    "bcImageId": "a3761685080",
+    "purchaseUrl": "https://1oo1o.bandcamp.com/album/tribalista",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "_César Augusto (@trashtechno)"
+      },
+      {
+        "role": "Mastering",
+        "name": "Beau Thomas at Ten Eight Seven"
+      }
+    ],
+    "note": "All NRG programmed by 1OO1O, WOST, DNZA between Mexico D.F and Bogotá",
+    "order": 3,
+    "visible": true
+  },
+  {
+    "id": "gubbins",
+    "catalog": "TRA029",
+    "album": "Gubbins",
+    "artists": [
+      "lws"
+    ],
+    "date": "2026-02-20",
+    "bcImageId": "a1385304732",
+    "purchaseUrl": "https://lwslwslws.bandcamp.com/album/gubbins",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Photo",
+        "name": "Cromero"
+      },
+      {
+        "role": "Aditional Design",
+        "name": "Andrés Jácome"
+      },
+      {
+        "role": "Mastering",
+        "name": "Beau Thomas at Ten Eight Seven"
+      }
+    ],
+    "note": "All NRG programmed by LWS, WOST & DJ Yirvin between Edinburgh, Bogotá and Caracas.",
+    "order": 4,
+    "visible": true
+  },
+  {
+    "id": "no-pare-sigue-sigue-4",
+    "catalog": "",
+    "album": "no pare, sigue sigue 4",
+    "artists": [
+      "various-artists"
+    ],
+    "date": "2025-11-28",
+    "bcImageId": "a1866960330",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/no-pare-sigue-sigue-4",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Tarcilongo"
+      },
+      {
+        "role": "Aditional Design",
+        "name": "J Guzmán"
+      }
+    ],
+    "note": "",
+    "order": 5,
+    "visible": true
+  },
+  {
+    "id": "a-tropical-entropy-remixed",
+    "catalog": "TRA028",
+    "album": "A Tropical Entropy remixed",
+    "artists": [
+      "nick-leon"
+    ],
+    "date": "2025-10-15",
+    "bcImageId": "a3838608074",
+    "purchaseUrl": "https://nicknoexit.bandcamp.com/album/a-tropical-entropy-remixed",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Beau Thomas at Ten Eight Seven"
+      },
+      {
+        "role": "Artwork",
+        "name": "Ezra Miller"
+      },
+      {
+        "role": "Art Direction",
+        "name": "Caterina Haddad"
+      }
+    ],
+    "note": "",
+    "order": 6,
+    "visible": true
+  },
+  {
+    "id": "testa-dura",
+    "catalog": "TRA027",
+    "album": "Testa Dura",
+    "artists": [
+      "de-grandi"
+    ],
+    "date": "2025-10-03",
+    "bcImageId": "a0758539532",
+    "purchaseUrl": "https://degrandi.bandcamp.com/album/testa-dura",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Alfie Allen & Max Marshall"
+      },
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      }
+    ],
+    "note": "*Call Super & Parris remix mastered by Beau Thomas",
+    "order": 7,
+    "visible": true
+  },
+  {
+    "id": "humedo",
+    "catalog": "TRA026",
+    "album": "Húmedo",
+    "artists": [
+      "brenda"
+    ],
+    "date": "2025-08-22",
+    "bcImageId": "a2026549777",
+    "purchaseUrl": "https://brendaa.bandcamp.com/album/h-medo",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Beau Thomas at Ten Eight Seven"
+      },
+      {
+        "role": "Artwork",
+        "name": "cmdp.fk"
+      }
+    ],
+    "note": "*Convextion remix is available only on Bandcamp",
+    "order": 8,
+    "visible": true
+  },
+  {
+    "id": "split-3",
+    "catalog": "TRA025",
+    "album": "Split 3",
+    "artists": [
+      "anthony-naples",
+      "pariah"
+    ],
+    "date": "2025-07-24",
+    "bcImageId": "a0750972864",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/split-3",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mixed by",
+        "name": "David Kennedy aka Pearson Sound"
+      },
+      {
+        "role": "'Mantequilla' Mastered by",
+        "name": "Matt Colton"
+      },
+      {
+        "role": "'Perk' Mastered by",
+        "name": "Beau Thomas"
+      },
+      {
+        "role": "Artwork by",
+        "name": "Phillip Windly Kim"
+      }
+    ],
+    "note": "",
+    "order": 9,
+    "visible": true
+  },
+  {
+    "id": "a-tropical-entropy",
+    "catalog": "TRA028",
+    "album": "A Tropical Entropy",
+    "artists": [
+      "nick-leon"
+    ],
+    "date": "2025-06-27",
+    "bcImageId": "a4155131059",
+    "purchaseUrl": "https://nicknoexit.bandcamp.com/album/a-tropical-entropy",
+    "listenUrl": "",
+    "credits": [],
+    "note": "Programmed & Mixed by Nick León\n\nArtwork by Ezra Miller\n\nDesign & Art Direction by Caterina Haddad\n\nAdditional Mixing by James Rand on 1,4,8,9,11\n\nMastered by Beau Thomas\n\nBikini Mastered by Rashad Becker",
+    "order": 10,
+    "visible": true
+  },
+  {
+    "id": "no-pare-sigue-sigue-3",
+    "catalog": "",
+    "album": "no pare, sigue sigue 3",
+    "artists": [
+      "various-artists"
+    ],
+    "date": "2024-11-15",
+    "bcImageId": "a1467953008",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/no-pare-sigue-sigue-3",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Cover art and concept",
+        "name": "Tarcilongo"
+      },
+      {
+        "role": "Additional design",
+        "name": "Julian Guzman"
+      }
+    ],
+    "note": "All NRG programmed by artistas que nos traman mucho",
+    "order": 11,
+    "visible": true
+  },
+  {
+    "id": "desde-los-oidos-de-un-sapo",
+    "catalog": "",
+    "album": "Desde los oídos de un sapo",
+    "artists": [
+      "lechuga-zafiro"
+    ],
+    "date": "2024-10-18",
+    "bcImageId": "a1937582818",
+    "purchaseUrl": "https://lechugazafiro.bandcamp.com/album/desde-los-o-dos-de-un-sapo",
+    "listenUrl": "",
+    "credits": [],
+    "note": "All nrg recorded, programmed and mixed by Lechuga Zafiro in Uruguay.\n\nMastered by Rashad Becker\n\nCover design by Weirdcore\n\nPhoto by Bruno Gentile\n\nDesign layout by Jimena Madero",
+    "order": 12,
+    "visible": true
+  },
+  {
+    "id": "split-2",
+    "catalog": "",
+    "album": "Split 2",
+    "artists": [
+      "aquarian",
+      "hodge"
+    ],
+    "date": "2024-08-22",
+    "bcImageId": "a0268697124",
+    "purchaseUrl": "https://aquariandekmantel.bandcamp.com/album/split-2",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Phillip Windly Kim"
+      },
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      }
+    ],
+    "note": "",
+    "order": 13,
+    "visible": true
+  },
+  {
+    "id": "bikini",
+    "catalog": "",
+    "album": "Bikini",
+    "artists": [
+      "nick-leon",
+      "erika-de-casier"
+    ],
+    "date": "2024-07-26",
+    "bcImageId": "a1690245655",
+    "purchaseUrl": "https://nicknoexit.bandcamp.com/track/bikini",
+    "listenUrl": "",
+    "credits": [],
+    "note": "Produced by Nick León, Sammy\n\nVocals by Erika de Casier\n\nWritten by Nick León, Erika de Casier, Sammy\n\nMixed by James Rand\n\nMastered by Rashad Becker\n\nArtwork by Ezra Miller",
+    "order": 14,
+    "visible": true
+  },
+  {
+    "id": "mecha",
+    "catalog": "",
+    "album": "Mecha",
+    "artists": [
+      "doctor-jeep"
+    ],
+    "date": "2024-07-05",
+    "bcImageId": "a1519123361",
+    "purchaseUrl": "https://doctorjeep.bandcamp.com/album/mecha",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Cmdp"
+      }
+    ],
+    "note": "",
+    "order": 15,
+    "visible": true
+  },
+  {
+    "id": "split-1",
+    "catalog": "",
+    "album": "Split 1",
+    "artists": [
+      "tsvi",
+      "dj-babatr"
+    ],
+    "date": "2024-06-05",
+    "bcImageId": "a3492978097",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/split-1",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Phillip Windly Kim"
+      },
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      }
+    ],
+    "note": "",
+    "order": 16,
+    "visible": true
+  },
+  {
+    "id": "ruido-y-flor",
+    "catalog": "AMBIE—TÓN001",
+    "album": "Ruido y Flor",
+    "artists": [
+      "ezmeralda"
+    ],
+    "date": "2024-05-07",
+    "bcImageId": "a1899094188",
+    "purchaseUrl": "https://eezzmmeerraallddaa.bandcamp.com/album/ruido-y-flor",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Jonathan Castro Alejos"
+      },
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      }
+    ],
+    "note": "** Shipping costs have got a bit crazy recently and we know times are tough so we looked into it and cheaper shipping is available. If you want to opt for the more affordable service, please put a note in the order form when checking out and we’ll get in touch. Please note however it can take up to four weeks outside of Europe (within Europe, it’s seven working days), and does not come with tracking so shipping is entirely at your own risk.",
+    "order": 17,
+    "visible": true
+  },
+  {
+    "id": "cilicio",
+    "catalog": "",
+    "album": "Cilicio",
+    "artists": [
+      "maoupa-mazzocchetti"
+    ],
+    "date": "2024-03-29",
+    "bcImageId": "a0043563240",
+    "purchaseUrl": "https://maoupamazzocchetti.bandcamp.com/album/cilicio",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Callum Bridge"
+      },
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      }
+    ],
+    "note": "",
+    "order": 18,
+    "visible": true
+  },
+  {
+    "id": "no-pare-sigue-sigue-2",
+    "catalog": "TRA017",
+    "album": "no pare, sigue sigue 2",
+    "artists": [
+      "various-artists"
+    ],
+    "date": "2024-02-09",
+    "bcImageId": "a0958497668",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/no-pare-sigue-sigue-2",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Julián Guzman"
+      },
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      }
+    ],
+    "note": "All NRG programmed by sound designers from Latino América, África and Europa.",
+    "order": 19,
+    "visible": true
+  },
+  {
+    "id": "pa-bailar",
+    "catalog": "TRA016",
+    "album": "Pa' Bailar",
+    "artists": [
+      "luca-duran"
+    ],
+    "date": "2023-09-22",
+    "bcImageId": "a3311930924",
+    "purchaseUrl": "https://lucaduran.bandcamp.com/album/pa-bailar",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Wurdex"
+      }
+    ],
+    "note": "All NRG programmed by Luca Durán, Parco Palaz, Perko & Laksa between Zurich, Copenhagen and London | 2023.",
+    "order": 20,
+    "visible": true
+  },
+  {
+    "id": "gueto-club",
+    "catalog": "TRA015",
+    "album": "GUETO CLUB",
+    "artists": [
+      "badsista"
+    ],
+    "date": "2023-08-18",
+    "bcImageId": "a0124089310",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/gueto-club",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Julián Guzmán"
+      }
+    ],
+    "note": "All NRG programmed by Badsista, DJ Marfox & Batu between Sao Paulo, Lisboa & Bristol | 2022 – 2023.",
+    "order": 21,
+    "visible": true
+  },
+  {
+    "id": "drumtratrax",
+    "catalog": "TRA014",
+    "album": "DrumTraTrax",
+    "artists": [
+      "3-phaz"
+    ],
+    "date": "2023-05-26",
+    "bcImageId": "a0368431480",
+    "purchaseUrl": "https://3phaz.bandcamp.com/album/drumtratrax",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Cmdp.fk"
+      }
+    ],
+    "note": "All NRG programmed by 3Phaz, Amazondotcom, E-Saggila, ZULI & OMAAR, between El Cairo, Montreal, el Estado de México & Los Ángeles 2022 – 2023.",
+    "order": 22,
+    "visible": true
+  },
+  {
+    "id": "push-the-body",
+    "catalog": "TRA013",
+    "album": "Push The Body",
+    "artists": [
+      "doctor-jeep"
+    ],
+    "date": "2023-03-31",
+    "bcImageId": "a1526563724",
+    "purchaseUrl": "https://doctorjeep.bandcamp.com/album/push-the-body",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Sometimes Always"
+      }
+    ],
+    "note": "All NRG programmed by Doctor Jeep, Aquarian, Hodge & Sam Binga between NYC, Berlin & Bristol 2022 – 2023",
+    "order": 23,
+    "visible": true
+  },
+  {
+    "id": "32-balas",
+    "catalog": "TRA012",
+    "album": "32 Balas",
+    "artists": [
+      "tomas-urquieta"
+    ],
+    "date": "2023-02-17",
+    "bcImageId": "a1736008550",
+    "purchaseUrl": "https://tomasurquieta.bandcamp.com/album/32-balas",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Otis Verhoeve"
+      }
+    ],
+    "note": "All NRG programmed by Tomás Urquieta, re:ni, Rhyw and Siu Mata & Amor Satyr between NYC, Berlin, London and Paris 2021 – 2022",
+    "order": 24,
+    "visible": true
+  },
+  {
+    "id": "no-pare-sigue-sigue",
+    "catalog": "TRA010",
+    "album": "no pare, sigue sigue",
+    "artists": [
+      "various-artists"
+    ],
+    "date": "2022-11-18",
+    "bcImageId": "a0870303707",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/no-pare-sigue-sigue",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Weirdcore"
+      },
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      }
+    ],
+    "note": "All NRG programmed by latinxs + diáspora sudaca 2021 – 2022",
+    "order": 25,
+    "visible": true
+  },
+  {
+    "id": "burundanger",
+    "catalog": "TRA011",
+    "album": "Burundanger",
+    "artists": [
+      "quixosis"
+    ],
+    "date": "2022-09-30",
+    "bcImageId": "a0768083075",
+    "purchaseUrl": "https://quixosis.bandcamp.com/album/burundanger",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "pktwidz"
+      }
+    ],
+    "note": "All NRG programmed by Quixosis, Mike Parker, Cando & Flore between Quito, Buffalo, Bristol & Lyon 2021 – 2022",
+    "order": 26,
+    "visible": true
+  },
+  {
+    "id": "xtasis",
+    "catalog": "TRA009",
+    "album": "Xtasis",
+    "artists": [
+      "nick-leon"
+    ],
+    "date": "2022-07-29",
+    "bcImageId": "a0875263199",
+    "purchaseUrl": "https://nicknoexit.bandcamp.com/album/xtasis",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph + Matt Coltton on Pearson Sound remix"
+      },
+      {
+        "role": "Artwork",
+        "name": "Shinzo Noda"
+      }
+    ],
+    "note": "All NRG programmed by Nick León, DJ Babatr, Pearson Sound & Doctor Jeep between Miami, Caracas, NY, London 2021 – 2022",
+    "order": 27,
+    "visible": true
+  },
+  {
+    "id": "pliegues",
+    "catalog": "TRA008",
+    "album": "Pliegues",
+    "artists": [
+      "dngdngdng",
+      "prisma"
+    ],
+    "date": "2022-05-27",
+    "bcImageId": "a2633652957",
+    "purchaseUrl": "https://denguedenguedengue.bandcamp.com/album/pliegues-4",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Sonja Camara"
+      }
+    ],
+    "note": "All NRG programmed by Dengue Dengue Dengue, Prisma, DJ Python, Verraco between Berlin, New York & Medallo 2021 – 2022 |  www.tratratrax.com",
+    "order": 28,
+    "visible": true
+  },
+  {
+    "id": "fervor",
+    "catalog": "TRA007",
+    "album": "Fervor",
+    "artists": [
+      "pvssy",
+      "entranas"
+    ],
+    "date": "2022-03-11",
+    "bcImageId": "a1963360449",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/fervor",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Paula de Álvaro"
+      }
+    ],
+    "note": "All NRG programmed by PVSSY, Entrañas, Lechuga Zafiro, Menzi between Sur América & Sur África, 2021 – 2022 |  www.insurgentes.co",
+    "order": 29,
+    "visible": true
+  },
+  {
+    "id": "sentimientos-encontrados",
+    "catalog": "TRA006",
+    "album": "Sentimientos Encontrados",
+    "artists": [
+      "nicola-cruz"
+    ],
+    "date": "2021-11-05",
+    "bcImageId": "a1090765361",
+    "purchaseUrl": "https://nicolacruz.bandcamp.com/album/sentimientos-encontrados",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Pedro Ajo"
+      }
+    ],
+    "note": "All nrg programmed by Nicola Cruz, Isabella Lovestory and Ehua between Quito, Montreal and London. Additional keys on 'O sea, sí te quiero' by Juan Diego Illescas",
+    "order": 30,
+    "visible": true
+  },
+  {
+    "id": "rompediscoteka",
+    "catalog": "TRA005",
+    "album": "Rompediscoteka",
+    "artists": [
+      "nick-leon"
+    ],
+    "date": "2021-10-01",
+    "bcImageId": "a3617841964",
+    "purchaseUrl": "https://nicknoexit.bandcamp.com/album/rompediscoteka",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Colin Dörffler"
+      }
+    ],
+    "note": "Programmed by Nick León, Henzo, Kelman Duran, Maral between USA, UK & Sur América, 2021",
+    "order": 31,
+    "visible": true
+  },
+  {
+    "id": "noche-de-rosas",
+    "catalog": "TRA004",
+    "album": "Noche de Rosas",
+    "artists": [
+      "luca-duran"
+    ],
+    "date": "2021-07-23",
+    "bcImageId": "a0831901247",
+    "purchaseUrl": "https://lucaduran.bandcamp.com/album/noche-de-rosas",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Seph"
+      },
+      {
+        "role": "Artwork",
+        "name": "Sonja Camara"
+      }
+    ],
+    "note": "All NRG programmed by Luca Durán, Parco Palaz, Badsista, Ikonika between Europe & Sur América, 2021 |  www.insurgentes.co",
+    "order": 32,
+    "visible": true
+  },
+  {
+    "id": "negro-in-negro",
+    "catalog": "TRA003",
+    "album": "Negro in Negro",
+    "artists": [
+      "octubrxlibrv"
+    ],
+    "date": "2021-02-19",
+    "bcImageId": "a1923408274",
+    "purchaseUrl": "https://octubrxlibrv.bandcamp.com/album/negro-in-negro",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Sebastián Galante"
+      },
+      {
+        "role": "Artwork",
+        "name": "Cmdp"
+      }
+    ],
+    "note": "Programmed by OCTUBRXLIBRV + Florentino + AYA between Colombia & UK, 2020 — 2021 |  www.insurgentes.co",
+    "order": 33,
+    "visible": true
+  },
+  {
+    "id": "fuego-clandestino",
+    "catalog": "TRA002",
+    "album": "Fuego Clandestino",
+    "artists": [
+      "bitter-babe",
+      "nick-leon"
+    ],
+    "date": "2020-11-27",
+    "bcImageId": "a0034221111",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/fuego-clandestino",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Sebastián Galante"
+      },
+      {
+        "role": "Artwork",
+        "name": "Pedro Ajo"
+      }
+    ],
+    "note": "Programed by Bitter Babe x Nick León + Simo Cell between Miami, Bogotá & París, 2020",
+    "order": 34,
+    "visible": true
+  },
+  {
+    "id": "evg-en-el-mapa",
+    "catalog": "TRA001",
+    "album": "EVG en el mapa",
+    "artists": [
+      "dj-pai"
+    ],
+    "date": "2020-07-02",
+    "bcImageId": "a3264574335",
+    "purchaseUrl": "https://tratratrax.bandcamp.com/album/evg-en-el-mapa",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Mastering",
+        "name": "Sebastián Galante"
+      },
+      {
+        "role": "Artwork",
+        "name": "Pedro Ajo"
+      }
+    ],
+    "note": "All energy programmed by DJ Pai en la Loma del Chocho, 2019 - 2020 |  www.insurgentes.co",
+    "order": 35,
+    "visible": true
+  }
+]

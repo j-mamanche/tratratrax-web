@@ -1,0 +1,44 @@
+<!-- ============================================================
+     CARGO — HOME  [id="L4057471394"]
+     Snapshot 2026-07-27
+
+     El "disco": 4 carátulas + 1 idle apiladas en el mismo punto, todas
+     rotadas 330° y a scale 50%, con un overlay de CD encima (z-index 5,
+     pointer-events none) que da la ilusión del disco.
+
+     ⚠️ La clase `hover-reveal-module` hace que ADEMÁS del script dedicado
+     ("HOVER CARÁTULA") se le enganche el primer script genérico del HTML
+     global, que en mouseenter muestra un item AL AZAR y en mouseleave
+     esconde todo. Los dos scripts compiten por el mismo elemento.
+
+     ⚠️ El primer .hover-item y el .hover-item--idle usan el MISMO hash
+     (W2854683496348920639726698313930).
+
+     ⚠️ href="google.com" en el overlay es placeholder — y es relativo,
+     resolvería a /google.com. Inofensivo porque pointer-events:none.
+     ============================================================ -->
+
+<div class="hover-system">
+  <div class="hover-reveal-module">
+    <div class="hover-reveal-stack">
+      <div class="hover-item">
+        <media-item animate="0.3" class="hover-media" disable-zoom="true" hash="W2854683496348920639726698313930" rotation="330" scale="50%" uses="rotation"></media-item>
+      </div>
+      <div class="hover-item hover-item--idle">
+        <media-item animate="0.3" class="hover-media" disable-zoom="true" hash="W2854683496348920639726698313930" rotation="330" scale="50%" uses="rotation"></media-item>
+      </div>
+      <div class="hover-item">
+        <media-item animate="0.3" class="hover-media" disable-zoom="true" hash="S2854683496385814127874117417162" rotation="330" scale="50%" uses="rotation"></media-item>
+      </div>
+      <div class="hover-item">
+        <media-item animate="0.3" class="hover-media" disable-zoom="true" hash="S2854683496367367383800407865546" rotation="330" scale="50%" uses="rotation"></media-item>
+      </div>
+      <div class="hover-item">
+        <media-item animate="0.3" class="hover-media" disable-zoom="true" hash="F2854683496404260871947826968778" rotation="330" scale="50%" uses="rotation"></media-item>
+      </div>
+      <div class="hover-overlay-item">
+        <media-item class="overlay-media" disable-zoom="true" hash="N2854671466341666458190031042762" href="google.com" scale="50%"></media-item>
+      </div>
+    </div>
+  </div>
+</div>

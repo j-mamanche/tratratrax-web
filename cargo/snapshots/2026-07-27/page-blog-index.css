@@ -1,0 +1,40 @@
+/* ============================================================
+   CARGO — BLOG (índice)  [id="T2278312101"]
+   Snapshot 2026-07-27
+   Geometría: bordes izq/der/abajo + radio ABAJO → baja desde arriba.
+   ============================================================ */
+
+[id="T2278312101"] .page-content {
+	background-color: #ffffff;
+	border-right-width: 0.1rem;
+	border-color: #000000;
+	border-radius: 0rem;
+	border-top-width: 0rem;
+	border-bottom-width: 0.1rem;
+	border-left-width: 0.1rem;
+	border-bottom-left-radius: 1rem;
+	border-bottom-right-radius: 1rem;
+}
+
+[id="T2278312101"].page {
+	min-height: auto;
+}
+
+[id="T2278312101"] .page-layout {
+	max-width: 55%;
+}
+
+[id="T2278312101"] column-set {
+	align-items: center;
+}
+
+/* ⚠️ REGLA MUERTA: `[id="…"] .page` es un selector de DESCENDIENTE,
+   pero el id ES el .page. Debería ser `[id="…"].page` (sin espacio),
+   como la regla de min-height de arriba. El fade de transición nunca aplica. */
+[id="T2278312101"] .page {
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+[id="T2278312101"] .page.is-transitioning {
+  opacity: 0;
+}

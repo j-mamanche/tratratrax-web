@@ -1,0 +1,17 @@
+{
+  "name": "tratratrax-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Contenido, widgets y herramienta de gestión del sitio TraTraTrax (Cargo.site)",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "npm run validate && astro build",
+    "preview": "astro preview",
+    "validate": "node tools/validate.mjs",
+    "import": "node tools/bandcamp-import.mjs"
+  },
+  "devDependencies": {
+    "astro": "^5.13.0"
+  }
+}

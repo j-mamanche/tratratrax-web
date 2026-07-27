@@ -1,0 +1,31 @@
+/* ============================================================
+   CARGO — BLOG (entrada)  [id="N0681261848"]
+   Snapshot 2026-07-27
+   Geometría: bordes arriba/izq/der + radio ARRIBA → sube desde abajo,
+   igual que las páginas de merch. La entrada tapa el índice.
+   ============================================================ */
+
+[id="N0681261848"] .page-content {
+	background-color: #ffffff;
+	border-left-width: 0.1rem;
+	border-color: #000000;
+	border-radius: 0rem;
+	border-top-left-radius: 1rem;
+	border-top-right-radius: 1rem;
+	border-right-width: 0.1rem;
+	border-top-width: 0.1rem;
+	align-items: flex-start;
+}
+
+[id="N0681261848"].page {
+	min-height: var(--viewport-height);
+}
+
+[id="N0681261848"] .page-layout {
+	padding-top: 5rem;
+	max-width: 55%;
+	padding-left: 0rem;
+	padding-right: 0rem;
+	padding-bottom: 0rem;
+	align-items: flex-start;
+}
