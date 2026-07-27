@@ -1,0 +1,233 @@
+/* El catálogo: el carril horizontal y el acordeón.
+   Todo cuelga de [data-ttx='catalogo']. */
+
+/* ── El carril ────────────────────────────────────────────────────────
+   El gesto de dedo con inercia, el trackpad de dos dedos y la scrollbar
+   oculta son nativos. El JS solo agrega arrastre con mouse, rueda y
+   flechas. Nada de marquee. */
+[data-ttx='catalogo'] .ttx-carril {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  cursor: grab;
+  outline-offset: -2px;
+}
+
+[data-ttx='catalogo'] .ttx-carril::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mientras dura un gesto —arrastre o rueda— el snap pelea contra él y
+   devuelve el carril a donde estaba. Se apaga y vuelve al soltar. */
+[data-ttx='catalogo'] .ttx-carril[data-gesto] {
+  scroll-snap-type: none;
+}
+
+[data-ttx='catalogo'] .ttx-carril[data-arrastrando] {
+  cursor: grabbing;
+}
+
+/* ── El ítem ──────────────────────────────────────────────────────────
+   Dos filas de alto fijo compartido: la etiqueta y el cuerpo. Como todos
+   los ítems usan el mismo `--ttx-banda-h`, la fila de etiquetas se lee
+   como una sola franja blanca continua — que es la banda del stack, solo
+   que repartida para que cada una viaje con su columna. */
+[data-ttx='catalogo'] .ttx-item {
+  flex: 0 0 var(--ttx-w-item);
+  display: grid;
+  grid-template-rows: var(--ttx-banda-h) minmax(0, 1fr);
+  min-width: 0;
+  overflow: hidden;
+  scroll-snap-align: start;
+  background: var(--ttx-papel);
+  border-left: 1px solid var(--ttx-linea);
+  transition: flex-basis var(--ttx-dur) var(--ttx-ease);
+}
+
+[data-ttx='catalogo'] .ttx-item:first-child {
+  border-left: 0;
+}
+
+/* El acordeón. Un solo cambio de `flex-basis`: el ítem abierto crece y
+   empuja a los demás, sin una sola altura calculada en JS. */
+[data-ttx='catalogo'] .ttx-item[data-abierto] {
+  flex-basis: calc(var(--ttx-w-item) + var(--ttx-panel-w));
+}
+
+/* ── La etiqueta ──────────────────────────────────────────────────────
+   `TRA 031 · PYREXIA · EHUA & FLORE`, sin separadores en el contenido:
+   los espacios y las rayas son cosa del CSS, como en el sitio viejo. */
+[data-ttx='catalogo'] .ttx-etiqueta {
+  display: flex;
+  align-items: center;
+  gap: var(--ttx-etiqueta-gap, 0);
+  width: 100%;
+  height: 100%;
+  padding: 0 0.5rem;
+  font-size: var(--ttx-chrome);
+  line-height: 1;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+[data-ttx='catalogo'] .ttx-cat::after,
+[data-ttx='catalogo'] .ttx-album::after {
+  content: var(--ttx-etiqueta-sep, '');
+}
+
+[data-ttx='catalogo'] .ttx-album {
+  font-weight: 700;
+}
+
+[data-ttx='catalogo'] .ttx-artistas {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── El cuerpo: panel + carátula ──────────────────────────────────────
+   El panel arranca en cero y se abre a la izquierda de la carátula. Su
+   contenido tiene ancho propio (`.ttx-panel-col`), así que no se
+   reacomoda mientras la gaveta se abre. */
+[data-ttx='catalogo'] .ttx-cuerpo {
+  display: flex;
+  min-height: 0;
+  background: var(--ttx-papel);
+}
+
+[data-ttx='catalogo'] .ttx-panel {
+  flex: 0 0 0px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  transition: flex-basis var(--ttx-dur) var(--ttx-ease);
+}
+
+[data-ttx='catalogo'] .ttx-panel::-webkit-scrollbar {
+  display: none;
+}
+
+[data-ttx='catalogo'] .ttx-item[data-abierto] .ttx-panel {
+  flex-basis: var(--ttx-panel-w);
+}
+
+[data-ttx='catalogo'] .ttx-panel-col {
+  width: var(--ttx-panel-w);
+  padding: 0 1.25rem 1.5rem 0.5rem;
+  font-size: var(--ttx-cuerpo-fs);
+  line-height: 1.45;
+}
+
+[data-ttx='catalogo'] .ttx-cover {
+  flex: 0 0 var(--ttx-w-item);
+  width: var(--ttx-w-item);
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ── El contenido del panel ───────────────────────────────────────────
+   Según la ref: CRÉDITOS · la fecha · las líneas `Rol__ Valor` · la nota ·
+   los enlaces. Sin párrafo editorial y sin player: se descartaron. */
+[data-ttx='catalogo'] .ttx-titulo-panel {
+  font-size: var(--ttx-chrome);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+[data-ttx='catalogo'] .ttx-creditos {
+  margin-top: 1em;
+}
+
+[data-ttx='catalogo'] .ttx-rol {
+  white-space: nowrap;
+}
+
+[data-ttx='catalogo'] .ttx-nota {
+  margin-top: 1em;
+}
+
+[data-ttx='catalogo'] .ttx-enlaces {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9em;
+  margin-top: 2em;
+}
+
+[data-ttx='catalogo'] .ttx-enlace {
+  font-size: var(--ttx-chrome);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+[data-ttx='catalogo'] .ttx-enlace:hover,
+[data-ttx='catalogo'] .ttx-enlace:focus-visible {
+  text-decoration: underline;
+}
+
+/* El enlace nombra el álbum para que un lector de pantalla lo entienda
+   fuera de contexto; en pantalla solo se lee PURCHASE / LISTEN. */
+[data-ttx] .ttx-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── Teléfono ─────────────────────────────────────────────────────────
+   En una pantalla alta y angosta el ítem cuadrado no cabe: la columna
+   queda mucho más alta que ancha y `object-fit: cover` se comería la
+   mitad de la carátula. Aquí la carátula deja de llenar la fila y se
+   queda cuadrada, centrada en su banda. */
+@media (max-width: 46rem) {
+  [data-ttx='catalogo'] {
+    --ttx-w-max: 78vw;
+  }
+
+  /* El acordeón se vuelve vertical: el ítem no crece a lo ancho y el panel
+     se abre debajo de la carátula. Es el único cambio que hace falta —
+     el resto del widget no se entera. */
+  [data-ttx='catalogo'] .ttx-item[data-abierto] {
+    flex-basis: var(--ttx-w-item);
+  }
+
+  [data-ttx='catalogo'] .ttx-cuerpo {
+    flex-direction: column;
+  }
+
+  [data-ttx='catalogo'] .ttx-cover {
+    order: -1; /* la carátula arriba, los créditos debajo */
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  [data-ttx='catalogo'] .ttx-panel {
+    flex: 0 1 0px;
+  }
+
+  [data-ttx='catalogo'] .ttx-item[data-abierto] .ttx-panel {
+    flex-basis: 100%; /* se encoge hasta lo que sobre bajo la carátula */
+  }
+
+  [data-ttx='catalogo'] .ttx-panel-col {
+    width: 100%;
+    padding: 0.75rem 0.5rem 1rem;
+  }
+}

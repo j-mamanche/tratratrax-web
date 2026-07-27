@@ -1,0 +1,167 @@
+/* Todo va scopeado bajo [data-ttx]. Nunca global.
+   El CSS de Cargo es agresivo y pisa estilos; y al revés, un widget nuestro
+   no puede romper la página donde el equipo lo pegue. */
+
+[data-ttx] {
+  /* ── Geometría del stack ─────────────────────────────────────────────
+     Home y catálogo son la misma maquetación con otro `--ttx-visor-h` y
+     otro `--ttx-visor-fx`. Estas dos variables son el punto de calibración
+     de Silvi: se pisan desde el CSS de la página de Cargo sin tocar el
+     widget. */
+  --ttx-alto: 100svh;
+  --ttx-visor-h: clamp(64px, 16%, 190px);
+  --ttx-banda-h: 1.45rem;
+
+  /* Ancho del ítem del carril. `--ttx-cuerpo-h` la escribe el JS al medir
+     el alto de la fila: un ítem cerrado es cuadrado, como su carátula.
+     `--ttx-w-max` evita que en un teléfono el ítem sea más ancho que la
+     pantalla. */
+  --ttx-w-max: 88vw;
+  --ttx-w-item: min(var(--ttx-cuerpo-h, 40vh), var(--ttx-w-max));
+  --ttx-panel-w: 21rem;
+
+  /* ── Movimiento ───────────────────────────────────────────────────── */
+  --ttx-dur: 0.5s;
+  --ttx-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* ── Efecto del visor ─────────────────────────────────────────────── */
+  --ttx-visor-fx: blur(26px) saturate(1.2);
+
+  /* ── Color ────────────────────────────────────────────────────────── */
+  --ttx-tinta: #000;
+  --ttx-papel: #fff;
+  --ttx-linea: rgba(0, 0, 0, 0.22);
+
+  /* ── Tipografía ───────────────────────────────────────────────────── */
+  /* La del sitio. Cargo ya carga Monument Grotesk; heredamos y solo
+     fijamos tamaños, que es lo único que el chrome necesita. */
+  --ttx-chrome: clamp(9px, 0.72vw, 11px);
+  --ttx-cuerpo-fs: clamp(11px, 0.78vw, 13px);
+
+  color: var(--ttx-tinta);
+  background: var(--ttx-papel);
+}
+
+[data-ttx],
+[data-ttx] *,
+[data-ttx] *::before,
+[data-ttx] *::after {
+  box-sizing: border-box;
+}
+
+/* Neutralizar lo que el CSS global de Cargo le pone a estos elementos. */
+[data-ttx] :is(p, h1, h2, h3, h4, ul, ol, li, figure) {
+  margin: 0;
+  padding: 0;
+}
+[data-ttx] :is(ul, ol) {
+  list-style: none;
+}
+[data-ttx] img {
+  display: block;
+  max-width: 100%;
+}
+[data-ttx] button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+[data-ttx] a {
+  color: inherit;
+}
+
+/* ── El stack: visor · banda · contenido ──────────────────────────────
+   La banda del contenedor es opcional; si el widget no la crea, la fila
+   `auto` colapsa a cero. El catálogo no la usa porque ahí cada ítem lleva
+   su etiqueta, que tiene que ir alineada con su propia columna.
+
+   Las filas van asignadas a mano: sin banda, la colocación automática
+   metería el contenido en la fila 2 y dejaría la 3 vacía. */
+[data-ttx].ttx-stack {
+  display: grid;
+  grid-template-rows: var(--ttx-visor-h) auto minmax(0, 1fr);
+  height: var(--ttx-alto);
+  overflow: hidden;
+}
+
+
+/* ── El visor ─────────────────────────────────────────────────────────
+   Dos capas de la misma imagen: la de arriba invertida y en
+   `mix-blend-mode: luminosity`. El resultado toma la luminancia invertida
+   de arriba y el matiz de abajo — invertido de luminosidad, no de color.
+
+   `isolation: isolate` no es opcional: sin él, el blend se come el fondo
+   de la página de Cargo. */
+.ttx-visor {
+  grid-row: 1;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--ttx-papel);
+}
+
+.ttx-visor-capa {
+  position: absolute;
+  /* El blur difumina también los bordes: sin el desborde quedan
+     transparentes contra el papel. */
+  inset: -4%;
+  background-image: var(--ttx-visor-img);
+  background-size: cover;
+  background-position: center;
+  filter: var(--ttx-visor-fx);
+}
+
+.ttx-visor-inv {
+  filter: invert(1) var(--ttx-visor-fx);
+  mix-blend-mode: luminosity;
+}
+
+/* Sin imagen todavía: papel limpio, no un rectángulo gris. */
+[data-ttx]:not([style*='--ttx-visor-img']) .ttx-visor-capa {
+  opacity: 0;
+}
+
+/* ── La banda del contenedor ──────────────────────────────────────────
+   Proyección del ítem activo. Nunca contenido propio. */
+.ttx-banda {
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-height: var(--ttx-banda-h);
+  padding: 0 0.5rem;
+  font-size: var(--ttx-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ttx-contenido {
+  grid-row: 3;
+  min-height: 0;
+}
+
+/* ── Estados del loader ───────────────────────────────────────────────── */
+[data-ttx][data-ttx-estado='montando'] {
+  min-height: var(--ttx-visor-h);
+}
+
+.ttx-error {
+  padding: 1rem;
+  font-size: var(--ttx-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ttx] * {
+    transition-duration: 0.01ms !important;
+  }
+}

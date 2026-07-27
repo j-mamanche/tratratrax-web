@@ -42,6 +42,22 @@ Ahora el catálogo es un `<div>` que llenamos nosotros, con `overflow-x: auto` y
   Viene así del HTML de Cargo. El validador lo avisa; falta que el sello decida.
 - El blog es contenido placeholder. About no existe todavía.
 
+## Los widgets
+
+`src/widgets/` es lo que corre dentro de Cargo: JS sin framework, bundle IIFE
+(no ESM — `document.currentScript` es `null` en un módulo, y de ahí sale la URL
+de los datos y del CSS). `npm run build:widgets` los compila a `public/`, que es
+**generado y no se versiona**.
+
+El stack de tres bandas —visor · banda · contenido— vive en `_runtime/stack.js`
+y `tokens.css`. Antes de maquetar una pantalla nueva, partir de ahí: home,
+catálogo y merca son la misma maquetación con otro `--ttx-visor-h` y otro
+`--ttx-visor-fx`.
+
+**Calibrar es poner variables en el placeholder**, no editar el widget. Un
+`style` inline le gana al CSS global de Cargo, que es lo único que siempre
+funciona allá.
+
 ## Al terminar cualquier cambio en `data/`
 
 ```bash

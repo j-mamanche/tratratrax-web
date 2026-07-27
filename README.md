@@ -23,8 +23,38 @@ npm run dev        # abre el tablero de datos en localhost:4321
 |---|---|
 | `npm run dev` | Levanta el tablero de estado de los datos |
 | `npm run validate` | Revisa `data/*.json` — errores y avisos |
-| `npm run build` | Valida y compila (falla si hay errores) |
+| `npm run build:widgets` | Compila los widgets a `public/` |
+| `npm run build` | Valida, compila widgets y sitio (falla si hay errores) |
 | `npm run import -- <url>` | Trae un release desde Bandcamp |
+
+---
+
+## El widget de catálogo
+
+Se ve corriendo, con los datos reales y el mismo bundle que carga Cargo, en
+**`/preview/catalogo`** (`npm run dev` y abrir esa ruta).
+
+Es el stack de tres bandas: **visor** arriba (la carátula del ítem activo,
+difuminada e invertida de luminosidad), la franja de **etiquetas** en la
+mitad, y el **carril** de carátulas abajo. Al hacer clic en una etiqueta el
+release se abre y empuja a los demás; el visor sigue a lo que cruza el centro
+del carril.
+
+Qué se pega en Cargo y cómo se calibra sin tocar código:
+**[cargo/snippets/catalogo.md](cargo/snippets/catalogo.md)**.
+
+```
+src/widgets/
+├── index.js            Entrada del bundle
+├── tokens.css          Variables y el stack. Todo scopeado a [data-ttx]
+├── _runtime/
+│   ├── mount.js        Loader + MutationObserver (Cargo navega por AJAX)
+│   ├── datos.js        Un solo fetch de data/*.json por página
+│   ├── stack.js        Visor · banda · contenido, y la proyección
+│   ├── hscroll.js      Arrastre, rueda y flechas. El resto es nativo
+│   └── format.js       Rol__ Valor, fechas, URLs de carátula
+└── catalogo/           El widget
+```
 
 ---
 

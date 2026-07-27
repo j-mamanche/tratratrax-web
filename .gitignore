@@ -6,3 +6,6 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Generado por tools/build-widgets.mjs
+public/

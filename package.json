@@ -6,12 +6,16 @@
   "description": "Contenido, widgets y herramienta de gestión del sitio TraTraTrax (Cargo.site)",
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run validate && astro build",
+    "build": "npm run validate && npm run build:widgets && astro build",
+    "build:widgets": "node tools/build-widgets.mjs",
     "preview": "astro preview",
     "validate": "node tools/validate.mjs",
-    "import": "node tools/bandcamp-import.mjs"
+    "import": "node tools/bandcamp-import.mjs",
+    "predev": "npm run build:widgets",
+    "prepreview": "npm run build:widgets"
   },
   "devDependencies": {
-    "astro": "^5.13.0"
+    "astro": "^5.13.0",
+    "esbuild": "^0.27.7"
   }
 }
