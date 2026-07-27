@@ -8,7 +8,15 @@
      otro `--ttx-visor-fx`. Estas dos variables son el punto de calibración
      de Silvi: se pisan desde el CSS de la página de Cargo sin tocar el
      widget. */
-  --ttx-alto: 100svh;
+  /* El recorte. `--ttx-margen` es aire por los cuatro lados y `--ttx-nav-h`
+     el espacio que se reserva **abajo** para la barra de navegación. Los dos
+     entran en el alto: si no, poner aire arriba y a los lados solo empujaría
+     el widget y la página terminaría scrolleando de más. */
+  --ttx-margen: 0px;
+  --ttx-nav-h: 0px;
+  --ttx-radio: 0px;
+  --ttx-alto: calc(100svh - var(--ttx-margen) * 2 - var(--ttx-nav-h));
+
   --ttx-visor-h: clamp(64px, 16%, 190px);
   --ttx-banda-h: 1.45rem;
 
@@ -25,7 +33,10 @@
   --ttx-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
   /* ── Efecto del visor ─────────────────────────────────────────────── */
-  --ttx-visor-fx: blur(26px) saturate(1.2);
+  /* Color, no inversión: lo de arriba es el reflejo de las mismas carátulas
+     con el color subido, no una capa de otro tono. La versión con
+     `invert() + mix-blend-mode: luminosity` teñía todo de azul. */
+  --ttx-visor-fx: blur(20px) saturate(3.2) contrast(1.18);
 
   /* ── Color ────────────────────────────────────────────────────────── */
   --ttx-tinta: #000;
@@ -75,6 +86,17 @@
   color: inherit;
 }
 
+/* ── Los guiones bajos ────────────────────────────────────────────────
+   `Released__ February 20, 2026`. Con el tracking normal los guiones bajos
+   salen picados, uno a uno. El sitio viejo ya los cerraba con -0.13em para
+   que se leyeran como una sola línea continua; es el mismo valor. */
+[data-ttx] .ttx-guion {
+  display: inline-block;
+  letter-spacing: -0.13em;
+  /* Le devuelve al último guión el espacio que le quitó el tracking. */
+  margin-right: 0.15em;
+}
+
 /* ── El stack: visor · banda · contenido ──────────────────────────────
    La banda del contenedor es opcional; si el widget no la crea, la fila
    `auto` colapsa a cero. El catálogo no la usa porque ahí cada ítem lleva
@@ -86,17 +108,17 @@
   display: grid;
   grid-template-rows: var(--ttx-visor-h) auto minmax(0, 1fr);
   height: var(--ttx-alto);
+  /* El aire va por los cuatro lados, y abajo lleva además el hueco de la
+     barra de navegación. Como el alto ya los descontó, la página no crece. */
+  margin: var(--ttx-margen);
+  margin-bottom: calc(var(--ttx-margen) + var(--ttx-nav-h));
+  border-radius: var(--ttx-radio);
   overflow: hidden;
 }
 
-
 /* ── El visor ─────────────────────────────────────────────────────────
-   Dos capas de la misma imagen: la de arriba invertida y en
-   `mix-blend-mode: luminosity`. El resultado toma la luminancia invertida
-   de arriba y el matiz de abajo — invertido de luminosidad, no de color.
-
-   `isolation: isolate` no es opcional: sin él, el blend se come el fondo
-   de la página de Cargo. */
+   El reflejo del carril: las mismas carátulas, de cabeza y con el color
+   subido. Ver `_runtime/espejo.js`. */
 .ttx-visor {
   grid-row: 1;
   position: relative;
@@ -105,24 +127,58 @@
   background: var(--ttx-papel);
 }
 
-.ttx-visor-capa {
+/* El marco mide lo que el visor, no lo que el carril: así el `filter`
+   procesa una franja de pantalla y no las treinta y cinco carátulas. El
+   desborde le da material al blur para que no se desvanezca en los bordes,
+   y el `scaleY(-1)` es la bisagra — lo de arriba es lo de abajo, volteado. */
+.ttx-espejo-marco {
   position: absolute;
-  /* El blur difumina también los bordes: sin el desborde quedan
-     transparentes contra el papel. */
-  inset: -4%;
-  background-image: var(--ttx-visor-img);
-  background-size: cover;
-  background-position: center;
+  inset: -7%;
+  overflow: hidden;
+  transform: scaleY(-1);
   filter: var(--ttx-visor-fx);
 }
 
-.ttx-visor-inv {
-  filter: invert(1) var(--ttx-visor-fx);
-  mix-blend-mode: luminosity;
+.ttx-espejo-pista {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: flex;
+  will-change: transform;
+}
+
+/* La celda es del ancho de su ítem y crece con él cuando el acordeón lo
+   abre — misma transición, así que las dos capas viajan juntas. La carátula
+   se ancla a la derecha porque abajo el panel se abre a su izquierda. */
+.ttx-espejo-celda {
+  flex: 0 0 var(--ttx-w-item);
+  height: 100%;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: right top;
+  background-size: var(--ttx-w-item) auto;
+  transition: flex-basis var(--ttx-dur) var(--ttx-ease);
+}
+
+.ttx-espejo-celda[data-abierto] {
+  flex-basis: calc(var(--ttx-w-item) + var(--ttx-panel-w));
+}
+
+/* El respaldo de teléfono: ahí el carril va en vertical y un reflejo que
+   corre a lo ancho no significa nada, así que se muestra sola la carátula
+   activa. Mismo filtro, misma volteada. */
+.ttx-visor-fondo {
+  display: none;
+  position: absolute;
+  inset: -7%;
+  background-image: var(--ttx-visor-img);
+  background-size: cover;
+  background-position: center;
+  transform: scaleY(-1);
+  filter: var(--ttx-visor-fx);
 }
 
 /* Sin imagen todavía: papel limpio, no un rectángulo gris. */
-[data-ttx]:not([style*='--ttx-visor-img']) .ttx-visor-capa {
+[data-ttx]:not([style*='--ttx-visor-img']) .ttx-visor-fondo {
   opacity: 0;
 }
 

@@ -19,14 +19,16 @@ export function numeroCatalogo(catalog) {
   return m ? `${m[1]} ${m[2]}` : catalog.trim();
 }
 
-const FECHA = new Intl.DateTimeFormat('es-CO', {
-  day: 'numeric',
+// El sitio está en inglés — así están escritos los créditos en Bandcamp y
+// así se leían en el sitio viejo: `Released__ February 20, 2026`.
+const FECHA = new Intl.DateTimeFormat('en-US', {
   month: 'long',
+  day: 'numeric',
   year: 'numeric',
   timeZone: 'UTC', // sin esto, un release del día 1 se muestra como del 30 anterior
 });
 
-/** `2026-04-30` → `30 de abril de 2026`. */
+/** `2026-02-20` → `February 20, 2026`. */
 export function fechaLarga(iso) {
   if (!iso) return '';
   const d = new Date(`${iso}T00:00:00Z`);
@@ -35,16 +37,25 @@ export function fechaLarga(iso) {
 
 /**
  * Los créditos en la convención `Rol__ Valor` que el sello ya escribe en
- * Bandcamp. El número de catálogo vive en su propio campo del JSON, así que
- * lo anteponemos aquí — y descartamos el crédito duplicado si el importador
- * lo trajo también como rol.
+ * Bandcamp.
+ *
+ * La fecha es la primera línea y tiene la misma forma que las demás
+ * —`Released__ February 20, 2026`— porque así estaba en el sitio viejo: no
+ * es una frase aparte, es un crédito más. El que la pinta la separa del
+ * resto con aire, no con otro formato.
+ *
+ * El número de catálogo **no** entra: ya se lee en la etiqueta del ítem, y
+ * repetirlo aquí era una línea de ruido.
  */
 export function lineasCredito(release) {
   const lineas = [];
-  if (release.catalog) lineas.push({ rol: 'Catalog', valor: release.catalog });
+  // `suelta` le dice al que la pinta que esta línea va separada del resto.
+  if (release.date) {
+    lineas.push({ rol: 'Released', valor: fechaLarga(release.date), suelta: true });
+  }
 
   for (const c of release.credits ?? []) {
-    if (/^cat/i.test(c.role)) continue; // ya lo pusimos arriba
+    if (/^cat/i.test(c.role)) continue; // el número de catálogo va en la etiqueta
     lineas.push({ rol: c.role, valor: c.name });
   }
   return lineas;

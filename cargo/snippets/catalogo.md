@@ -45,26 +45,53 @@ CSS, incluido el global de Cargo, así que esto siempre funciona:
 
 | Variable | Qué hace | Por defecto |
 |---|---|---|
-| `--ttx-alto` | alto total del widget | `100svh` |
+| `--ttx-margen` | aire por los **cuatro** lados | `0px` |
+| `--ttx-nav-h` | hueco reservado **abajo** para la barra de navegación | `0px` |
+| `--ttx-radio` | esquinas redondeadas | `0px` |
+| `--ttx-alto` | alto total; ya descuenta margen y nav | `calc(100svh - …)` |
 | `--ttx-visor-h` | alto de la franja de arriba | `clamp(64px, 16%, 190px)` |
-| `--ttx-visor-fx` | el filtro del visor: blur, contrast, saturate… | `blur(26px) saturate(1.2)` |
+| `--ttx-visor-fx` | el filtro del reflejo: blur, saturate, contrast… | `blur(20px) saturate(3.2) contrast(1.18)` |
 | `--ttx-banda-h` | alto de la franja de etiquetas | `1.45rem` |
+| `--ttx-etiqueta-sep` | separador entre número, álbum y artistas | `'_____'` |
 | `--ttx-panel-w` | ancho del panel de créditos abierto | `21rem` |
 | `--ttx-w-max` | tope de ancho del ítem (para teléfono) | `88vw` |
 | `--ttx-dur` | duración del acordeón | `0.5s` |
 
-### Pendiente de calibrar (medido en vivo el 2026-07-27)
+### El recorte de la página
 
-En `tratratrax.cargo.site/catalog` la página **scrollea 30px de más**: Cargo
-deja 6px de aire arriba del widget y unos 24px debajo, y el widget mide
-`100svh` completos. Se arregla cambiando el placeholder por:
+Para que el widget quede como una tarjeta flotando, con aire alrededor y
+sitio abajo para la barra de navegación:
 
 ```html
-<div data-ttx="catalogo" style="--ttx-alto: calc(100svh - 30px)"></div>
+<div data-ttx="catalogo"
+     style="--ttx-margen: 10px; --ttx-nav-h: 1.6rem; --ttx-radio: 8px"></div>
 ```
 
-Es el único ajuste que le falta al catálogo en vivo. En teléfono no pasa:
-ahí el widget mide lo que miden las carátulas y no se estira al viewport.
+Lo importante: **los dos salen del alto**. Poner aire arriba y a los lados
+sin descontarlo abajo es lo que hacía que la página scrolleara de más. Con
+esto no hay que tocar `--ttx-alto` a mano nunca.
+
+En `tratratrax.cargo.site/catalog`, Cargo deja unos 6px de aire arriba y 24
+abajo por su cuenta; `--ttx-margen: 6px; --ttx-nav-h: 18px` los absorbe.
+
+### El visor
+
+Lo de arriba no es una imagen aparte: es **el reflejo del carril**. Las
+mismas carátulas, de cabeza, con el color subido, corriendo pegadas al
+scroll de abajo. No hay cruce ni fundido entre discos porque no hay nada
+que cruzar — si abajo se movió, arriba ya se movió.
+
+Todo el color se calibra en una sola variable. Un par de puntos de partida:
+
+```css
+--ttx-visor-fx: blur(20px) saturate(3.2) contrast(1.18);   /* el de ahora */
+--ttx-visor-fx: blur(8px) saturate(5) contrast(1.3);       /* más definido */
+--ttx-visor-fx: blur(34px) saturate(2) hue-rotate(20deg);  /* más lavado */
+```
+
+En teléfono el carril va parado, y un reflejo que corre a lo ancho ahí no
+significa nada: el visor muestra la carátula activa sola, con el mismo
+filtro y la misma volteada.
 
 ### Opciones de contenido
 
@@ -82,6 +109,12 @@ ahí el widget mide lo que miden las carátulas y no se estira al viewport.
 
 - **Ni marquee ni columnas.** El scroll horizontal es nativo: gesto de dedo
   con inercia, trackpad de dos dedos, arrastre con mouse, rueda y flechas.
+- **Ni `scroll-snap`.** Recorrer treinta y cinco discos y que el carril
+  frenara y se acomodara en cada uno se sentía mal. Lo único que se coloca
+  solo es el release que se abre.
+- **Ni cerrar el `_` a mano.** Los guiones bajos ya llevan el tracking
+  negativo que los pega en una línea continua, tanto en la etiqueta como en
+  los créditos.
 - **Ni ordenar a mano.** Manda el campo `order` del JSON.
 - **Ni volver a entrar a Cargo para publicar.** Un release nuevo es un
   commit en `data/releases.json`.

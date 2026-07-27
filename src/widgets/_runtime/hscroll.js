@@ -41,7 +41,6 @@ export function hscroll(carril) {
     if (recorrido > UMBRAL_ARRASTRE) {
       if (!carril.hasPointerCapture(e.pointerId)) carril.setPointerCapture(e.pointerId);
       carril.dataset.arrastrando = '';
-      carril.dataset.gesto = '';
       carril.scrollLeft = scroll0 - dx;
       e.preventDefault();
     }
@@ -51,7 +50,6 @@ export function hscroll(carril) {
     if (!arrastrando) return;
     arrastrando = false;
     delete carril.dataset.arrastrando;
-    delete carril.dataset.gesto;
     if (carril.hasPointerCapture?.(e.pointerId)) carril.releasePointerCapture(e.pointerId);
   };
   on(carril, 'pointerup', soltar);
@@ -73,27 +71,21 @@ export function hscroll(carril) {
   );
 
   // ── Rueda vertical → desplazamiento horizontal ────────────────────────
-  // Un tic de rueda mueve menos de medio ítem, y el `scroll-snap` lo
-  // devuelve al punto de partida: parece que la rueda no hiciera nada. Por
-  // eso el snap se apaga mientras dura el gesto y vuelve al soltarlo.
-  let finRueda;
-
+  // Con el carril acostado, la rueda de un mouse común no lo movería nunca.
   on(
     carril,
     'wheel',
     (e) => {
+      // Con el carril parado —teléfono— la rueda ya hace lo correcto.
+      if (carril.scrollWidth <= carril.clientWidth) return;
       // Trackpad horizontal: ya funciona, no lo tocamos.
       if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;
       // Dentro de un bloque que scrollea vertical (el panel de créditos)
       // manda el bloque, no el carril.
       if (e.target instanceof Element && e.target.closest('[data-scroll-y]')) return;
 
-      carril.dataset.gesto = '';
       carril.scrollLeft += e.deltaY;
       e.preventDefault();
-
-      clearTimeout(finRueda);
-      finRueda = setTimeout(() => delete carril.dataset.gesto, 160);
     },
     { passive: false },
   );
@@ -117,8 +109,5 @@ export function hscroll(carril) {
     e.preventDefault();
   });
 
-  return () => {
-    clearTimeout(finRueda);
-    ac.abort();
-  };
+  return () => ac.abort();
 }

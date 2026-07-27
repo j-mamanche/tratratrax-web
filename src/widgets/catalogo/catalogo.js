@@ -1,14 +1,9 @@
 import { registrar } from '../_runtime/mount.js';
 import { cargar } from '../_runtime/datos.js';
 import { crearStack, proyectar, precargar } from '../_runtime/stack.js';
+import { espejo } from '../_runtime/espejo.js';
 import { hscroll } from '../_runtime/hscroll.js';
-import {
-  cover,
-  numeroCatalogo,
-  fechaLarga,
-  lineasCredito,
-  nombresArtistas,
-} from '../_runtime/format.js';
+import { cover, numeroCatalogo, lineasCredito, nombresArtistas } from '../_runtime/format.js';
 import './catalogo.css';
 
 // El catálogo: visor arriba, carril de carátulas abajo, y una etiqueta por
@@ -37,7 +32,7 @@ registrar('catalogo', async (host) => {
     return;
   }
 
-  const { contenido: carril } = crearStack(host);
+  const { visor, contenido: carril } = crearStack(host);
   carril.classList.add('ttx-carril');
   carril.tabIndex = 0;
   carril.setAttribute('role', 'list');
@@ -46,24 +41,38 @@ registrar('catalogo', async (host) => {
   const id = ++contador;
   carril.append(...lista.map((r, i) => crearItem(r, indiceArtistas, `${id}-${i}`)));
 
-  // El primer cruce parpadearía si la imagen del visor empieza a bajar
-  // justo cuando tiene que aparecer.
-  precargar(lista.map((r) => cover(r.bcImageId, 16)));
+  // Sin esto las celdas del espejo salen en blanco y se van llenando
+  // mientras uno hace scroll.
+  const visores = lista.map((r) => cover(r.bcImageId, 16));
+  precargar(visores);
 
+  const reflejo = espejo(visor, carril, visores);
   const soltarScroll = hscroll(carril);
   const soltarMedidas = medirItems(host, carril);
-  const soltarCentro = seguirCentro(host, carril, lista);
+  const soltarCentro = seguirCentro(host, carril);
+  const ancla = anclador(carril);
 
   carril.addEventListener('click', (e) => {
     const etiqueta = e.target.closest?.('.ttx-etiqueta');
-    if (etiqueta && carril.contains(etiqueta)) alternar(host, carril, etiqueta.closest('.ttx-item'));
+    if (etiqueta && carril.contains(etiqueta)) {
+      alternar(host, carril, etiqueta.closest('.ttx-item'), ancla);
+    }
   });
+
+  // Cualquier gesto propio del usuario le gana al anclaje: si empezó a
+  // moverse solo, que el carril siga tirando de él es de lo peor que puede
+  // hacer una interfaz.
+  for (const ev of ['pointerdown', 'wheel', 'touchstart', 'keydown']) {
+    carril.addEventListener(ev, ancla.soltar, { passive: true });
+  }
 
   // Proyección inicial: el primero, antes de que nadie haga scroll.
   proyectarItem(host, carril.firstElementChild);
 
   return {
     destruir() {
+      ancla.soltar();
+      reflejo.destruir();
       soltarScroll();
       soltarMedidas();
       soltarCentro();
@@ -98,8 +107,7 @@ function crearItem(r, indiceArtistas, sufijo) {
     elemento(
       'div',
       { class: 'ttx-panel-col' },
-      elemento('h3', { class: 'ttx-titulo-panel' }, 'Créditos'),
-      r.date && elemento('p', { class: 'ttx-fecha' }, `Se lanzó el ${fechaLarga(r.date)}`),
+      elemento('h3', { class: 'ttx-titulo-panel' }, 'Credits'),
       creditos(r),
       r.note && elemento('p', { class: 'ttx-nota' }, r.note),
       enlaces(r),
@@ -133,11 +141,26 @@ function creditos(r) {
 
   // `Rol__ Valor` es como el sello ya escribe en Bandcamp. Se guarda
   // estructurado y se serializa aquí, no al revés.
+  //
+  // Los guiones bajos van en su propio `<span>` porque necesitan tracking
+  // negativo para leerse como una línea continua, y ese tracking no puede
+  // tocar la palabra del rol. La primera línea es la fecha y se separa del
+  // bloque de roles, como en el sitio viejo.
   return elemento(
     'ul',
     { class: 'ttx-creditos' },
-    ...lineas.map(({ rol, valor }) =>
-      elemento('li', {}, elemento('span', { class: 'ttx-rol' }, `${rol}__`), ` ${valor}`),
+    ...lineas.map(({ rol, valor, suelta }) =>
+      elemento(
+        'li',
+        suelta ? { class: 'ttx-credito-fecha' } : {},
+        elemento(
+          'span',
+          { class: 'ttx-rol' },
+          rol,
+          elemento('span', { class: 'ttx-guion' }, '__'),
+        ),
+        ` ${valor}`,
+      ),
     ),
   );
 }
@@ -165,24 +188,80 @@ function enlaces(r) {
 
 // ── Estado ──────────────────────────────────────────────────────────────
 
-function alternar(host, carril, item) {
+function alternar(host, carril, item, ancla) {
   if (!item) return;
   const abrir = !item.hasAttribute('data-abierto');
 
+  ancla.soltar();
   for (const otro of carril.children) cerrar(otro);
 
-  if (abrir) {
-    item.setAttribute('data-abierto', '');
-    item.querySelector('.ttx-etiqueta').setAttribute('aria-expanded', 'true');
-    item.querySelector('.ttx-panel').removeAttribute('inert');
-    // Gancho para el CSS de la página: cuál release está abierto.
-    host.dataset.abierto = item.dataset.id;
-    // El ítem crece hacia la derecha, así que basta con traer su borde
-    // izquierdo al del carril; los de antes no cambian de ancho.
-    carril.scrollTo({ left: item.offsetLeft - carril.offsetLeft, behavior: 'smooth' });
-  } else {
+  if (!abrir) {
     delete host.dataset.abierto;
+    return;
   }
+
+  item.setAttribute('data-abierto', '');
+  item.querySelector('.ttx-etiqueta').setAttribute('aria-expanded', 'true');
+  item.querySelector('.ttx-panel').removeAttribute('inert');
+  // Gancho para el CSS de la página: cuál release está abierto.
+  host.dataset.abierto = item.dataset.id;
+  ancla.fijar(item);
+}
+
+/**
+ * Trae el borde izquierdo del ítem abierto al borde izquierdo del carril, y
+ * lo **mantiene ahí** mientras dura el acordeón.
+ *
+ * Un `scrollTo` de una sola vez no alcanza, y ese era el bug: al abrir un
+ * segundo release el primero se cierra, o sea que todo lo que está a la
+ * izquierda encoge — pero encoge *animado*, durante medio segundo. La
+ * posición que se calculaba en el instante del clic era la de antes de esa
+ * animación, así que el carril apuntaba a un lugar que dejaba de existir y
+ * el ítem terminaba corrido: la carátula pegada al borde y el panel de
+ * créditos escondido fuera de pantalla, a la izquierda.
+ *
+ * La corrección es no calcular una posición sino sostener una relación. Cada
+ * cuadro se vuelve a medir dónde quedó el ítem y se corrige la diferencia;
+ * como el layout de abajo se mueve suave, la corrección también. En teléfono
+ * no se usa: ahí el ítem no crece a lo ancho y no hay nada que sostener.
+ */
+function anclador(carril) {
+  let objetivo = null;
+  let raf = 0;
+  let fin = 0;
+
+  const soltar = () => {
+    cancelAnimationFrame(raf);
+    raf = 0;
+  };
+
+  const paso = () => {
+    // Lo que le falta al ítem para tocar el borde izquierdo del carril.
+    // Positivo: está a la derecha, hay que scrollear hacia adelante.
+    carril.scrollLeft +=
+      objetivo.getBoundingClientRect().left - carril.getBoundingClientRect().left;
+    raf = performance.now() < fin ? requestAnimationFrame(paso) : 0;
+  };
+
+  return {
+    soltar,
+    fijar(item) {
+      // El carril horizontal es el único que se mueve solo.
+      if (carril.scrollWidth <= carril.clientWidth) return;
+      objetivo = item;
+      // El acordeón dura `--ttx-dur`; un respiro de más cubre el último
+      // cuadro, donde la transición ya terminó pero el layout aún no.
+      fin = performance.now() + duracion(carril) + 120;
+      if (!raf) raf = requestAnimationFrame(paso);
+    },
+  };
+}
+
+/** `--ttx-dur` en milisegundos. Vive en el CSS, que es donde se calibra. */
+function duracion(el) {
+  const v = getComputedStyle(el).getPropertyValue('--ttx-dur').trim();
+  const n = parseFloat(v) || 0.5;
+  return /ms$/.test(v) ? n : n * 1000;
 }
 
 function cerrar(item) {
@@ -197,16 +276,21 @@ function proyectarItem(host, item) {
 
 /**
  * Manda lo que cruza el centro del carril. Un `IntersectionObserver` con el
- * carril como root y los lados recortados al 49% deja una franja de 2% en
- * el centro: lo que la toca, es lo que se proyecta. Sin escuchar `scroll`.
+ * carril como root y los cuatro lados recortados al 49% deja un cuadrito de
+ * 2% en el centro: lo que lo toca, es lo que se proyecta. Sin escuchar
+ * `scroll`.
+ *
+ * El recorte va por los cuatro lados, no solo por los horizontales, para que
+ * sirva igual con el carril acostado y parado: en cualquiera de los dos el
+ * ítem ocupa todo el eje contrario, así que siempre toca el cuadrito.
  */
-function seguirCentro(host, carril, lista) {
+function seguirCentro(host, carril) {
   const io = new IntersectionObserver(
     (entradas) => {
       const dentro = entradas.filter((e) => e.isIntersecting).pop();
       if (dentro) proyectarItem(host, dentro.target);
     },
-    { root: carril, rootMargin: '0px -49% 0px -49%', threshold: 0 },
+    { root: carril, rootMargin: '-49%', threshold: 0 },
   );
 
   for (const item of carril.children) io.observe(item);

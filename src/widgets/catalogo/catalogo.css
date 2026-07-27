@@ -4,13 +4,16 @@
 /* ── El carril ────────────────────────────────────────────────────────
    El gesto de dedo con inercia, el trackpad de dos dedos y la scrollbar
    oculta son nativos. El JS solo agrega arrastre con mouse, rueda y
-   flechas. Nada de marquee. */
+   flechas. Nada de marquee.
+
+   Sin `scroll-snap`: recorrer treinta y cinco discos rápido y que el carril
+   frene y se acomode en cada uno se sentía mal. El único momento en que el
+   carril se coloca solo es al abrir un release, y eso lo hace el JS. */
 [data-ttx='catalogo'] .ttx-carril {
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   cursor: grab;
@@ -19,12 +22,6 @@
 
 [data-ttx='catalogo'] .ttx-carril::-webkit-scrollbar {
   display: none;
-}
-
-/* Mientras dura un gesto —arrastre o rueda— el snap pelea contra él y
-   devuelve el carril a donde estaba. Se apaga y vuelve al soltar. */
-[data-ttx='catalogo'] .ttx-carril[data-gesto] {
-  scroll-snap-type: none;
 }
 
 [data-ttx='catalogo'] .ttx-carril[data-arrastrando] {
@@ -42,7 +39,6 @@
   grid-template-rows: var(--ttx-banda-h) minmax(0, 1fr);
   min-width: 0;
   overflow: hidden;
-  scroll-snap-align: start;
   background: var(--ttx-papel);
   border-left: 1px solid var(--ttx-linea);
   transition: flex-basis var(--ttx-dur) var(--ttx-ease);
@@ -59,8 +55,8 @@
 }
 
 /* ── La etiqueta ──────────────────────────────────────────────────────
-   `TRA 031 · PYREXIA · EHUA & FLORE`, sin separadores en el contenido:
-   los espacios y las rayas son cosa del CSS, como en el sitio viejo. */
+   `TRA 031_____PYREXIA_____EHUA & FLORE`, sin separadores en el contenido:
+   los guiones bajos son un `::after` del CSS, como en el sitio viejo. */
 [data-ttx='catalogo'] .ttx-etiqueta {
   display: flex;
   align-items: center;
@@ -78,9 +74,22 @@
   cursor: pointer;
 }
 
+/* El separador. `letter-spacing` negativo porque si no los guiones bajos
+   salen picados uno a uno en vez de leerse como una raya sola — es el mismo
+   -0.13em con el que el sitio viejo cierra los de la barra de artistas. El
+   tracking se lo come el último guión, y el margen se lo devuelve. */
 [data-ttx='catalogo'] .ttx-cat::after,
 [data-ttx='catalogo'] .ttx-album::after {
-  content: var(--ttx-etiqueta-sep, '');
+  content: var(--ttx-etiqueta-sep, '_____');
+  display: inline-block;
+  letter-spacing: -0.13em;
+  margin: 0 0.2em 0 0.15em;
+}
+
+/* Sin artistas, el álbum es el último: nada que separar de nada. */
+[data-ttx='catalogo'] .ttx-album:last-child::after {
+  content: '';
+  margin: 0;
 }
 
 [data-ttx='catalogo'] .ttx-album {
@@ -136,8 +145,23 @@
 }
 
 /* ── El contenido del panel ───────────────────────────────────────────
-   Según la ref: CRÉDITOS · la fecha · las líneas `Rol__ Valor` · la nota ·
-   los enlaces. Sin párrafo editorial y sin player: se descartaron. */
+   Tal como estaba en el sitio viejo, que es lo que la ref muestra:
+
+     CREDITS
+                            ← aire
+     Released__ February 20, 2026
+                            ← aire
+     Photo__ Cromero
+     Aditional Design__ Andrés Jácome
+     Mastering__ Beau Thomas at Ten Eight Seven
+                            ← aire
+     la nota
+                            ← aire
+     Purchase
+
+   La fecha no es una frase aparte: es una línea `Rol__ Valor` más, solo que
+   suelta arriba. Y el número de catálogo no va aquí — ya se lee en la
+   etiqueta del ítem. Sin párrafo editorial y sin player: se descartaron. */
 [data-ttx='catalogo'] .ttx-titulo-panel {
   font-size: var(--ttx-chrome);
   font-weight: 400;
@@ -146,7 +170,12 @@
 }
 
 [data-ttx='catalogo'] .ttx-creditos {
-  margin-top: 1em;
+  margin-top: 1.6em;
+}
+
+/* La línea de la fecha va sola, separada del bloque de roles. */
+[data-ttx='catalogo'] .ttx-credito-fecha {
+  margin-bottom: 1.4em;
 }
 
 [data-ttx='catalogo'] .ttx-rol {
@@ -154,7 +183,7 @@
 }
 
 [data-ttx='catalogo'] .ttx-nota {
-  margin-top: 1em;
+  margin-top: 1.4em;
 }
 
 [data-ttx='catalogo'] .ttx-enlaces {
@@ -165,17 +194,16 @@
   margin-top: 2em;
 }
 
+/* Como en la ref: `Purchase` subrayado, en caja y peso de texto corrido.
+   No es chrome en versalitas — es una línea más del bloque de créditos. */
 [data-ttx='catalogo'] .ttx-enlace {
-  font-size: var(--ttx-chrome);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
 }
 
 [data-ttx='catalogo'] .ttx-enlace:hover,
 [data-ttx='catalogo'] .ttx-enlace:focus-visible {
-  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 
 /* El enlace nombra el álbum para que un lector de pantalla lo entienda
@@ -189,55 +217,61 @@
   white-space: nowrap;
 }
 
-/* ── Teléfono ─────────────────────────────────────────────────────────
-   En una pantalla alta y angosta el ítem cuadrado no cabe: la columna
-   queda mucho más alta que ancha y `object-fit: cover` se comería la
-   mitad de la carátula. Aquí la carátula deja de llenar la fila y se
-   queda cuadrada, centrada en su banda. */
+/* ── Teléfono: el carril se para ──────────────────────────────────────
+   En una pantalla alta y angosta un carril horizontal es el gesto
+   equivocado: la carátula cuadrada no cabe al lado de nada y hay que
+   arrastrar de lado para recorrer treinta y cinco discos. Aquí el mismo
+   carril se vuelve una columna — se recorre hacia abajo, como cualquier
+   lista de teléfono — y el acordeón abre el panel debajo de la carátula.
+
+   El widget no se entera: sigue siendo el mismo contenedor con overflow,
+   la misma etiqueta y el mismo acordeón. Solo cambia el eje. */
 @media (max-width: 46rem) {
   [data-ttx='catalogo'] {
-    --ttx-w-max: 78vw;
-    /* En un teléfono la fila es mucho más alta que ancha: si el ítem
-       siguiera midiendo lo que mide la fila, la carátula cuadrada dejaría
-       media pantalla en blanco. Aquí manda el ancho, y el stack deja de
-       estirarse al viewport. */
-    --ttx-w-item: var(--ttx-w-max);
+    /* Lo que en pantalla ancha es chrome de 9px aquí es ilegible, y la
+       etiqueta es lo que hay que tocar para abrir un release. */
+    --ttx-chrome: 11px;
+    --ttx-cuerpo-fs: 13px;
+    --ttx-banda-h: 1.9rem;
   }
 
-  /* La fila del carril va en `max-content`, no en `auto`: el carril es un
-     contenedor de scroll y con `auto` la fila no se entera del alto de las
-     carátulas. */
-  [data-ttx='catalogo'].ttx-stack {
-    grid-template-rows: var(--ttx-visor-h) auto max-content;
-    height: auto;
+  [data-ttx='catalogo'] .ttx-carril {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    cursor: default;
   }
 
-  /* El acordeón se vuelve vertical: el ítem no crece a lo ancho y el panel
-     se abre debajo de la carátula. Es el único cambio que hace falta —
-     el resto del widget no se entera. */
+  /* En columna el ítem mide lo que mide su contenido, no una fracción de
+     la fila; y la línea que lo separa del anterior es horizontal. */
+  [data-ttx='catalogo'] .ttx-item {
+    flex: 0 0 auto;
+    width: 100%;
+    grid-template-rows: var(--ttx-banda-h) auto;
+    border-left: 0;
+    border-top: 1px solid var(--ttx-linea);
+  }
+
+  [data-ttx='catalogo'] .ttx-item:first-child {
+    border-top: 0;
+  }
+
+  /* El ítem ya no crece a lo ancho: lo que crece es el panel, hacia abajo. */
   [data-ttx='catalogo'] .ttx-item[data-abierto] {
-    flex-basis: var(--ttx-w-item);
+    flex-basis: auto;
   }
 
   [data-ttx='catalogo'] .ttx-cuerpo {
     flex-direction: column;
   }
 
-  /* El ancho va en una longitud, no en `100%`: con `aspect-ratio` un ancho
-     porcentual es cíclico al medir la fila, la carátula aporta cero alto y
-     el ítem colapsa. */
   [data-ttx='catalogo'] .ttx-cover {
     order: -1; /* la carátula arriba, los créditos debajo */
     flex: 0 0 auto;
-    width: var(--ttx-w-item);
+    width: 100%;
     height: auto;
     aspect-ratio: 1 / 1;
-  }
-
-  /* Con el stack a alto automático, una fila `1fr` no aporta altura
-     intrínseca y el ítem colapsa: aquí manda el contenido. */
-  [data-ttx='catalogo'] .ttx-item {
-    grid-template-rows: var(--ttx-banda-h) auto;
   }
 
   /* El panel crece en el eje vertical, que ahora es el principal. `auto` no
@@ -254,6 +288,16 @@
 
   [data-ttx='catalogo'] .ttx-panel-col {
     width: 100%;
-    padding: 0.75rem 0.5rem 1rem;
+    padding: 0.75rem 0.6rem 1.5rem;
+  }
+
+  /* Un reflejo que corre a lo ancho no significa nada cuando lo de abajo se
+     mueve hacia abajo: aquí el visor muestra la carátula activa sola. */
+  [data-ttx='catalogo'] .ttx-espejo-marco {
+    display: none;
+  }
+
+  [data-ttx='catalogo'] .ttx-visor-fondo {
+    display: block;
   }
 }

@@ -17,7 +17,9 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
       body {
         margin: 0;
         height: 100%;
-        background: #fff;
+        /* Oscuro a propósito: es lo único que deja ver si el recorte de los
+           cuatro lados está funcionando. */
+        background: #d8d5cf;
         color: #000;
         font-family: ui-sans-serif, system-ui, sans-serif;
         overscroll-behavior: none;
@@ -43,8 +45,16 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
   <body>
     <!-- Así se calibra sin tocar el widget: las variables van en el propio
          placeholder, que es lo único que se pega en la página de Cargo. Un
-         `style` inline le gana a cualquier CSS, incluido el global de Cargo. -->
-    <div data-ttx="catalogo" style="--ttx-alto: calc(100svh - 1.6rem)"></div>
+         `style` inline le gana a cualquier CSS, incluido el global de Cargo.
+
+         `--ttx-margen` recorta por los cuatro lados y `--ttx-nav-h` deja
+         abajo el hueco de la barra de navegación. Los dos salen del alto, o
+         sea que la página no crece ni un pixel: no hay que tocar
+         `--ttx-alto` a mano. -->
+    <div
+      data-ttx="catalogo"
+      style="--ttx-margen: 10px; --ttx-nav-h: 1.6rem; --ttx-radio: 8px"
+    ></div>
 
     <div class="chrome">
       <span>2026 © Todos los izquierdos públicos</span>
