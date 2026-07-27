@@ -14,18 +14,21 @@ const script =
   document.currentScript ?? document.querySelector('script[src*="ttx.js"]');
 
 /**
- * El CSS se inyecta desde aquí, no se pega aparte en Cargo: dos líneas que
- * hay que mantener sincronizadas a mano son dos líneas que se desincronizan.
- * Se arrastra el `?v=` del script para que el CSS quede pinneado igual.
+ * El CSS viaja **dentro** de este archivo: `__TTX_CSS__` lo reemplaza el
+ * build por el CSS entero.
+ *
+ * Antes era un `<link>` a `ttx.css` con el mismo `?v=` del script. Parecía
+ * equivalente y no lo es: son dos recursos con cachés independientes de diez
+ * minutos, y el navegador puede revalidar uno y no el otro. En vivo quedó
+ * corriendo el JS de una versión con el CSS de otra, y la página se
+ * desmaquetó. Un solo archivo no se puede desincronizar consigo mismo.
  */
 function inyectarCss() {
-  if (!script?.src || document.querySelector('link[data-ttx-css]')) return;
-  const url = new URL(script.src);
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = new URL(`ttx.css${url.search}`, url).href;
-  link.dataset.ttxCss = '';
-  document.head.append(link);
+  if (!__TTX_CSS__ || document.querySelector('style[data-ttx-css]')) return;
+  const style = document.createElement('style');
+  style.dataset.ttxCss = '';
+  style.textContent = __TTX_CSS__;
+  document.head.append(style);
 }
 
 async function montar(host) {

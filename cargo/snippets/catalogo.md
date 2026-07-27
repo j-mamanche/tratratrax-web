@@ -10,11 +10,22 @@ Dos pegadas, y una de ellas solo se hace una vez en la vida del sitio.
 <script src="https://j-mamanche.github.io/tratratrax-web/ttx.js?v=1" defer></script>
 ```
 
-Eso es todo. El CSS lo inyecta el propio script — no hay una segunda línea
-que mantener sincronizada.
+Eso es todo. El CSS va **dentro** del `ttx.js` y el script lo inyecta al
+arrancar: no hay una segunda línea que mantener sincronizada, y tampoco un
+segundo archivo.
+
+Eso último no es cosmético. Cuando el CSS era un `ttx.css` aparte, los dos
+archivos se cacheaban por su cuenta diez minutos cada uno, y el navegador
+podía revalidar uno y no el otro: quedaba corriendo el JS de una versión con
+el CSS de otra y la página se desmaquetaba. Pasó en vivo. Un solo archivo no
+se puede desincronizar consigo mismo.
 
 **Qué hace el `?v=1`:** rompe la caché. GitHub Pages cachea diez minutos;
 subir el número obliga a Cargo a pedir el archivo de nuevo en vez de esperar.
+Como ahora es un archivo solo, subirlo actualiza todo de golpe.
+
+**Si algo se ve raro después de un cambio**, casi siempre es la caché: sube
+el número y recarga con `Cmd+Shift+R`.
 
 **Qué NO hace:** *no* fija una versión. Hay un solo `ttx.js` publicado, así
 que cada push a `main` sale en vivo con o sin cambiar el número — igual que
