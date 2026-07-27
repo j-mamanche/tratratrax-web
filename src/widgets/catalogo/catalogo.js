@@ -50,31 +50,26 @@ registrar('catalogo', async (host) => {
   const soltarScroll = hscroll(carril);
   const soltarMedidas = medirItems(host, carril);
   const soltarCentro = seguirCentro(host, carril);
-  const ancla = anclador(carril);
 
   // La carátula abre el release igual que la etiqueta. El estado y los
   // atributos ARIA siguen viviendo en la etiqueta, que es el `<button>`:
   // esto es un blanco más grande para el puntero, no un segundo control.
+  //
+  // Abrir **no mueve el carril**. Llevaba el release al comienzo, y con el
+  // acordeón animándose debajo se sentía como un tirón: uno hace clic en un
+  // sitio y la pantalla se va a otro. El release se abre donde está.
   carril.addEventListener('click', (e) => {
     const disparador = e.target.closest?.('.ttx-etiqueta, .ttx-cover');
     if (disparador && carril.contains(disparador)) {
-      alternar(host, carril, disparador.closest('.ttx-item'), ancla);
+      alternar(host, carril, disparador.closest('.ttx-item'));
     }
   });
-
-  // Cualquier gesto propio del usuario le gana al anclaje: si empezó a
-  // moverse solo, que el carril siga tirando de él es de lo peor que puede
-  // hacer una interfaz.
-  for (const ev of ['pointerdown', 'wheel', 'touchstart', 'keydown']) {
-    carril.addEventListener(ev, ancla.soltar, { passive: true });
-  }
 
   // Proyección inicial: el primero, antes de que nadie haga scroll.
   proyectarItem(host, carril.firstElementChild);
 
   return {
     destruir() {
-      ancla.soltar();
       reflejo.destruir();
       soltarScroll();
       soltarMedidas();
@@ -107,13 +102,22 @@ function crearItem(r, indiceArtistas, sufijo) {
   const panel = elemento(
     'div',
     { class: 'ttx-panel', id: idPanel, 'data-scroll-y': '', inert: '' },
+    // `.ttx-panel-caja` no es un div de más. Es la que se aplasta cuando el
+    // acordeón vertical cierra: tiene que poder medir cero, y `.ttx-panel-col`
+    // no puede porque lleva el padding —una caja con padding nunca mide menos
+    // que su padding—. Sin ella el panel cerrado dejaba asomando su primera
+    // línea debajo de cada carátula.
     elemento(
       'div',
-      { class: 'ttx-panel-col' },
-      elemento('h3', { class: 'ttx-titulo-panel' }, 'Credits'),
-      creditos(r),
-      r.note && elemento('p', { class: 'ttx-nota' }, r.note),
-      enlaces(r),
+      { class: 'ttx-panel-caja' },
+      elemento(
+        'div',
+        { class: 'ttx-panel-col' },
+        elemento('h3', { class: 'ttx-titulo-panel' }, 'Credits'),
+        creditos(r),
+        r.note && elemento('p', { class: 'ttx-nota' }, r.note),
+        enlaces(r),
+      ),
     ),
   );
 
@@ -191,81 +195,25 @@ function enlaces(r) {
 
 // ── Estado ──────────────────────────────────────────────────────────────
 
-function alternar(host, carril, item, ancla) {
+function alternar(host, carril, item) {
   if (!item) return;
   const abrir = !item.hasAttribute('data-abierto');
 
-  ancla.soltar();
   for (const otro of carril.children) cerrar(otro);
 
   if (!abrir) {
-    delete host.dataset.abierto;
+    delete host.dataset.releaseAbierto;
     return;
   }
 
   item.setAttribute('data-abierto', '');
   item.querySelector('.ttx-etiqueta').setAttribute('aria-expanded', 'true');
   item.querySelector('.ttx-panel').removeAttribute('inert');
-  // Gancho para el CSS de la página: cuál release está abierto.
-  host.dataset.abierto = item.dataset.id;
-  ancla.fijar(item);
-}
-
-/**
- * Trae el comienzo del ítem abierto al comienzo del carril, y lo **mantiene
- * ahí** mientras dura el acordeón. Acostado eso es el borde izquierdo;
- * parado es el borde de arriba, o sea que el título del release queda justo
- * debajo del visor — en la segunda banda del stack, que es donde va.
- *
- * Un `scrollTo` de una sola vez no alcanza, y ese era el bug: al abrir un
- * segundo release el primero se cierra, o sea que todo lo que está antes
- * encoge — pero encoge *animado*, durante medio segundo. La posición que se
- * calculaba en el instante del clic era la de antes de esa animación, así
- * que el carril apuntaba a un lugar que dejaba de existir y el ítem
- * terminaba corrido: la carátula pegada al borde y el panel de créditos
- * escondido fuera de pantalla.
- *
- * La corrección es no calcular una posición sino sostener una relación. Cada
- * cuadro se vuelve a medir dónde quedó el ítem y se corrige la diferencia;
- * como el layout se mueve suave, la corrección también.
- */
-function anclador(carril) {
-  let objetivo = null;
-  let raf = 0;
-  let fin = 0;
-
-  const soltar = () => {
-    cancelAnimationFrame(raf);
-    raf = 0;
-  };
-
-  const paso = () => {
-    const it = objetivo.getBoundingClientRect();
-    const ca = carril.getBoundingClientRect();
-    // Lo que le falta al ítem para tocar el comienzo del carril. Positivo:
-    // está más adelante, hay que scrollear hacia allá.
-    if (carril.scrollWidth > carril.clientWidth) carril.scrollLeft += it.left - ca.left;
-    else carril.scrollTop += it.top - ca.top;
-    raf = performance.now() < fin ? requestAnimationFrame(paso) : 0;
-  };
-
-  return {
-    soltar,
-    fijar(item) {
-      objetivo = item;
-      // El acordeón dura `--ttx-dur`; un respiro de más cubre el último
-      // cuadro, donde la transición ya terminó pero el layout aún no.
-      fin = performance.now() + duracion(carril) + 120;
-      if (!raf) raf = requestAnimationFrame(paso);
-    },
-  };
-}
-
-/** `--ttx-dur` en milisegundos. Vive en el CSS, que es donde se calibra. */
-function duracion(el) {
-  const v = getComputedStyle(el).getPropertyValue('--ttx-dur').trim();
-  const n = parseFloat(v) || 0.5;
-  return /ms$/.test(v) ? n : n * 1000;
+  // Gancho para el CSS de la página: cuál release está abierto. El nombre
+  // no es `data-abierto` a propósito: el ítem ya usa ese, y tenerlo también
+  // en el host hace que `[data-abierto] .ttx-panel` matchee **todos** los
+  // paneles, no el del abierto. Es una trampa fácil de pisar.
+  host.dataset.releaseAbierto = item.dataset.id;
 }
 
 function cerrar(item) {

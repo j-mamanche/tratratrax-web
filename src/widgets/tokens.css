@@ -45,7 +45,11 @@
      en negro y en negrita. Eso es lo que hace de separador. */
   --ttx-tinta-floja: rgba(0, 0, 0, 0.46);
   --ttx-papel: #fff;
-  --ttx-linea: rgba(0, 0, 0, 0.22);
+  /* El gris del chrome: la franja de etiquetas y el panel de créditos. Va
+     sin una sola línea — lo que separa es el gris, y sin bordes la franja
+     se lee como una barra sola que recorre la pantalla, no como una fila
+     de casillas. */
+  --ttx-gris: #e5e5e5;
 
   /* ── Tipografía ───────────────────────────────────────────────────── */
   /* La del sitio. Cargo ya carga Monument Grotesk; heredamos y solo
@@ -54,7 +58,13 @@
   --ttx-cuerpo-fs: clamp(11px, 0.78vw, 13px);
 
   color: var(--ttx-tinta);
-  background: var(--ttx-papel);
+  /* El aire va como padding del host, no como margen: un margen inferior se
+     colapsa con el del padre cuando el padre no cierra su caja —lo que hace
+     Cargo— y el hueco de la barra de navegación simplemente no aparece. El
+     papel lo pone el marco de adentro, no el host, o el padding se pintaría
+     de blanco y no se vería el recorte. */
+  padding: var(--ttx-margen);
+  padding-bottom: calc(var(--ttx-margen) + var(--ttx-nav-h));
 }
 
 [data-ttx],
@@ -108,14 +118,11 @@
 
    Las filas van asignadas a mano: sin banda, la colocación automática
    metería el contenido en la fila 2 y dejaría la 3 vacía. */
-[data-ttx].ttx-stack {
+.ttx-marco {
   display: grid;
   grid-template-rows: var(--ttx-visor-h) auto minmax(0, 1fr);
   height: var(--ttx-alto);
-  /* El aire va por los cuatro lados, y abajo lleva además el hueco de la
-     barra de navegación. Como el alto ya los descontó, la página no crece. */
-  margin: var(--ttx-margen);
-  margin-bottom: calc(var(--ttx-margen) + var(--ttx-nav-h));
+  background: var(--ttx-papel);
   /* Esquinas cuadradas, siempre. No hay variable para redondearlas: es una
      regla del diseño, no una calibración. */
   overflow: hidden;

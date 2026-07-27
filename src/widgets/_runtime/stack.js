@@ -24,8 +24,16 @@
  * @param {{ banda?: boolean }} opciones
  */
 export function crearStack(host, { banda = false } = {}) {
-  host.classList.add('ttx', 'ttx-stack');
+  host.classList.add('ttx');
   inyectarFiltro();
+
+  // El aire de alrededor va como `padding` del host y el stack vive en un
+  // marco adentro. Estaba como `margin` del host y no se veía: un margen
+  // inferior se colapsa con el del padre cuando el padre no cierra su caja
+  // —que es lo que hace Cargo— y desaparece. Un padding no se colapsa
+  // nunca, y de paso Cargo tampoco lo pisa.
+  const marco = document.createElement('div');
+  marco.className = 'ttx-marco';
 
   const visor = document.createElement('div');
   visor.className = 'ttx-visor';
@@ -44,8 +52,9 @@ export function crearStack(host, { banda = false } = {}) {
   const contenido = document.createElement('div');
   contenido.className = 'ttx-contenido';
 
-  host.replaceChildren(visor, ...(banda ? [franja] : []), contenido);
-  return { visor, banda: banda ? franja : null, contenido };
+  marco.append(visor, ...(banda ? [franja] : []), contenido);
+  host.replaceChildren(marco);
+  return { marco, visor, banda: banda ? franja : null, contenido };
 }
 
 /**

@@ -40,12 +40,7 @@
   min-width: 0;
   overflow: hidden;
   background: var(--ttx-papel);
-  border-left: 1px solid var(--ttx-linea);
   transition: flex-basis var(--ttx-dur) var(--ttx-ease);
-}
-
-[data-ttx='catalogo'] .ttx-item:first-child {
-  border-left: 0;
 }
 
 /* El acordeón. Un solo cambio de `flex-basis`: el ítem abierto crece y
@@ -66,6 +61,7 @@
   width: 100%;
   height: 100%;
   padding: 0 0.5rem;
+  background: var(--ttx-gris);
   font-size: var(--ttx-chrome);
   line-height: 1;
   text-align: left;
@@ -117,6 +113,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
+  background: var(--ttx-gris);
   transition: flex-basis var(--ttx-dur) var(--ttx-ease);
 }
 
@@ -167,12 +164,16 @@
 
    La fecha no es una frase aparte: es una línea `Rol__ Valor` más, solo que
    suelta arriba. Y el número de catálogo no va aquí — ya se lee en la
-   etiqueta del ítem. Sin párrafo editorial y sin player: se descartaron. */
+   etiqueta del ítem. Sin párrafo editorial y sin player: se descartaron.
+
+   El rótulo va en gris y más chico que el chrome: tiene que nombrar el
+   bloque, no encabezarlo. */
 [data-ttx='catalogo'] .ttx-titulo-panel {
-  font-size: var(--ttx-chrome);
+  font-size: calc(var(--ttx-chrome) * 0.88);
   font-weight: 400;
+  color: var(--ttx-tinta-floja);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 [data-ttx='catalogo'] .ttx-creditos {
@@ -265,12 +266,6 @@
     flex: 0 0 auto;
     width: 100%;
     overflow: visible;
-    border-left: 0;
-    border-top: 1px solid var(--ttx-linea);
-  }
-
-  [data-ttx='catalogo'] .ttx-item:first-child {
-    border-top: 0;
   }
 
   /* El título se queda pegado arriba mientras uno recorre su release, y
@@ -278,17 +273,16 @@
      hay JS: es exactamente lo que hace `sticky` con hermanos, y el que está
      pegado es siempre el del disco que uno está mirando.
 
-     El fondo no es decoración: sin él se le transparentan las carátulas que
-     pasan por debajo. Y el `z-index` lo pone por encima del contenido en
-     flujo del ítem siguiente — como el título de ese ítem viene después en
-     el DOM, gana él, que es justo el empujón. */
+     El gris de la banda es opaco, que es lo que hace falta: sin fondo se le
+     transparentarían las carátulas al pasar por debajo. Y el `z-index` lo
+     pone por encima del contenido en flujo del ítem siguiente — como el
+     título de ese ítem viene después en el DOM, gana él, que es justo el
+     empujón. */
   [data-ttx='catalogo'] .ttx-etiqueta {
     position: sticky;
     top: 0;
     z-index: 2;
     height: var(--ttx-banda-h);
-    background: var(--ttx-papel);
-    border-bottom: 1px solid var(--ttx-linea);
   }
 
   /* El ítem ya no crece a lo ancho: lo que crece es el panel, hacia abajo. */
@@ -308,16 +302,36 @@
     aspect-ratio: 1 / 1;
   }
 
-  /* El panel crece en el eje vertical, que ahora es el principal. `auto` no
-     se puede interpolar, así que aquí el acordeón no anima — a cambio, no
-     hay una altura calculada en JS. */
+  /* El panel crece hacia abajo, y anima. La forma obvia —`flex-basis` de 0
+     a `auto`— no sirve: `auto` no es un número y el navegador no tiene entre
+     qué interpolar, así que el panel aparecía de golpe. Una fila de grid de
+     `0fr` a `1fr` sí se interpola, y da la altura del contenido sin que
+     nadie la mida en JS. */
   [data-ttx='catalogo'] .ttx-panel {
-    flex: 0 0 0;
+    display: grid;
+    grid-template-rows: 0fr;
+    flex: 0 0 auto;
     overflow: hidden;
+    transition: grid-template-rows var(--ttx-dur) var(--ttx-ease);
   }
 
+  /* El `flex-basis` tiene que volver a `auto` a mano. En columna ese
+     `--ttx-panel-w` de la regla de escritorio ya no es un ancho, es un
+     alto: el panel se abría de golpe a 336px y la fila de grid no pintaba
+     nada. Que manda el contenido, no el ancho del panel de al lado. */
   [data-ttx='catalogo'] .ttx-item[data-abierto] .ttx-panel {
     flex-basis: auto;
+    grid-template-rows: 1fr;
+  }
+
+  /* La que se aplasta es la caja, no la columna. Una fila de `0fr` solo
+     encoge lo que puede medir cero, y `.ttx-panel-col` no puede: lleva el
+     padding, y una caja con padding nunca mide menos que su padding. Por eso
+     el panel cerrado dejaba asomando su primera línea debajo de cada
+     carátula — primero la palabra CREDITS, y al ocultarla, la fecha. */
+  [data-ttx='catalogo'] .ttx-panel-caja {
+    min-height: 0;
+    overflow: hidden;
   }
 
   [data-ttx='catalogo'] .ttx-panel-col {
