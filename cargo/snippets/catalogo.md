@@ -83,18 +83,25 @@ cruce ni fundido entre discos porque no hay nada que cruzar — si abajo se
 movió, arriba ya se movió.
 
 Encima va una estampa en **blanco y negro**, sin un solo gris: un poco de
-blur, a grises, y el gris aplanado a dos valores. Como `posterize` y el
-umbral no existen en CSS, el filtro es SVG y lo inyecta el propio script;
-`--ttx-visor-fx` sigue siendo el único punto de calibración y admite
-encadenar filtros de CSS antes o después.
+blur, a grises, el gris aplanado a dos valores **en inverso** —lo oscuro
+sale blanco— y un blur suave al final que le quita el filo de recorte al
+salto entre los dos tonos. Como `posterize` y el umbral no existen en CSS,
+el filtro es SVG y lo inyecta el propio script; `--ttx-visor-fx` sigue
+siendo el único punto de calibración y admite encadenar filtros de CSS antes
+o después.
 
-Los dos números que valen la pena tocar están en el `tableValues` del filtro
-(`src/widgets/_runtime/stack.js`):
+Todo lo que vale la pena tocar está en el `tableValues` del filtro
+(`src/widgets/_runtime/stack.js`), y va al revés de lo que uno esperaría
+porque el umbral está invertido:
 
-- **dónde corta:** `"0 1"` parte por la mitad; `"0 0 1"` deja más negro,
-  `"0 1 1"` más blanco.
-- **cuántos tonos:** `"0 .55 1"` mete un gris medio, si se quiere menos
+- **dar la vuelta:** `"1 0"` es el inverso, `"0 1"` el directo.
+- **dónde corta:** `"1 0"` parte por la mitad; `"1 1 0"` deja más blanco,
+  `"1 0 0"` más negro.
+- **cuántos tonos:** `"1 .45 0"` mete un gris medio, si se quiere menos
   brutal.
+
+Y el `stdDeviation` del último `feGaussianBlur` es cuánto se ablandan los
+bordes: `0` los deja de recorte, `2` es lo que hay, `5` ya los derrite.
 
 En teléfono el carril va parado, y un reflejo que corre a lo ancho ahí no
 significa nada: el visor muestra la carátula activa sola, con el mismo

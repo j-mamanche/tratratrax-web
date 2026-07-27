@@ -75,13 +75,15 @@ export function proyectar(host, datos) {
 
 // ── El filtro del visor ───────────────────────────────────────────────
 //
-// Una estampa en blanco y negro, sin un solo gris. Tres pasos:
+// Una estampa en blanco y negro, sin un solo gris. Cuatro pasos:
 //
 //   1. un poco de blur, para que lo que quede sean formas y no grano;
 //   2. a escala de grises;
 //   3. el gris aplanado a dos valores — eso es `posterize` llevado al
 //      límite, y en SVG es literalmente un `feComponentTransfer` de tipo
-//      `discrete` con dos entradas.
+//      `discrete` con dos entradas. En inverso: lo oscuro sale blanco;
+//   4. y un blur suave al final, que le quita el filo de recorte al salto
+//      entre los dos tonos.
 //
 // Nada de esto existe como filtro de CSS: `blur()` sí, pero no hay ni
 // `posterize` ni umbral. En SVG sí, y se referencia igual —
@@ -93,21 +95,24 @@ export function proyectar(host, datos) {
 // *es* el salto entre blanco y negro. Se sacó, y con él lo más caro del
 // filtro.
 //
-// Dos números para calibrar, los dos en `tableValues`:
-//   - dónde corta: `"0 1"` parte por la mitad; `"0 0 1"` deja más negro y
-//     `"0 1 1"` más blanco.
-//   - cuántos tonos: `"0 .55 1"` mete un gris medio, si algún día se quiere
+// Todo lo que vale la pena calibrar está en `tableValues`, y va al revés de
+// lo que uno esperaría porque el umbral está invertido:
+//   - dar la vuelta: `"1 0"` es el inverso, `"0 1"` el directo.
+//   - dónde corta: `"1 0"` parte por la mitad; `"1 1 0"` deja más blanco y
+//     `"1 0 0"` más negro.
+//   - cuántos tonos: `"1 .45 0"` mete un gris medio, si algún día se quiere
 //     menos brutal.
 const FILTRO = `
 <filter id="ttx-visor-fx" x="-8%" y="-8%" width="116%" height="116%"
         color-interpolation-filters="sRGB">
   <feGaussianBlur stdDeviation="3" result="suave"/>
   <feColorMatrix in="suave" type="saturate" values="0" result="gris"/>
-  <feComponentTransfer in="gris">
-    <feFuncR type="discrete" tableValues="0 1"/>
-    <feFuncG type="discrete" tableValues="0 1"/>
-    <feFuncB type="discrete" tableValues="0 1"/>
+  <feComponentTransfer in="gris" result="umbral">
+    <feFuncR type="discrete" tableValues="1 0"/>
+    <feFuncG type="discrete" tableValues="1 0"/>
+    <feFuncB type="discrete" tableValues="1 0"/>
   </feComponentTransfer>
+  <feGaussianBlur in="umbral" stdDeviation="2"/>
 </filter>`;
 
 const NS = 'http://www.w3.org/2000/svg';
