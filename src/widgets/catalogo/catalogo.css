@@ -83,11 +83,7 @@
   letter-spacing: -0.13em;
 }
 
-[data-ttx='catalogo'] .ttx-cat,
-[data-ttx='catalogo'] .ttx-artistas {
-  color: var(--ttx-tinta-floja);
-}
-
+/* Los tres van en tinta plena: lo único que los separa es el peso. */
 [data-ttx='catalogo'] .ttx-album {
   font-weight: 700;
 }
@@ -127,7 +123,9 @@
 
 [data-ttx='catalogo'] .ttx-panel-col {
   width: var(--ttx-panel-w);
-  padding: 0 1.25rem 1.5rem 0.5rem;
+  /* El aire de arriba vale una línea: pegado al borde, CREDITS se leía como
+     parte de la etiqueta y no como el comienzo del panel. */
+  padding: 0.9rem 1.25rem 1.5rem 0.5rem;
   font-size: var(--ttx-cuerpo-fs);
   line-height: 1.45;
 }
@@ -336,7 +334,7 @@
 
   [data-ttx='catalogo'] .ttx-panel-col {
     width: 100%;
-    padding: 0.75rem 0.6rem 1.5rem;
+    padding: 1.1rem 0.6rem 1.5rem;
   }
 
   /* Un reflejo que corre a lo ancho no significa nada cuando lo de abajo se
