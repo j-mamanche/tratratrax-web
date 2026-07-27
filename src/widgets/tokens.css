@@ -14,7 +14,6 @@
      el widget y la página terminaría scrolleando de más. */
   --ttx-margen: 0px;
   --ttx-nav-h: 0px;
-  --ttx-radio: 0px;
   --ttx-alto: calc(100svh - var(--ttx-margen) * 2 - var(--ttx-nav-h));
 
   --ttx-visor-h: clamp(64px, 16%, 190px);
@@ -33,13 +32,18 @@
   --ttx-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
   /* ── Efecto del visor ─────────────────────────────────────────────── */
-  /* Color, no inversión: lo de arriba es el reflejo de las mismas carátulas
-     con el color subido, no una capa de otro tono. La versión con
-     `invert() + mix-blend-mode: luminosity` teñía todo de azul. */
-  --ttx-visor-fx: blur(20px) saturate(3.2) contrast(1.18);
+  /* Una estampa en blanco y negro: un poco de blur, a grises, y el gris
+     aplanado a dos valores. El filtro SVG lo inyecta `stack.js`; aquí se
+     puede encadenar lo que sea de CSS antes o después. Ojo con `saturate`
+     y compañía: sobre dos tonos no hacen nada. */
+  --ttx-visor-fx: url(#ttx-visor-fx);
 
   /* ── Color ────────────────────────────────────────────────────────── */
   --ttx-tinta: #000;
+  /* La tinta floja separa lo secundario de lo principal sin meter un
+     carácter de por medio: el número y los artistas van en gris, el álbum
+     en negro y en negrita. Eso es lo que hace de separador. */
+  --ttx-tinta-floja: rgba(0, 0, 0, 0.46);
   --ttx-papel: #fff;
   --ttx-linea: rgba(0, 0, 0, 0.22);
 
@@ -112,7 +116,8 @@
      barra de navegación. Como el alto ya los descontó, la página no crece. */
   margin: var(--ttx-margen);
   margin-bottom: calc(var(--ttx-margen) + var(--ttx-nav-h));
-  border-radius: var(--ttx-radio);
+  /* Esquinas cuadradas, siempre. No hay variable para redondearlas: es una
+     regla del diseño, no una calibración. */
   overflow: hidden;
 }
 

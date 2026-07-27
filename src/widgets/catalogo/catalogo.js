@@ -52,10 +52,13 @@ registrar('catalogo', async (host) => {
   const soltarCentro = seguirCentro(host, carril);
   const ancla = anclador(carril);
 
+  // La carátula abre el release igual que la etiqueta. El estado y los
+  // atributos ARIA siguen viviendo en la etiqueta, que es el `<button>`:
+  // esto es un blanco más grande para el puntero, no un segundo control.
   carril.addEventListener('click', (e) => {
-    const etiqueta = e.target.closest?.('.ttx-etiqueta');
-    if (etiqueta && carril.contains(etiqueta)) {
-      alternar(host, carril, etiqueta.closest('.ttx-item'), ancla);
+    const disparador = e.target.closest?.('.ttx-etiqueta, .ttx-cover');
+    if (disparador && carril.contains(disparador)) {
+      alternar(host, carril, disparador.closest('.ttx-item'), ancla);
     }
   });
 
@@ -209,21 +212,22 @@ function alternar(host, carril, item, ancla) {
 }
 
 /**
- * Trae el borde izquierdo del ítem abierto al borde izquierdo del carril, y
- * lo **mantiene ahí** mientras dura el acordeón.
+ * Trae el comienzo del ítem abierto al comienzo del carril, y lo **mantiene
+ * ahí** mientras dura el acordeón. Acostado eso es el borde izquierdo;
+ * parado es el borde de arriba, o sea que el título del release queda justo
+ * debajo del visor — en la segunda banda del stack, que es donde va.
  *
  * Un `scrollTo` de una sola vez no alcanza, y ese era el bug: al abrir un
- * segundo release el primero se cierra, o sea que todo lo que está a la
- * izquierda encoge — pero encoge *animado*, durante medio segundo. La
- * posición que se calculaba en el instante del clic era la de antes de esa
- * animación, así que el carril apuntaba a un lugar que dejaba de existir y
- * el ítem terminaba corrido: la carátula pegada al borde y el panel de
- * créditos escondido fuera de pantalla, a la izquierda.
+ * segundo release el primero se cierra, o sea que todo lo que está antes
+ * encoge — pero encoge *animado*, durante medio segundo. La posición que se
+ * calculaba en el instante del clic era la de antes de esa animación, así
+ * que el carril apuntaba a un lugar que dejaba de existir y el ítem
+ * terminaba corrido: la carátula pegada al borde y el panel de créditos
+ * escondido fuera de pantalla.
  *
  * La corrección es no calcular una posición sino sostener una relación. Cada
  * cuadro se vuelve a medir dónde quedó el ítem y se corrige la diferencia;
- * como el layout de abajo se mueve suave, la corrección también. En teléfono
- * no se usa: ahí el ítem no crece a lo ancho y no hay nada que sostener.
+ * como el layout se mueve suave, la corrección también.
  */
 function anclador(carril) {
   let objetivo = null;
@@ -236,18 +240,18 @@ function anclador(carril) {
   };
 
   const paso = () => {
-    // Lo que le falta al ítem para tocar el borde izquierdo del carril.
-    // Positivo: está a la derecha, hay que scrollear hacia adelante.
-    carril.scrollLeft +=
-      objetivo.getBoundingClientRect().left - carril.getBoundingClientRect().left;
+    const it = objetivo.getBoundingClientRect();
+    const ca = carril.getBoundingClientRect();
+    // Lo que le falta al ítem para tocar el comienzo del carril. Positivo:
+    // está más adelante, hay que scrollear hacia allá.
+    if (carril.scrollWidth > carril.clientWidth) carril.scrollLeft += it.left - ca.left;
+    else carril.scrollTop += it.top - ca.top;
     raf = performance.now() < fin ? requestAnimationFrame(paso) : 0;
   };
 
   return {
     soltar,
     fijar(item) {
-      // El carril horizontal es el único que se mueve solo.
-      if (carril.scrollWidth <= carril.clientWidth) return;
       objetivo = item;
       // El acordeón dura `--ttx-dur`; un respiro de más cubre el último
       // cuadro, donde la transición ya terminó pero el layout aún no.

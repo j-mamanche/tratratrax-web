@@ -55,8 +55,10 @@
 }
 
 /* ── La etiqueta ──────────────────────────────────────────────────────
-   `TRA 031_____PYREXIA_____EHUA & FLORE`, sin separadores en el contenido:
-   los guiones bajos son un `::after` del CSS, como en el sitio viejo. */
+   `TRA 031PYREXIAEHUA & FLORE`, pegado y sin un solo carácter de por medio.
+   Lo que separa es tipografía: el álbum en negrita y tinta plena, el número
+   y los artistas en gris y peso normal. Es lo mismo que hace la ref, solo
+   que ahí va en tres líneas y aquí en una. */
 [data-ttx='catalogo'] .ttx-etiqueta {
   display: flex;
   align-items: center;
@@ -74,22 +76,20 @@
   cursor: pointer;
 }
 
-/* El separador. `letter-spacing` negativo porque si no los guiones bajos
-   salen picados uno a uno en vez de leerse como una raya sola — es el mismo
-   -0.13em con el que el sitio viejo cierra los de la barra de artistas. El
-   tracking se lo come el último guión, y el margen se lo devuelve. */
+/* Por defecto no hay separador: van pegados. La variable queda por si
+   alguna pantalla quiere meter algo — si son guiones bajos, el
+   `letter-spacing` negativo los cierra en una raya continua en vez de
+   dejarlos picados uno a uno (el mismo -0.13em de la barra de artistas). */
 [data-ttx='catalogo'] .ttx-cat::after,
 [data-ttx='catalogo'] .ttx-album::after {
-  content: var(--ttx-etiqueta-sep, '_____');
+  content: var(--ttx-etiqueta-sep, '');
   display: inline-block;
   letter-spacing: -0.13em;
-  margin: 0 0.2em 0 0.15em;
 }
 
-/* Sin artistas, el álbum es el último: nada que separar de nada. */
-[data-ttx='catalogo'] .ttx-album:last-child::after {
-  content: '';
-  margin: 0;
+[data-ttx='catalogo'] .ttx-cat,
+[data-ttx='catalogo'] .ttx-artistas {
+  color: var(--ttx-tinta-floja);
 }
 
 [data-ttx='catalogo'] .ttx-album {
@@ -135,11 +135,17 @@
   line-height: 1.45;
 }
 
+/* La carátula abre el release igual que la etiqueta: es el blanco grande y
+   evidente, y la etiqueta es una franja de milímetros. El control de verdad
+   —el que ve el teclado y el lector de pantalla— sigue siendo la etiqueta,
+   que es un `<button>`; esto es un atajo con el puntero, no un segundo
+   control. */
 [data-ttx='catalogo'] .ttx-cover {
   flex: 0 0 var(--ttx-w-item);
   width: var(--ttx-w-item);
   height: 100%;
   object-fit: cover;
+  cursor: pointer;
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -244,17 +250,45 @@
   }
 
   /* En columna el ítem mide lo que mide su contenido, no una fracción de
-     la fila; y la línea que lo separa del anterior es horizontal. */
+     la fila; y la línea que lo separa del anterior es horizontal.
+
+     Dos cosas que parecen detalles y no lo son:
+
+     - `display: block` en vez de grid. Un `sticky` se pega dentro de su
+       bloque contenedor, y el de un ítem de grid es su celda — una franja
+       de la altura del título. Pegado ahí no se pega a nada.
+     - `overflow: visible`. `hidden` convierte al ítem en contenedor de
+       scroll, y entonces el título se pegaría a *él* y no al carril: se
+       quedaría quieto en su sitio para siempre. */
   [data-ttx='catalogo'] .ttx-item {
+    display: block;
     flex: 0 0 auto;
     width: 100%;
-    grid-template-rows: var(--ttx-banda-h) auto;
+    overflow: visible;
     border-left: 0;
     border-top: 1px solid var(--ttx-linea);
   }
 
   [data-ttx='catalogo'] .ttx-item:first-child {
     border-top: 0;
+  }
+
+  /* El título se queda pegado arriba mientras uno recorre su release, y
+     cuando llega el siguiente lo empuja hacia afuera y toma su lugar. No
+     hay JS: es exactamente lo que hace `sticky` con hermanos, y el que está
+     pegado es siempre el del disco que uno está mirando.
+
+     El fondo no es decoración: sin él se le transparentan las carátulas que
+     pasan por debajo. Y el `z-index` lo pone por encima del contenido en
+     flujo del ítem siguiente — como el título de ese ítem viene después en
+     el DOM, gana él, que es justo el empujón. */
+  [data-ttx='catalogo'] .ttx-etiqueta {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: var(--ttx-banda-h);
+    background: var(--ttx-papel);
+    border-bottom: 1px solid var(--ttx-linea);
   }
 
   /* El ítem ya no crece a lo ancho: lo que crece es el panel, hacia abajo. */

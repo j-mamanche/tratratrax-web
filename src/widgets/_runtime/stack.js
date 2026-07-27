@@ -25,6 +25,7 @@
  */
 export function crearStack(host, { banda = false } = {}) {
   host.classList.add('ttx', 'ttx-stack');
+  inyectarFiltro();
 
   const visor = document.createElement('div');
   visor.className = 'ttx-visor';
@@ -70,6 +71,59 @@ export function proyectar(host, datos) {
       el.textContent = valor;
     }
   }
+}
+
+// ── El filtro del visor ───────────────────────────────────────────────
+//
+// Una estampa en blanco y negro, sin un solo gris. Tres pasos:
+//
+//   1. un poco de blur, para que lo que quede sean formas y no grano;
+//   2. a escala de grises;
+//   3. el gris aplanado a dos valores — eso es `posterize` llevado al
+//      límite, y en SVG es literalmente un `feComponentTransfer` de tipo
+//      `discrete` con dos entradas.
+//
+// Nada de esto existe como filtro de CSS: `blur()` sí, pero no hay ni
+// `posterize` ni umbral. En SVG sí, y se referencia igual —
+// `filter: url(#…)`— así que el punto de calibración sigue siendo una sola
+// variable.
+//
+// Se probó también dibujar los bordes encima con un `feConvolveMatrix`,
+// como en una serigrafía. Sobre dos tonos no aporta nada: el contorno ya
+// *es* el salto entre blanco y negro. Se sacó, y con él lo más caro del
+// filtro.
+//
+// Dos números para calibrar, los dos en `tableValues`:
+//   - dónde corta: `"0 1"` parte por la mitad; `"0 0 1"` deja más negro y
+//     `"0 1 1"` más blanco.
+//   - cuántos tonos: `"0 .55 1"` mete un gris medio, si algún día se quiere
+//     menos brutal.
+const FILTRO = `
+<filter id="ttx-visor-fx" x="-8%" y="-8%" width="116%" height="116%"
+        color-interpolation-filters="sRGB">
+  <feGaussianBlur stdDeviation="3" result="suave"/>
+  <feColorMatrix in="suave" type="saturate" values="0" result="gris"/>
+  <feComponentTransfer in="gris">
+    <feFuncR type="discrete" tableValues="0 1"/>
+    <feFuncG type="discrete" tableValues="0 1"/>
+    <feFuncB type="discrete" tableValues="0 1"/>
+  </feComponentTransfer>
+</filter>`;
+
+const NS = 'http://www.w3.org/2000/svg';
+
+/** Uno solo para todo el documento: el filtro no depende de la instancia. */
+function inyectarFiltro() {
+  if (document.getElementById('ttx-visor-fx')) return;
+
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('width', '0');
+  svg.setAttribute('height', '0');
+  // Fuera del flujo y sin tamaño: es una definición, no algo que se vea.
+  svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+  svg.innerHTML = FILTRO;
+  document.body.append(svg);
 }
 
 /**
