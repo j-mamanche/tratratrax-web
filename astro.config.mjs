@@ -1,13 +1,11 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// OJO: `site` y `base` hay que ajustarlos cuando exista el repo en GitHub.
-// Si el repo es github.com/<usuario>/tratratrax-web, entonces:
-//   site: 'https://<usuario>.github.io'
-//   base: '/tratratrax-web'
-// Con dominio propio, `base` se borra.
+// GitHub Pages de proyecto: la URL publicada es
+//   https://j-mamanche.github.io/tratratrax-web/
+// Si algún día se pone dominio propio, `base` vuelve a '/'.
 export default defineConfig({
-  site: 'https://EDITAR.github.io',
+  site: 'https://j-mamanche.github.io',
   base: '/tratratrax-web',
   build: {
     // Los widgets se compilan aparte (npm run build:widgets), no como isla de Astro.
