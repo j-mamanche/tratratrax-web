@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     PREVIEW LOCAL DEL NAV — no se pega en Cargo.
+     Sirve para calibrar el glitch, la separación del menú y el
+     blanco/negro automático sin tocar el sitio en vivo. El HTML, el
+     CSS y los scripts son los mismos que están en nav.md; acá van con
+     <column-set> emulado por divs y el logo reemplazado por un cuadro,
+     porque los custom elements de Cargo no existen fuera de Cargo.
+     El panel de arriba a la izquierda no existe en Cargo: es para
+     probar fondos y el interruptor de página.
+     Si cambias algo acá y queda bien, cópialo a nav.md y a Cargo.
+     ============================================================ -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Preview nav — TraTraTrax</title>
+<style>
+	html, body {
+		margin: 0;
+		height: 100%;
+	}
+
+	body {
+		font-family: "Helvetica Neue", Helvetica, sans-serif;
+		font-size: 0.8rem;
+		letter-spacing: 0;
+	}
+
+	/* --- emulación de Cargo: la página de fondo y el nav encima --- */
+	.page {
+		min-height: 100vh;
+	}
+
+	#fondo .page-content {
+		position: absolute;
+		inset: 0;
+		background: #101010;
+	}
+
+	[id="L3482832595"] {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+	}
+
+	[id="L3482832595"] .page-content {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: flex-end;
+		padding: 1rem;
+	}
+
+	column-set {
+		display: flex;
+		align-items: stretch;
+		width: 100%;
+		gap: 1rem;
+	}
+
+	column-set > column-unit {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		flex: 1;
+	}
+
+	column-set > column-unit > * {
+		width: 100%;
+	}
+
+	/* --- lo que sí se copia a Cargo (sin el prefijo del id, salvo el
+	       bloque de color, que va igual que allá) --- */
+
+	[id="L3482832595"],
+	[id="L3482832595"] [data-nav="white"] {
+		--nav-ink: rgba(255, 255, 255, 0.85);
+		--nav-ink-strong: rgb(255, 255, 255);
+		--nav-logo-filter: none;
+	}
+
+	[id="L3482832595"][data-nav="black"],
+	[id="L3482832595"] [data-nav="black"] {
+		--nav-ink: rgba(0, 0, 0, 0.85);
+		--nav-ink-strong: rgb(0, 0, 0);
+		--nav-logo-filter: invert(1);
+	}
+
+	.nav-lema {
+		text-align: left;
+		color: var(--nav-ink);
+		transition: color 220ms ease;
+	}
+
+	.nav-logo {
+		text-align: center;
+		line-height: 0;
+	}
+
+	.nav-links {
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-end;
+		gap: 0.03em;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.nav-links a {
+		display: inline-block;
+		color: var(--nav-ink-strong);
+		text-decoration: none;
+		border-bottom: 0;
+		font-weight: 400;
+		transition: color 220ms ease;
+	}
+
+	.nav-links a.active,
+	.nav-links a.is-active {
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.nav-links a.active + a,
+	.nav-links a.is-active + a {
+		margin-left: 0.05em;
+	}
+
+	.nav-links a::after {
+		content: attr(data-label);
+		display: block;
+		height: 0;
+		overflow: hidden;
+		visibility: hidden;
+		font-weight: 700;
+		pointer-events: none;
+	}
+
+	[data-glitch] {
+		display: inline-block;
+		white-space: nowrap;
+	}
+
+	.glitch-caret::after {
+		content: "▌";
+		opacity: 0;
+	}
+
+	[data-glitch].is-typing .glitch-caret::after {
+		opacity: 1;
+	}
+
+	[data-glitch].is-resting .glitch-caret::after {
+		animation: ttx-caret 0.5s steps(1) 3 both;
+	}
+
+	@keyframes ttx-caret {
+		0%, 49% { opacity: 1; }
+		50%, 100% { opacity: 0; }
+	}
+
+	/* --- solo del preview --- */
+	.fake-logo {
+		display: inline-block;
+		width: 15%;
+		aspect-ratio: 3 / 1;
+		background: #ffffff;
+		filter: var(--nav-logo-filter);
+		transition: filter 220ms ease;
+	}
+
+	/* fondos de prueba */
+	#fondo .mitad {
+		position: absolute;
+		inset: 0 0 0 50%;
+		background: #ffffff;
+		display: none;
+	}
+
+	#fondo.partido .mitad { display: block; }
+
+	#fondo.foto .page-content {
+		background:
+			radial-gradient(circle at 30% 70%, #d8cf9a 0%, #6b5b2a 45%, #14120a 100%);
+	}
+
+	#panel {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 99999;
+		padding: 0.6rem;
+		background: rgba(127, 127, 127, 0.35);
+		font-size: 11px;
+		line-height: 1.9;
+		color: #fff;
+		mix-blend-mode: difference;
+	}
+
+	#panel button {
+		font: inherit;
+		cursor: pointer;
+		margin-right: 2px;
+	}
+
+	#panel b { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="page" id="fondo"><div class="page-content"><div class="mitad"></div></div></div>
+
+<div class="page" id="L3482832595"><div class="page-content">
+
+<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><span class="fake-logo"></span></div></column-unit><column-unit slot="2"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" class="active">CATALOG</a><a href="merca-2" rel="history" data-label="MERCA">MERCA</a><a href="blog-2" rel="history" data-label="BLOG">BLOG</a></div></column-unit></column-set>
+
+</div></div>
+
+<div id="panel">
+	<b>fondo</b>
+	<button data-bg="#101010">negro</button><button data-bg="#ffffff">blanco</button><button data-bg="#e5e5e5">gris</button><button data-bg="#7a7a7a">gris medio</button><button data-split>partido</button><button data-foto>foto</button>
+	<br>
+	<b>interruptor de página</b>
+	<button data-mode="auto">auto</button><button data-mode="white">blanco</button><button data-mode="black">negro</button>
+	<br>
+	<span id="estado"></span>
+</div>
+
+<!-- SCRIPT LEMA GLITCH + PÁGINA ACTIVA (navs L3482832595 · N1901077103) -->
+
+<script>
+(function () {
+  var PHRASES = [
+    "TODOS LOS IZQUIERDOS PÚBLICOS",
+    "MUÉVALO",
+    "IMPUREZA SÓNICA",
+    "SONIC HUSTLERS",
+    "DEL SUR"
+  ];
+
+  // Residuo que arrastra el cursor. Sin letras acentuadas: se leen como
+  // error de encoding.
+  var NOISE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/\\|<>_-=+*#%$@[]{}·";
+
+  var HOLD_MIN  = 3200;  // ms quieto antes de cambiar (mínimo)
+  var HOLD_MAX  = 6500;  // ms quieto antes de cambiar (máximo)
+  var DEL_MS    = 30;    // ms por letra borrada — borra más rápido de lo que escribe
+  var DEL_JIT   = 14;    // variación del borrado, ±
+  var TYPE_MS   = 58;    // ms por letra escrita
+  var TYPE_JIT  = 42;    // variación del tecleo, ± — es lo que lo hace humano
+  var PAUSE_MIN = 180;   // ms en blanco entre borrar y escribir
+  var PAUSE_MAX = 420;
+  var TRAIL     = 1;     // letras de ruido que arrastra el cursor al escribir
+  var GHOST     = 0.05;  // probabilidad de que una letra ya escrita parpadee (0 lo apaga)
+
+  var AWAY_MS   = 1000;  // cada cuánto mira si el nodo volvió al documento
+  var AWAY_MAX  = 30;    // cuántas veces mira antes de rendirse (30s)
+  var WATCH_MS  = 3000;  // ronda de reparación
+
+  // En Cargo el nav de escritorio y el de móvil son dos páginas distintas, cada
+  // una con su id. Acá van todas las instancias; el lema se anima solo en las
+  // que tengan un [data-glitch], esta lista es para marcar la página activa.
+  var NAV_IDS = ["L3482832595", "N1901077103"];
+  var NAV_SEL = '[id="' + NAV_IDS.join('"], [id="') + '"]';
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Los controladores viven acá y NO en un data-attribute. Un atributo
+  // sobrevive a los clones: si Cargo cachea el nav ya inicializado, la copia
+  // vuelve marcada como "lista" y nadie la vuelve a arrancar. Un WeakMap no
+  // se copia con el nodo, así que un clon se reinicializa solo.
+  var seen = new WeakMap();
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+
+  function pickOther(list, current) {
+    var value;
+    do {
+      value = list[Math.floor(Math.random() * list.length)];
+    } while (list.length > 1 && value === current);
+    return value;
+  }
+
+  function noiseRun(count) {
+    var text = "";
+    for (var i = 0; i < count; i++) {
+      text += NOISE.charAt(Math.floor(Math.random() * NOISE.length));
+    }
+    return text;
+  }
+
+  // Las últimas `trail` letras todavía son ruido; el resto ya cuajó, salvo
+  // un parpadeo ocasional que deja el residuo.
+  function withTrail(text, count, trail) {
+    var solid = Math.max(0, count - trail);
+    var head = text.slice(0, solid);
+
+    if (GHOST > 0 && solid > 1 && Math.random() < GHOST) {
+      var i = Math.floor(Math.random() * solid);
+      head = head.slice(0, i) + noiseRun(1) + head.slice(i + 1);
+    }
+
+    return head + noiseRun(count - solid);
+  }
+
+  function build(el) {
+    var seed = (el.textContent || "").trim();
+
+    var ctl = {
+      out: null,
+      phrase: PHRASES.indexOf(seed) >= 0 ? seed : PHRASES[0],
+      idle: true,      // false solo mientras corre la animación
+      stopped: false,  // se rindió: el nodo estuvo fuera del documento demasiado
+      dead: false,     // otro controlador tomó su lugar
+      away: 0
+    };
+
+    el.textContent = "";
+    el.classList.remove("is-typing");
+    el.classList.add("is-resting"); // parpadea al cargar y se apaga
+
+    ctl.out = document.createElement("span");
+    ctl.out.className = "glitch-text";
+    ctl.out.textContent = ctl.phrase;
+
+    var caret = document.createElement("span");
+    caret.className = "glitch-caret";
+    caret.setAttribute("aria-hidden", "true");
+
+    el.appendChild(ctl.out);
+    el.appendChild(caret);
+
+    // Un solo timer por lema: espera, borrado y tecleo se turnan.
+    function later(fn, ms) {
+      setTimeout(function () {
+        if (!ctl.dead) fn();
+      }, ms);
+    }
+
+    // ÚNICO punto donde el ciclo puede detenerse, y siempre con la frase
+    // completa en pantalla. Nunca en mitad de una animación: por eso el lema
+    // ya no puede quedar vacío para siempre.
+    function gate() {
+      if (document.contains(el)) {
+        ctl.away = 0;
+        change();
+        return;
+      }
+
+      // Cargo mueve y reemplaza el nav al navegar; estar fuera del documento
+      // un instante es normal, no motivo para morirse.
+      ctl.away += 1;
+      if (ctl.away > AWAY_MAX) {
+        ctl.stopped = true; // si el nodo reaparece, scan() lo revive
+        return;
+      }
+      later(gate, AWAY_MS);
+    }
+
+    function hold() {
+      later(gate, rnd(HOLD_MIN, HOLD_MAX));
+    }
+
+    function change() {
+      var next = pickOther(PHRASES, ctl.phrase);
+      run(next, function () {
+        ctl.phrase = next;
+        hold();
+      });
+    }
+
+    // Sin comprobaciones de nodo adentro: una vez que arranca, termina. Dura
+    // ~2s y siempre aterriza en la frase entera, esté donde esté el nodo.
+    function run(to, done) {
+      var from = ctl.phrase;
+
+      if (reduce) {
+        ctl.out.textContent = to;
+        done();
+        return;
+      }
+
+      ctl.idle = false;
+      el.classList.remove("is-resting");
+      el.classList.add("is-typing");
+
+      var erased = from.length;
+      var typed = 0;
+
+      // Borrar es limpio: se come la frase letra por letra, sin ruido.
+      function erase() {
+        erased -= 1;
+
+        if (erased <= 0) {
+          ctl.out.textContent = "";
+          later(type, rnd(PAUSE_MIN, PAUSE_MAX));
+          return;
+        }
+
+        ctl.out.textContent = from.slice(0, erased);
+        later(erase, rnd(DEL_MS - DEL_JIT, DEL_MS + DEL_JIT));
+      }
+
+      function type() {
+        typed += 1;
+
+        if (typed > to.length) {
+          settle(TRAIL - 1);
+          return;
+        }
+
+        ctl.out.textContent = withTrail(to, typed, TRAIL);
+        later(type, rnd(TYPE_MS - TYPE_JIT, TYPE_MS + TYPE_JIT));
+      }
+
+      // Deja que el residuo se apague solo en vez de cortarlo de golpe.
+      function settle(trail) {
+        if (trail <= 0) {
+          ctl.out.textContent = to;
+          el.classList.remove("is-typing");
+          el.classList.add("is-resting"); // dispara los parpadeos finales
+          ctl.idle = true;
+          done();
+          return;
+        }
+
+        ctl.out.textContent = withTrail(to, to.length, trail);
+        later(function () { settle(trail - 1); }, rnd(TYPE_MS - TYPE_JIT, TYPE_MS + TYPE_JIT));
+      }
+
+      erase();
+    }
+
+    // La red de seguridad: si el lema quedó vacío o a medias por algo que no
+    // controlamos, vuelve a la frase completa; si el ciclo se había rendido,
+    // arranca de nuevo.
+    ctl.resume = function () {
+      if (ctl.idle && ctl.out.textContent !== ctl.phrase) {
+        ctl.out.textContent = ctl.phrase;
+      }
+      if (ctl.stopped) {
+        ctl.stopped = false;
+        ctl.away = 0;
+        hold();
+      }
+    };
+
+    hold();
+    return ctl;
+  }
+
+  function initGlitch(el) {
+    var ctl = seen.get(el);
+
+    // Mismo nodo, controlador vivo y con sus <span> puestos: solo repara.
+    if (ctl && !ctl.dead && el.contains(ctl.out)) {
+      ctl.resume();
+      return;
+    }
+
+    // Nodo clonado por Cargo, o vaciado por debajo: al controlador viejo se
+    // le retira el turno para que no queden dos escribiendo.
+    if (ctl) ctl.dead = true;
+
+    seen.set(el, build(el));
+  }
+
+  // Respaldo por si Cargo no marca .active en los links del nav.
+  function markActive(root) {
+    var here = location.pathname.replace(/^\/|\/$/g, "");
+    var links = root.querySelectorAll(".nav-links a[href]");
+
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute("href").replace(/^\/|\/$/g, "");
+      links[i].classList.toggle("is-active", href !== "" && href === here);
+    }
+  }
+
+  function scan() {
+    var lemas = document.querySelectorAll("[data-glitch]");
+    for (var i = 0; i < lemas.length; i++) initGlitch(lemas[i]);
+
+    var navs = document.querySelectorAll(NAV_SEL);
+    for (var j = 0; j < navs.length; j++) markActive(navs[j]);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", scan);
+  } else {
+    scan();
+  }
+  window.addEventListener("load", scan);
+  window.addEventListener("hashchange", scan);
+  window.addEventListener("popstate", scan);
+  window.addEventListener("pageshow", scan); // volver con el botón atrás
+
+  // Cargo navega por AJAX: sin observer, el nav vuelve sin lema animado.
+  var pending = null;
+  var observer = new MutationObserver(function (records) {
+    for (var i = 0; i < records.length; i++) {
+      var node = records[i].target;
+      if (node.nodeType !== 1) node = node.parentElement;
+      // Ignora las mutaciones que provoca el propio lema, si no el observer
+      // se dispara con cada letra.
+      if (node && node.closest && node.closest("[data-glitch]")) continue;
+
+      clearTimeout(pending);
+      pending = setTimeout(scan, 120);
+      return;
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Ronda de reparación: cueste lo que cueste, un lema vacío o dormido se
+  // arregla solo en menos de 3s. Es una pasada de querySelectorAll, nada más.
+  setInterval(scan, WATCH_MS);
+})();
+</script>
+
+<!-- SCRIPT NAV BLANCO/NEGRO (navs L3482832595 · N1901077103) -->
+
+<script>
+(function () {
+  // Todas las instancias del nav: escritorio, móvil, y la que venga. Cada una
+  // es una página distinta en Cargo, con su propio id. Se miden todas y cada
+  // una decide su color por separado — la que esté escondida no mide nada.
+  var NAV_IDS = ["L3482832595", "N1901077103"];
+  var NAV_SEL = '[id="' + NAV_IDS.join('"], [id="') + '"]';
+
+  // Las tres piezas del nav. Cada una mide el fondo que le toca: si la página
+  // parte el fondo en dos, el lema puede ir blanco y el menú negro.
+  var PARTS = ".nav-lema, .nav-logo, .nav-links";
+  var SPLIT = true;       // false = un solo color para todo el nav (el promedio)
+
+  var DEFAULT = "white";  // lo que se pinta cuando no hay nada medible
+  var MARGIN  = 1.15;     // cambiar de color cuesta: el otro tiene que contrastar
+                          // un 15% mejor. Es la histéresis — sin ella, un fondo
+                          // justo en la frontera hace parpadear el nav al hacer
+                          // scroll.
+
+  var POLL_MS   = 1000;   // ronda de seguridad, por si algo cambió sin avisar
+  var SCROLL_PX = 4;      // scroll mínimo para volver a medir
+
+  // Elementos que pintan contenido propio: si el nav cae encima de uno no hay
+  // color que leer — una foto no tiene background-color.
+  var OPAQUE = { IMG: 1, VIDEO: 1, CANVAS: 1, PICTURE: 1, IFRAME: 1, "MEDIA-ITEM": 1 };
+
+  // ── color ──────────────────────────────────────────────────────────────
+
+  function parseColor(value) {
+    var m = /rgba?\(([^)]+)\)/.exec(value || "");
+    if (!m) return null;
+
+    var t = m[1].split(/[,\s\/]+/).filter(Boolean);
+    if (t.length < 3) return null;
+
+    // Los navegadores serializan `rgb(0, 0, 0)` / `rgba(0, 0, 0, 0.5)`, pero
+    // la sintaxis moderna admite porcentajes y hay que escalarlos.
+    function num(token, full) {
+      var n = parseFloat(token);
+      if (n !== n) return null;
+      return token.indexOf("%") >= 0 ? (n / 100) * full : n;
+    }
+
+    var c = {
+      r: num(t[0], 255),
+      g: num(t[1], 255),
+      b: num(t[2], 255),
+      a: t.length > 3 ? num(t[3], 1) : 1
+    };
+
+    if (c.r === null || c.g === null || c.b === null || c.a === null) return null;
+    return c;
+  }
+
+  // `top` pintado sobre `bottom`, alfa incluido.
+  function over(top, bottom) {
+    var a = top.a + bottom.a * (1 - top.a);
+    if (a === 0) return { r: 0, g: 0, b: 0, a: 0 };
+
+    return {
+      r: (top.r * top.a + bottom.r * bottom.a * (1 - top.a)) / a,
+      g: (top.g * top.a + bottom.g * bottom.a * (1 - top.a)) / a,
+      b: (top.b * top.a + bottom.b * bottom.a * (1 - top.a)) / a,
+      a: a
+    };
+  }
+
+  // Luminancia relativa (WCAG): 0 negro, 1 blanco. No es el promedio de RGB —
+  // el verde pesa el triple que el rojo, que es como ve el ojo.
+  function luminance(c) {
+    function ch(v) {
+      v = v / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    }
+    return 0.2126 * ch(c.r) + 0.7152 * ch(c.g) + 0.0722 * ch(c.b);
+  }
+
+  // ── medir el fondo ─────────────────────────────────────────────────────
+
+  // Todo lo que hay debajo de (x, y), de arriba hacia abajo, ignorando los nav.
+  // Devuelve null si topa con una foto: ahí no hay color, hay imagen.
+  function colorAt(x, y) {
+    var stack = document.elementsFromPoint(x, y);
+    if (!stack) return null;
+
+    var acc = { r: 0, g: 0, b: 0, a: 0 };
+
+    for (var i = 0; i < stack.length; i++) {
+      var el = stack[i];
+      // Ningún nav se mide a sí mismo ni al otro: en móvil las dos instancias
+      // están en el documento, una encima de la otra.
+      if (el.closest && el.closest(NAV_SEL)) continue;
+
+      var cs = getComputedStyle(el);
+
+      if (OPAQUE[el.tagName] || cs.backgroundImage !== "none") {
+        // Capa no medible. Si lo acumulado ya tapa casi todo, da igual lo que
+        // haya debajo; si no, nos rendimos y manda el interruptor de la página.
+        if (acc.a >= 0.99) break;
+        return null;
+      }
+
+      var c = parseColor(cs.backgroundColor);
+      if (!c) return null;
+      if (c.a > 0) acc = over(acc, c);
+      if (acc.a >= 0.99) break;
+    }
+
+    // Lo que quede sin cubrir es el lienzo del navegador: blanco.
+    if (acc.a < 0.99) acc = over(acc, { r: 255, g: 255, b: 255, a: 1 });
+    return acc;
+  }
+
+  // Tres catas por pieza: izquierda, centro y derecha de su caja.
+  function pointsFor(el) {
+    var r = el.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return [];
+
+    var y = clamp(r.top + r.height / 2, 1, window.innerHeight - 2);
+    var out = [];
+
+    for (var i = 1; i <= 3; i++) {
+      out.push([clamp(r.left + (r.width * i) / 4, 1, window.innerWidth - 2), y]);
+    }
+    return out;
+  }
+
+  function clamp(v, min, max) {
+    return v < min ? min : v > max ? max : v;
+  }
+
+  // Promedio de luminancia de una pieza, o null si ninguna cata sirvió.
+  function measure(points) {
+    var sum = 0;
+    var n = 0;
+
+    for (var i = 0; i < points.length; i++) {
+      var c = colorAt(points[i][0], points[i][1]);
+      if (!c) continue;
+      sum += luminance(c);
+      n += 1;
+    }
+
+    return n ? sum / n : null;
+  }
+
+  // ── el interruptor por página ──────────────────────────────────────────
+
+  function normalize(value) {
+    value = String(value || "").trim().toLowerCase();
+    if (value === "blanco") return "white";
+    if (value === "negro") return "black";
+    if (value === "white" || value === "black") return value;
+    return ""; // "auto", vacío o cualquier otra cosa: que mida
+  }
+
+  function switchOn(el) {
+    if (!el || el.nodeType !== 1) return "";
+
+    var marked = el.querySelector ? el.querySelector("[data-nav-mode]") : null;
+    var attr = normalize(marked && marked.getAttribute("data-nav-mode"));
+    if (attr) return attr;
+
+    // Las custom properties heredan, así que basta leerla en un descendiente:
+    // sirve puesta en .page, en .page-content o en body.
+    return normalize(getComputedStyle(el).getPropertyValue("--nav-mode"));
+  }
+
+  // Lo que manda la página que está debajo, si es que manda algo.
+  function forcedMode(points) {
+    for (var i = 0; i < points.length; i++) {
+      var stack = document.elementsFromPoint(points[i][0], points[i][1]) || [];
+      for (var j = 0; j < stack.length; j++) {
+        if (stack[j].closest && stack[j].closest(NAV_SEL)) continue;
+        var hit = switchOn(stack[j]);
+        if (hit) return hit;
+        break; // solo la capa de arriba; lo demás ya lo hereda
+      }
+    }
+
+    // Respaldo: la página puede ser más corta que el nav y la cata caer en el
+    // body. Se pregunta a las páginas del documento, de la última a la primera.
+    var pages = document.querySelectorAll(".page");
+    for (var k = pages.length - 1; k >= 0; k--) {
+      if (pages[k].closest(NAV_SEL)) continue; // las páginas del nav no cuentan
+      var page = switchOn(pages[k]);
+      if (page) return page;
+    }
+
+    return normalize(getComputedStyle(document.body).getPropertyValue("--nav-mode"));
+  }
+
+  // ── aplicar ────────────────────────────────────────────────────────────
+
+  // Gana la tinta que más contraste contra ese fondo (fórmula de contraste de
+  // la WCAG). Ojo: el punto de empate no es el gris del medio sino uno bastante
+  // oscuro, ~#767676 — sobre un gris medio la letra negra se lee mejor que la
+  // blanca, aunque el instinto diga lo contrario.
+  //
+  // El estado anterior sale del propio atributo: cuando Cargo reemplaza el nav
+  // el clon llega sin él y la histéresis arranca limpia, que es lo correcto.
+  function decide(lum, prev) {
+    if (lum === null) return prev || DEFAULT;
+
+    var black = (lum + 0.05) / 0.05;  // contraste de la tinta negra
+    var white = 1.05 / (lum + 0.05);  // contraste de la tinta blanca
+    var best = black > white ? "black" : "white";
+
+    if (!prev || prev === best) return best;
+
+    var gain = best === "black" ? black / white : white / black;
+    return gain > MARGIN ? best : prev;
+  }
+
+  function set(el, mode) {
+    if (el.getAttribute("data-nav") !== mode) el.setAttribute("data-nav", mode);
+  }
+
+  function update() {
+    if (!document.elementsFromPoint) return;
+
+    var navs = document.querySelectorAll(NAV_SEL);
+    for (var i = 0; i < navs.length; i++) updateNav(navs[i]);
+  }
+
+  // Un nav escondido (el de escritorio en móvil, o al revés) no tiene caja: se
+  // sale sin tocar nada y se queda con el color que traía hasta que reaparezca.
+  function updateNav(nav) {
+    var parts = nav.querySelectorAll(PARTS);
+    var boxes = [];
+    var all = [];
+    var i;
+
+    for (i = 0; i < parts.length; i++) {
+      var points = pointsFor(parts[i]);
+      if (!points.length) continue;
+      boxes.push({ el: parts[i], points: points });
+      all = all.concat(points);
+    }
+
+    // Sin piezas visibles (nav a medio montar): se mide la franja de abajo.
+    if (!all.length) {
+      var r = nav.getBoundingClientRect();
+      if (r.width < 2 || r.height < 2) return;
+      var y = clamp(r.bottom - 24, 1, window.innerHeight - 2);
+      all = [
+        [clamp(r.left + r.width * 0.15, 1, window.innerWidth - 2), y],
+        [clamp(r.left + r.width * 0.5, 1, window.innerWidth - 2), y],
+        [clamp(r.left + r.width * 0.85, 1, window.innerWidth - 2), y]
+      ];
+    }
+
+    var forced = forcedMode(all);
+
+    if (forced) {
+      set(nav, forced);
+      for (i = 0; i < boxes.length; i++) boxes[i].el.removeAttribute("data-nav");
+      return;
+    }
+
+    set(nav, decide(measure(all), nav.getAttribute("data-nav")));
+
+    for (i = 0; i < boxes.length; i++) {
+      if (!SPLIT) {
+        boxes[i].el.removeAttribute("data-nav");
+        continue;
+      }
+      var el = boxes[i].el;
+      set(el, decide(measure(boxes[i].points), el.getAttribute("data-nav")));
+    }
+  }
+
+  // ── cuándo medir ───────────────────────────────────────────────────────
+
+  var queued = false;
+
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () {
+      queued = false;
+      update();
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", schedule);
+  } else {
+    schedule();
+  }
+
+  window.addEventListener("load", schedule);
+  window.addEventListener("resize", schedule);
+  window.addEventListener("pageshow", schedule);
+  window.addEventListener("hashchange", schedule);
+  window.addEventListener("popstate", schedule);
+
+  var lastY = -1;
+  window.addEventListener("scroll", function () {
+    var y = window.pageYOffset;
+    if (Math.abs(y - lastY) < SCROLL_PX) return;
+    lastY = y;
+    schedule();
+  }, { passive: true });
+
+  // Cargo repinta el nav y la página en cada navegación AJAX: sin observer, el
+  // nav se queda con el color de la página anterior.
+  var observer = new MutationObserver(function (records) {
+    for (var i = 0; i < records.length; i++) {
+      var node = records[i].target;
+      if (node.nodeType !== 1) node = node.parentElement;
+
+      // El lema reescribe su texto cada pocos ms y cambia de clase al teclear:
+      // nada de eso mueve el fondo. (`data-nav`, lo que escribe este script, no
+      // está en el attributeFilter de abajo, así que no se muerde la cola.)
+      if (!node) continue;
+      if (node.closest && node.closest("[data-glitch]")) continue;
+
+      schedule();
+      return;
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class", "style", "data-nav-mode"]
+  });
+
+  setInterval(schedule, POLL_MS);
+})();
+</script>
+
+<script>
+/* Solo del preview: cambia el fondo de la página de abajo y el interruptor,
+   para ver al script decidir. En Cargo esto lo hace cada página. */
+(function () {
+	var fondo = document.getElementById("fondo");
+	var content = fondo.querySelector(".page-content");
+	var nav = document.querySelector('[id="L3482832595"]');
+	var estado = document.getElementById("estado");
+
+	document.getElementById("panel").addEventListener("click", function (e) {
+		var b = e.target.closest("button");
+		if (!b) return;
+
+		if (b.hasAttribute("data-bg")) {
+			fondo.classList.remove("partido", "foto");
+			content.style.background = b.getAttribute("data-bg");
+		}
+		if (b.hasAttribute("data-split")) {
+			fondo.classList.remove("foto");
+			fondo.classList.add("partido");
+			content.style.background = "#101010";
+		}
+		if (b.hasAttribute("data-foto")) {
+			fondo.classList.remove("partido");
+			content.style.background = "";
+			fondo.classList.add("foto");
+		}
+		if (b.hasAttribute("data-mode")) {
+			content.style.setProperty("--nav-mode", b.getAttribute("data-mode"));
+		}
+	});
+
+	setInterval(function () {
+		estado.textContent =
+			"nav: " + (nav.getAttribute("data-nav") || "—") +
+			"  ·  lema: " + (nav.querySelector(".nav-lema").getAttribute("data-nav") || "—") +
+			"  ·  menú: " + (nav.querySelector(".nav-links").getAttribute("data-nav") || "—");
+	}, 200);
+})();
+</script>
+
+</body>
+</html>
