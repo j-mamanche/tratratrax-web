@@ -22,21 +22,23 @@ video, según el estado— se mete debajo de la barra.
 
 ## Qué hace
 
-Dos piezas del mismo lanzamiento —un video y la carátula— que se turnan la caja
-de arriba y la de abajo. El interruptor es el título, o sea la banda del centro:
+**En reposo el home es una cenefa.** El video ocupa únicamente la franja del
+título, de borde a borde, y todo lo demás está en negro: una grieta de video con
+el nombre del disco encima. No se ve la carátula, no se ve una composición. El
+canal de información no se ilumina porque sea importante, sino porque es la
+bisagra — y es lo primero y lo último que se ve.
 
-1. **Reposo A** — carátula arriba, video abajo. Todo lo demás en negro.
-2. **La mano entra al título** — apagón. La carátula se va y el video se sale
-   de su caja: lo único encendido en toda la pantalla es **la franja del
-   título**, una grieta de video de borde a borde con el nombre del disco
-   encima. El canal de información no se ilumina porque sea importante, sino
-   porque es la bisagra.
-3. **La mano se va** — corte seco. Ahora el video está arriba y la carátula
-   abajo. **Reposo B.** La siguiente pasada los devuelve a A.
+1. **Reposo** — la cenefa. El video vive dentro de la franja del título.
+2. **La mano entra al título** — la grieta se abre en las dos cajas del
+   lanzamiento: **carátula arriba, video abajo**.
+3. **La mano se va** — corte seco, y vuelve la cenefa.
+4. **La pasada siguiente abre la contraria**: video arriba, carátula abajo. Y
+   así, alternando.
 
-Se conmuta **saliendo, no entrando**: uno no aprieta nada, uno pasa, y al pasar
-el sitio quedó de otra manera. En teléfono el toque hace de mano —se mantiene el
-dedo, el video invade, se suelta y quedó cambiado—; con teclado, el foco.
+La composición **es el gesto**: existe mientras alguien la sostiene. El cambio
+de una a otra ocurre al cerrar, con la cenefa ya en pantalla, así que nadie lo
+ve: uno pasa otra vez y encontró la otra. En teléfono el toque hace de mano —se
+mantiene el dedo, se abre; se suelta, se cierra—; con teclado, el foco.
 
 **Corte seco en las tres transiciones.** Sin fundido, sin deslizamiento, sin
 easing: el corte dura cero y no hay variable para ablandarlo.
@@ -47,11 +49,19 @@ fotograma. Lo que se controla es lo de después — un estado dura **como mínim
 se lea como un parpadeo. No se pierde ningún cambio: el que llega antes de
 tiempo espera su turno. Se calibra con `data-minimo` en el placeholder.
 
-**En teléfono el intercambio también corre solo:** seis segundos sin que nadie
-toque y las piezas se turnan, y siguen turnándose mientras el sitio siga quieto.
-Al primer toque se para. Es un intercambio limpio, sin apagón y sin grieta —
-eso sigue siendo cosa de la mano. En pantalla ancha no corre, y con
-`prefers-reduced-motion: reduce` tampoco.
+**En teléfono el home respira:** cinco segundos de franja, **un destello de un
+segundo** con la composición abierta, y otra vez la franja. Como al cerrar
+voltea, un destello enseña una composición y el siguiente la otra. Es un
+destello y no un turno: un segundo alcanza para ver que hay un lanzamiento
+debajo y es demasiado poco para instalarse — la composición sigue siendo lo que
+uno saca con la mano.
+
+Con el home invertido esto no es un adorno: en teléfono no hay hover, y sin el
+destello quien no sepa que el título se puede mantener pulsado no vería nunca la
+carátula. **Cualquier toque lo apaga en el acto y reinicia la cuenta**, que
+vuelve a empezar cuando el usuario suelte. En pantalla ancha no corre, y con
+`prefers-reduced-motion: reduce` tampoco: ahí el teléfono se queda en la cenefa,
+con el `poster` del video dentro de la franja.
 
 Se ve corriendo, sin depender de Cargo, en **`/preview/home`**.
 

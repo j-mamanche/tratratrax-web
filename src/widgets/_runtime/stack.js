@@ -21,9 +21,11 @@
 /**
  * Arma el esqueleto dentro de `host` y devuelve sus piezas.
  * @param {HTMLElement} host  el `[data-ttx]` que puso Cargo
- * @param {{ banda?: boolean }} opciones
+ * @param {{ banda?: boolean, ancla?: boolean }} opciones
+ *   `ancla: false` para las pantallas que **no** son índice: ver el bloque
+ *   del ancla más abajo.
  */
-export function crearStack(host, { banda = false } = {}) {
+export function crearStack(host, { banda = false, ancla = true } = {}) {
   host.classList.add('ttx');
   inyectarFiltro();
 
@@ -54,7 +56,65 @@ export function crearStack(host, { banda = false } = {}) {
 
   marco.append(visor, ...(banda ? [franja] : []), contenido);
   host.replaceChildren(marco);
-  return { marco, visor, banda: banda ? franja : null, contenido };
+
+  const anclar = ancla
+    ? medirAncla(marco, visor, banda ? franja : null, contenido)
+    : () => {};
+  return { marco, visor, banda: banda ? franja : null, contenido, anclar };
+}
+
+// ── El ancla ──────────────────────────────────────────────────────────
+//
+// La barra de la mitad no termina en el widget. Las gavetas de Cargo —merca
+// hoy, lo que venga después— se abren **encima** de esta página y se acuestan
+// contra ella: el borde de arriba de la gaveta cae exactamente en el borde de
+// abajo de la banda. Eso es lo que hace que la barra se lea como una sola
+// línea que atraviesa el sitio y no como el encabezado de cada pantalla.
+//
+// Para que la gaveta sepa dónde está esa línea, el stack la publica: un
+// `--ttx-ancla` en el `<html>`, en píxeles. El CSS de Cargo lo lee y ya
+// (`padding-top: var(--ttx-ancla, 21rem)`), sin JS al otro lado.
+//
+// Se mide en vez de calcularse desde `--ttx-visor-h` por lo mismo que en el
+// home: el visor se calibra en porcentaje y la fila de la banda es `auto`.
+// Un número copiado a mano al CSS de la gaveta —que es como estaba— se
+// desincroniza el día que alguien mueva el visor, y nadie se entera hasta
+// verlo.
+//
+// **No todas las pantallas tienen derecho a publicarlo.** `--ttx-ancla` vive
+// en el `<html>`, y el `<html>` sobrevive a la navegación por AJAX de Cargo:
+// lo último que se escribió es lo que se encuentra la gaveta que se abra
+// después, en cualquier página. El About tiene el stack invertido —su banda
+// está mucho más abajo— y no es página índice: si publicara, la gaveta de la
+// merca aterrizaría contra una línea que ya no existe. Ese es el caso de
+// `ancla: false`. Lo que quede escrito es lo de la última página que sí manda,
+// que es exactamente lo que la gaveta quiere.
+const RAIZ = 'ttx-ancla';
+
+function medirAncla(marco, visor, franja, contenido) {
+  const medir = () => {
+    if (!marco.isConnected) {
+      // Cargo navega por AJAX y este widget puede haberse ido sin que nadie
+      // llame a `destruir`. Que el observer se recoja solo.
+      ro.disconnect();
+      return;
+    }
+
+    // El catálogo no tiene banda de contenedor: ahí la barra son las
+    // etiquetas de los ítems, que están todas a la misma altura. Cualquiera
+    // sirve, y la primera es la que existe siempre.
+    const barra = franja ?? contenido.querySelector('.ttx-etiqueta');
+    const caja = (barra ?? visor).getBoundingClientRect();
+    if (caja.height === 0) return;
+
+    document.documentElement.style.setProperty(RAIZ, `${Math.round(caja.bottom)}px`);
+  };
+
+  // El marco mide `--ttx-alto`, que sale del viewport: cambiar la ventana lo
+  // cambia a él y vuelve a disparar. No hace falta escuchar `resize` aparte.
+  const ro = new ResizeObserver(medir);
+  ro.observe(marco);
+  return medir;
 }
 
 /**

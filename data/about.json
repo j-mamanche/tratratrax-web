@@ -1,0 +1,26 @@
+{
+  "lema": "Sonic hustlers since 2020",
+  "djs": [
+    {
+      "nombre": "DJ Lomalinda",
+      "instagram": "https://www.instagram.com/djlomalinda/",
+      "emblema": "media/about/lomalinda.gif",
+      "quieto": "media/about/lomalinda.png",
+      "relleno": true
+    },
+    {
+      "nombre": "Nyksan",
+      "instagram": "https://www.instagram.com/nyksan_/",
+      "emblema": "media/about/nyksan.gif",
+      "quieto": "media/about/nyksan.png",
+      "relleno": true
+    },
+    {
+      "nombre": "Verraco",
+      "instagram": "https://www.instagram.com/verraco__/",
+      "emblema": "media/about/verraco.gif",
+      "quieto": "media/about/verraco.png",
+      "relleno": true
+    }
+  ]
+}

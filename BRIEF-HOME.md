@@ -29,33 +29,37 @@ permiso explícito, no como descuido: donde haya que elegir, gana la expresión.
 
 ## 2. La mecánica
 
-Dos piezas del mismo lanzamiento —un video y la carátula— que se turnan las
-bandas de arriba y de abajo. El interruptor es el título, o sea la banda del
-centro. Eso es lo bonito del hallazgo: **el canal de información es la bisagra
-entre las otras dos bandas**, no un rótulo pasivo.
+**En reposo el home es una cenefa**: el video ocupando solo la banda del título,
+de borde a borde, sobre negro. No hay composición, no hay carátula, no hay dos
+piezas turnándose nada. Hay una grieta de video con el nombre del disco encima.
+Tomar el título con la mano **abre** esa grieta en las dos cajas del
+lanzamiento; soltarlo la cierra.
+
+Eso es lo bonito del hallazgo, y por eso es el reposo: **el canal de información
+es la bisagra entre las otras dos bandas**, no un rótulo pasivo — y la
+composición existe solo mientras alguien la sostiene.
 
 ```
-REPOSO A                  MANO ENCIMA               REPOSO B
+REPOSO                    MANO ENCIMA A             MANO ENCIMA B
 ┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┐
-│ ░░░ carátula ░░░ │      │                  │      │ ▓▓▓▓ video ▓▓▓▓▓ │
-├──────────────────┤      │      negro       │      ├──────────────────┤
-│ KILLING MARIPOS… │    ▓▓ KILLING MARIPOSAS… ▓▓    │ KILLING MARIPOS… │
-├──────────────────┤      │      negro       │      ├──────────────────┤
-│ ▓▓▓▓ video ▓▓▓▓▓ │      │                  │      │ ░░░ carátula ░░░ │
+│                  │      │ ░░░ carátula ░░░ │      │ ▓▓▓▓ video ▓▓▓▓▓ │
+│      negro       │      ├──────────────────┤      ├──────────────────┤
+▓▓ KILLING MARIPOSAS… ▓▓  │ KILLING MARIPOS… │      │ KILLING MARIPOS… │
+│      negro       │      ├──────────────────┤      ├──────────────────┤
+│                  │      │ ▓▓▓▓ video ▓▓▓▓▓ │      │ ░░░ carátula ░░░ │
 └──────────────────┘      └──────────────────┘      └──────────────────┘
    barra de Cargo            barra de Cargo            barra de Cargo
                               (no se toca)
 ```
 
-1. **Reposo A** — carátula arriba, video abajo. Todo lo demás en negro.
-2. **La mano entra al título** — apagón. La carátula se va, el video se sale de
-   su caja, y lo único encendido en toda la pantalla es **la franja del
-   título**: una grieta de video de borde a borde, con el nombre del disco
-   encima. Lo que se reproduce *es* la grieta — el video deja de ser contenido
-   y pasa a ser el intersticio entre las dos cajas.
-3. **La mano se va** — corte seco. Ahora el video está arriba y la carátula
-   abajo. **Reposo B.**
-4. La siguiente pasada repite el apagón y los devuelve a A. Y así.
+1. **Reposo** — la cenefa. Lo único encendido en toda la pantalla es la franja
+   del título. Lo que se reproduce *es* la grieta: el video no es contenido, es
+   el intersticio, y el intersticio es lo que el home enseña de entrada.
+2. **La mano entra al título** — la grieta se abre: carátula arriba, video
+   abajo.
+3. **La mano se va** — corte seco, y vuelve la cenefa.
+4. **La pasada siguiente abre la contraria** — video arriba, carátula abajo. Y
+   así, alternando.
 
 > **Corregido el 2026-07-28**, con el widget ya montado. En la primera versión
 > el video tomaba el marco entero y la carátula seguía en su sitio, recortada
@@ -63,9 +67,18 @@ REPOSO A                  MANO ENCIMA               REPOSO B
 > uno la tiene en la mano no debería quedar nada más encendido. Es más radical
 > y dice mejor lo mismo.
 
-El estado **se conmuta saliendo, no entrando.** Es lo que hace que no se
-sienta un botón: uno no aprieta nada, uno pasa, y al pasar el sitio quedó de
-otra manera.
+> **Invertido el 2026-07-29.** Hasta aquí la cenefa era la excepción —lo que
+> pasaba mientras había una mano encima— y la composición era el reposo. Se dio
+> vuelta: **la cenefa es el reposo y la composición es la excepción**. El
+> hallazgo era la grieta, así que la grieta es lo que el home es cuando nadie lo
+> toca; la composición pasa a ser lo que uno *saca* de ella. Se conservan las
+> tres imágenes, el corte seco y la alternancia — es la misma máquina con el
+> reposo movido de sitio.
+
+**El cambio de una composición a la otra ocurre al cerrar**, con la cenefa ya en
+pantalla: nadie lo ve. Es lo que hace que no se sienta un botón — uno no aprieta
+nada, uno pasa, y la próxima vez que pase el sitio quedó de otra manera.
+Volteando al abrir se vería el cambio y sería un carrusel.
 
 **Corte seco en las tres transiciones.** Sin fundido, sin deslizamiento, sin
 easing. Cero milisegundos. Es lo único que no se puede leer como efectismo.
@@ -73,20 +86,22 @@ easing. Cero milisegundos. Es lo único que no se puede leer como efectismo.
 Y **la mano no espera**: entrar al título cambia la pantalla en el mismo
 fotograma. Lo que se controla es lo de después — **un estado dura como mínimo
 100 ms antes de que pueda entrar el siguiente**. Pasar el ratón muy rápido
-disparaba la invasión y la conmutación casi a la vez y se leía como un
-parpadeo; con ese piso cada estado alcanza a existir y la pasada se ve como una
-decisión, no como un glitch.
+abría y cerraba la composición casi a la vez y se leía como un parpadeo; con ese
+piso cada estado alcanza a existir y la pasada se ve como una decisión, no como
+un glitch.
 
 No es un retardo y no se pierde nada por el camino: lo que llega antes de
 tiempo espera su turno, en orden. Una pasada rápida deja dos cambios en cola y
 salen los dos, espaciados.
 
 **En pantalla ancha, lo único que se mueve solo es el video**, en loop y sin
-sonido. Ese es el "respira despacio" de la ronda 1: no hay deriva y no hay
-parpadeos, el sitio está quieto salvo por el loop.
+sonido, dentro de la cenefa. Ese es el "respira despacio" de la ronda 1: no hay
+deriva y no hay parpadeos, el sitio está quieto salvo por el loop — y ahora
+además está quieto en su estado más callado.
 
-**En teléfono no.** Ahí las dos piezas se intercambian solas cada seis segundos
-mientras nadie toque, y se paran en cuanto alguien toca. Ver §4.
+**En teléfono no.** Ahí el home respira: cada cinco segundos de quietud, un
+destello de un segundo con la composición abierta. Se para en cuanto alguien
+toca. Ver §4.
 
 ---
 
@@ -112,32 +127,35 @@ host  (position: relative; background: negro)   ← el papel, siempre
   por la franja y por donde el video no llegue.
 - Las dos cajas van **encima** del video. La que tiene la carátula la pinta
   como `background-image` y tapa lo que haya debajo; la otra es transparente y
-  deja pasar el video. Con la mano encima las dos quedan transparentes —la
-  carátula también se apaga— y por debajo solo hay negro.
-- La banda es transparente: en reposo se ve el negro del host, en hover se ve
-  el video. **El título se queda encima y aguanta** — a veces se leerá bien y
-  a veces se perderá contra la imagen, y eso está decidido así.
+  deja pasar el video. **En reposo las dos quedan transparentes** —no hay
+  carátula en ninguna— y por debajo solo hay negro y la cenefa.
+- La banda es transparente: en reposo se ve el video, porque la banda *es* la
+  cenefa; con la composición abierta se ve el negro del host. **El título se
+  queda encima y aguanta** — a veces se leerá bien y a veces se perderá contra
+  la imagen, y eso está decidido así. Que se pierda en reposo, que es el estado
+  normal, es la apuesta de este home.
 
 Los tres recortes, en variables que ya existen en `tokens.css`:
 
 ```css
-/* Reposo A — el video ocupa la caja de abajo */
+/* Reposo — el video ocupa solo la franja del título, de borde a borde.
+   Es el valor por defecto en el host: los otros dos ganan por especificidad. */
+inset(calc(var(--ttx-margen) + var(--ttx-visor-h))
+      0
+      calc(100% - var(--ttx-margen) - var(--ttx-visor-h) - var(--ttx-home-banda-h))
+      0)
+
+/* Abierto A — el video ocupa la caja de abajo */
 inset(calc(var(--ttx-margen) + var(--ttx-visor-h) + var(--ttx-home-banda-h))
       var(--ttx-margen)
       calc(var(--ttx-margen) + var(--ttx-nav-h))
       var(--ttx-margen))
 
-/* Reposo B — el video ocupa la caja de arriba */
+/* Abierto B — el video ocupa la caja de arriba */
 inset(var(--ttx-margen)
       var(--ttx-margen)
       calc(100% - var(--ttx-margen) - var(--ttx-visor-h))
       var(--ttx-margen))
-
-/* Mano encima — el video ocupa solo la franja del título, de borde a borde */
-inset(calc(var(--ttx-margen) + var(--ttx-visor-h))
-      0
-      calc(100% - var(--ttx-margen) - var(--ttx-visor-h) - var(--ttx-home-banda-h))
-      0)
 ```
 
 `--ttx-home-banda-h` la publica un `ResizeObserver` sobre la franja, igual que
@@ -146,8 +164,8 @@ es solo un mínimo: calcular con el mínimo funcionaría hasta el día que el
 título dé dos líneas. Medir cuesta cuatro líneas y no vuelve a fallar.
 
 Todo el estado del widget son **dos atributos en el host**: `data-home="a|b"`
-—qué caja tiene la carátula— y `data-invade` mientras hay mano encima. Nada
-más. No hay animación que cancelar, no hay posición que recalcular, no hay
+—cuál de las dos composiciones abre la próxima pasada— y `data-abierto` mientras
+la composición está abierta. Nada más. No hay animación que cancelar, no hay posición que recalcular, no hay
 video que resincronizar.
 
 **El filtro de dos tonos no se usa aquí.** El home es el único sitio donde las
@@ -163,7 +181,7 @@ tokens ya lo permiten; no hay CSS nuevo por esto.
 
 ## 4. Los disparos
 
-| entrada | invade | conmuta |
+| entrada | abre | cierra (y voltea) |
 |---|---|---|
 | ratón | `pointerenter` en el título | `pointerleave` |
 | tacto | `pointerdown` en el título | `pointerup` / `pointercancel` |
@@ -171,27 +189,49 @@ tokens ya lo permiten; no hay CSS nuevo por esto.
 
 El título es un `<button>`, así que el teclado sale gratis y con el
 `aria-*` correcto. **En teléfono el toque hace de mano** — se mantiene el
-dedo, el video invade, se suelta y quedó cambiado. Es el mismo gesto, no una
-versión aparte.
+dedo, la composición se abre; se suelta y vuelve la cenefa, con la otra ya
+puesta para la próxima. Es el mismo gesto, no una versión aparte.
 
-**En teléfono, además, el intercambio corre solo.** Seis segundos sin que nadie
-toque y las dos piezas se turnan; y siguen turnándose cada seis segundos
-mientras el sitio siga quieto. Al primer toque se para, y no vuelve hasta seis
-segundos después de que la mano se retire.
+**En teléfono, además, el home respira.** Cinco segundos de franja, **un
+destello de un segundo** con la composición abierta, y otra vez la franja. Como
+al cerrar voltea, un destello enseña una composición y el siguiente la otra.
 
-Es un intercambio, no una invasión sin dedo: corte seco, sin apagón y sin
-grieta. Y va solo donde no hay mano — en pantalla ancha el hover ya lo dispara,
-y ahí un temporizador sería un parpadeo gratis.
+**Es un destello, no un turno**, y ahí está la diferencia con la primera
+versión de este gesto, que repartía el tiempo en partes iguales entre la cenefa
+y la composición. Un segundo alcanza para ver que hay un lanzamiento debajo y es
+demasiado poco para instalarse: la composición sigue siendo lo que uno saca con
+la mano, y el destello solo avisa que está ahí. Con turnos parejos el teléfono
+acababa contando otra historia que el escritorio.
 
-No corre con `prefers-reduced-motion: reduce`. El intercambio a mano sí sigue
+**Cualquier cosa que haga el usuario lo apaga en el acto y reinicia la cuenta**,
+que vuelve a correr desde la franja cuando la mano se retire. Nunca hay que
+esperar a que termine un destello para tener el home quieto.
+
+**Con el home invertido esto dejó de ser un adorno.** En reposo no se ve la
+carátula y en teléfono no hay hover: sin el destello, quien no sepa que el
+título se puede mantener pulsado no vería nunca el lanzamiento, solo una grieta
+de video. Y va solo donde no hay mano — en pantalla ancha el hover ya lo
+dispara, y ahí un temporizador sería un parpadeo gratis.
+
+No corre con `prefers-reduced-motion: reduce`. Abrir a mano sí sigue
 funcionando ahí, porque es un corte y lo pide el usuario; este no lo pide nadie,
 y movimiento que uno no provocó es justo lo que esa preferencia viene a apagar.
+Ahí el teléfono se queda en la cenefa, con el `poster` del video dentro de la
+franja.
 
 > **Corregido el 2026-07-29.** En la ronda 3 se había descartado explícitamente
 > que en teléfono el intercambio corriera por temporizador — "si nadie toca, no
 > pasa nada". Se cambió de opinión con el widget ya montado: en teléfono no hay
 > hover, y sin gesto de ocio el home se queda en una sola de sus dos caras para
-> quien no sepa que el título se puede tocar.
+> quien no sepa que el título se puede tocar. Con la inversión del mismo día el
+> argumento se volvió más fuerte todavía: sin el gesto, en teléfono no se llega
+> a ver ninguna de las dos.
+>
+> Y el gesto pasó de **turno a destello** el mismo 2026-07-29: primero repartía
+> el tiempo por partes iguales entre la cenefa y la composición, y así el
+> teléfono contaba otra historia que el escritorio. Ahora son cinco segundos de
+> franja y un segundo de composición — lo justo para avisar que hay algo
+> debajo.
 
 `prefers-reduced-motion: reduce` → el video no arranca y se muestra su
 `poster`. El intercambio sigue funcionando: es un corte, no una animación, y
@@ -263,9 +303,11 @@ de que el navegador bloquee el autoplay. `muted`, `loop`, `playsinline`,
 - Corte seco. Ninguna transición animada en el intercambio.
 - Sin filtro de dos tonos en el home.
 - La barra de Cargo no se invade.
-- En pantalla ancha nada se conmuta solo: lo único que se mueve por su cuenta
-  es el loop. En teléfono sí, cada seis segundos de quietud (§4, corregido el
-  2026-07-29).
+- **El reposo es la cenefa** (§2, invertido el 2026-07-29). La composición no es
+  el estado del home: es lo que uno saca de él con la mano.
+- En pantalla ancha nada se abre solo: lo único que se mueve por su cuenta es el
+  loop dentro de la cenefa. En teléfono sí, un destello de un segundo cada cinco
+  de quietud (§4, corregido el 2026-07-29).
 
 ---
 

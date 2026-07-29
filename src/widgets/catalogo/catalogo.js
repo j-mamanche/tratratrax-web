@@ -33,7 +33,7 @@ registrar('catalogo', async (host) => {
     return;
   }
 
-  const { visor, contenido: carril } = crearStack(host);
+  const { visor, contenido: carril, anclar } = crearStack(host);
   carril.classList.add('ttx-carril');
   carril.tabIndex = 0;
   carril.setAttribute('role', 'list');
@@ -68,6 +68,11 @@ registrar('catalogo', async (host) => {
 
   // Proyección inicial: el primero, antes de que nadie haga scroll.
   proyectarItem(host, carril.firstElementChild);
+
+  // Aquí la banda son las etiquetas de los ítems, que no existían cuando se
+  // armó el stack. Ya están: se vuelve a medir para que las gavetas que se
+  // abran encima del catálogo aterricen en la misma línea.
+  anclar();
 
   return {
     destruir() {

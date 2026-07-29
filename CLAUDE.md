@@ -44,7 +44,10 @@ Ahora el catálogo es un `<div>` que llenamos nosotros, con `overflow-x: auto` y
   hipótesis, no un dato** — confirmar con el sello antes de escribirlo.
 - TRA028 está repetido en dos releases de Nick León (el álbum y sus remezclas).
   Viene así del HTML de Cargo. El validador lo avisa; falta que el sello decida.
-- El blog es contenido placeholder. About no existe todavía.
+- El blog es contenido placeholder.
+- El About ya existe (`BRIEF-ABOUT.md`), pero sus tres emblemas son **material
+  de relleno**: estampas generadas, marcadas `"relleno": true`. El validador lo
+  avisa en cada corrida. Falta el material del sello.
 
 ## Los widgets
 
@@ -57,6 +60,11 @@ El stack de tres bandas —visor · banda · contenido— vive en `_runtime/stac
 y `tokens.css`. Antes de maquetar una pantalla nueva, partir de ahí: home,
 catálogo y merca son la misma maquetación con otro `--ttx-visor-h` y otro
 `--ttx-visor-fx`.
+
+La banda no termina en el widget: el stack publica `--ttx-ancla` en el
+`<html>` con el borde de abajo de esa barra, y las gavetas de Cargo —la
+merca— se acuestan contra ella. Nunca copiar ese número a mano a un CSS de
+página; se desincroniza al mover `--ttx-visor-h` y nadie se entera.
 
 **Calibrar es poner variables en el placeholder**, no editar el widget. Un
 `style` inline le gana al CSS global de Cargo, que es lo único que siempre

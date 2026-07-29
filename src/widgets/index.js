@@ -8,6 +8,7 @@
 import './tokens.css';
 import './catalogo/catalogo.js';
 import './home/home.js';
+import './about/about.js';
 
 import { iniciar } from './_runtime/mount.js';
 

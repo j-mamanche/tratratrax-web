@@ -13,7 +13,8 @@
    El fondo negro lo pone el **host**, así que se ve por el aire de los lados,
    por la franja del título y por donde el video no llegue. Las dos cajas van
    encima del video: la que tiene la carátula la pinta y tapa lo que haya
-   debajo, la otra es transparente y lo deja pasar. */
+   debajo, la otra es transparente y lo deja pasar. En reposo ninguna de las dos
+   tiene carátula — el home en reposo es la cenefa y nada más. */
 
 [data-ttx='home'] {
   /* Tinta invertida: el home es negro con texto blanco, al revés que el
@@ -78,15 +79,39 @@
 }
 
 /* Los altos van medidos y publicados por el JS (`--ttx-home-visor-h`,
-   `--ttx-home-banda-h`). Los tokens quedan de respaldo para el primer
-   fotograma, antes de que el ResizeObserver haya dicho nada. */
+   `--ttx-home-banda-h`); los tokens quedan de respaldo para el primer
+   fotograma, antes de que el ResizeObserver haya dicho nada. Y con ellos, el
+   recorte de reposo.
+
+   REPOSO — la cenefa. Es el estado por defecto y el que se ve casi siempre: el
+   video ocupa **solo la franja del título**, de borde a borde, y todo lo demás
+   está apagado. Una grieta de video con el nombre del disco encima, sobre negro.
+
+   Ahí está el hallazgo entero, y por eso es el reposo y no la excepción. El
+   canal de información no se ilumina porque sea importante: se ilumina porque
+   es la bisagra, y el sitio se compone alrededor de ella solo cuando alguien la
+   toma. El video no es contenido: es el intersticio, y el intersticio es lo que
+   el home enseña de entrada.
+
+   Va a los lados sin `--ttx-margen`: la cenefa atraviesa, no se queda dentro
+   del marco.
+
+   Sin `[data-home]` ni nada más en el selector: es el suelo del que salen los
+   otros dos, y los dos ganan por especificidad, no por orden. */
 [data-ttx='home'] {
   --ttx-home-caja-h: var(--ttx-home-visor-h, var(--ttx-visor-h));
   --ttx-home-franja-h: var(--ttx-home-banda-h, var(--ttx-banda-h));
+
+  --ttx-home-recorte: inset(
+    calc(var(--ttx-margen) + var(--ttx-home-caja-h))
+    0
+    calc(100% - var(--ttx-margen) - var(--ttx-home-caja-h) - var(--ttx-home-franja-h))
+    0
+  );
 }
 
-/* Reposo A — la carátula arriba, el video en la caja de abajo. */
-[data-ttx='home'][data-home='a'] {
+/* Abierto A — la carátula arriba, el video en la caja de abajo. */
+[data-ttx='home'][data-abierto][data-home='a'] {
   --ttx-home-recorte: inset(
     calc(var(--ttx-margen) + var(--ttx-home-caja-h) + var(--ttx-home-franja-h))
     var(--ttx-margen)
@@ -95,35 +120,13 @@
   );
 }
 
-/* Reposo B — el video arriba, la carátula abajo. */
-[data-ttx='home'][data-home='b'] {
+/* Abierto B — el video arriba, la carátula abajo. */
+[data-ttx='home'][data-abierto][data-home='b'] {
   --ttx-home-recorte: inset(
     var(--ttx-margen)
     var(--ttx-margen)
     calc(100% - var(--ttx-margen) - var(--ttx-home-caja-h))
     var(--ttx-margen)
-  );
-}
-
-/* Mano encima — apagón. La carátula se va, el video se sale de su caja y lo
-   único que queda encendido en toda la pantalla es **la franja del título**:
-   una grieta de video de borde a borde, con el nombre del disco encima.
-
-   Ahí está el hallazgo entero. El canal de información no se ilumina porque
-   sea importante: se ilumina porque es la bisagra, y mientras uno la tiene en
-   la mano el sitio entero se apaga alrededor. El video deja de ser contenido y
-   pasa a ser el intersticio.
-
-   Va a los lados sin `--ttx-margen`: la grieta atraviesa, no se queda dentro
-   del marco.
-
-   Va después de los dos reposos y con la misma especificidad: gana el último. */
-[data-ttx='home'][data-invade] {
-  --ttx-home-recorte: inset(
-    calc(var(--ttx-margen) + var(--ttx-home-caja-h))
-    0
-    calc(100% - var(--ttx-margen) - var(--ttx-home-caja-h) - var(--ttx-home-franja-h))
-    0
   );
 }
 
@@ -172,23 +175,28 @@
   grid-template-rows: minmax(0, 1fr) auto 0;
 }
 
-/* Qué caja tiene la carátula. Lo demás lo enseña el video. */
-[data-ttx='home'][data-home='a'] .ttx-home-arriba,
-[data-ttx='home'][data-home='b'] .ttx-home-abajo {
+/* En reposo la carátula no está: de la cenefa para afuera no queda nada, y eso
+   es lo que hace que la franja sea lo único que se ve y no una franja más
+   brillante entre dos cosas que siguen ahí. La caja ya nace transparente, así
+   que el reposo no necesita ninguna regla — la carátula solo aparece al abrir,
+   y en qué caja aparece es lo que se turna entre una pasada y la siguiente. */
+[data-ttx='home'][data-abierto][data-home='a'] .ttx-home-arriba,
+[data-ttx='home'][data-abierto][data-home='b'] .ttx-home-abajo {
   background-image: var(--ttx-home-caratula);
 }
 
-/* Con la mano encima se apaga también la carátula: de la grieta para afuera no
-   queda nada. Es lo que hace que la franja sea lo único que se ve, y no una
-   franja más brillante entre dos cosas que siguen ahí. */
-[data-ttx='home'][data-invade] .ttx-home-caja {
-  background-image: none;
+/* El home pobre no tiene video, así que no tiene cenefa ni tiene qué abrir: la
+   carátula es lo único que hay y se queda puesta. */
+[data-ttx='home'][data-pobre] .ttx-home-arriba {
+  background-image: var(--ttx-home-caratula);
 }
 
 /* ── El título ────────────────────────────────────────────────────────
-   La banda es transparente: en reposo se ve el negro del host, con la mano
-   encima se ve el video. El título se queda encima y aguanta — a veces se
-   leerá bien y a veces se perderá contra la imagen, y eso está decidido así.
+   La banda es transparente: en reposo se ve el video —la banda *es* la cenefa—
+   y con la composición abierta se ve el negro del host. El título se queda
+   encima y aguanta — a veces se leerá bien y a veces se perderá contra la
+   imagen, y eso está decidido así. Se pierde en reposo, que es el estado
+   normal: es la apuesta que hace este home.
 
    A diferencia del catálogo, aquí el texto **envuelve**: es el único texto de
    la página y perder el nombre del artista en un `overflow: hidden` sería

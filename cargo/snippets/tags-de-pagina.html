@@ -1,0 +1,114 @@
+<!-- ══════════════════════════════════════════════════════════════════════
+     TAGS DE PÁGINA — el tag como fuente única
+     Va en Cargo: Settings → Edit HTML → **Global**. Una sola vez, para todo
+     el sitio.
+
+     Qué hace: le pone al `<div class="page" id="…">` las mismas clases
+     `tag-<nombre-del-tag>` que Cargo ya le pone a los thumbnails del
+     `thumbnail-index`. Nada más. No pinta, no escribe texto, no toca el
+     contenido — solo deja el dato disponible para el CSS.
+
+     Por qué hace falta: Cargo pone `tag-in-stock` en el `media-item` de la
+     vitrina, pero **no** en la página del producto. Ahí el estado había que
+     escribirlo otra vez a mano (`data-merca-stock`). Con esto el tag manda en
+     los dos lados y `merca.css` no necesita el atributo:
+
+       .page.tag-out-of-stock  →  punto rojo, rótulo "Sold out", sin botón
+
+     De dónde sale el dato: `window.store`, el store de Redux que el frontend
+     de Cargo deja en `window` al arrancar. `getState().pages.byId[<id de la
+     página>].tags` es un array `[{tag, url}]` — el mismo que alimenta la
+     vitrina. No hay API pública ni endpoint que pedir: es el estado que ya
+     está cargado en la pestaña.
+
+     Es interno de Cargo y podría cambiar sin aviso. Por eso todo el acceso va
+     dentro de un `try` y la falla es silenciosa: si un día `window.store`
+     deja de existir, la página no lleva clases, `--merca-punto` se queda sin
+     valor y no se pinta ningún punto ni ningún rótulo. Callar es mejor que
+     mentir en una tienda. Lo que no puede pasar es que se rompa la página.
+
+     Se aplica a todas las páginas, no solo a las de merca: cualquier página
+     tageada queda seleccionable desde el CSS por su tag.
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<script>
+  (function () {
+    var PREFIJO = 'tag-';
+    var ESPERA = 100; // ms entre intentos mientras Cargo arma su store
+    var INTENTOS = 60; // ~6 s y nos rendimos sin hacer ruido
+    var pendiente = false;
+
+    function tagsDe(id) {
+      try {
+        var pagina = window.store.getState().pages.byId[id];
+        return (pagina.tags || [])
+          .map(function (t) {
+            return String(t.url || t.tag || '').toLowerCase();
+          })
+          .filter(Boolean);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    // Sin tags no se toca nada. Una página que todavía no cargó su metadata
+    // se queda como está en vez de perder las clases que ya tenía.
+    function marcar(page) {
+      var tags = tagsDe(page.id);
+      if (!tags.length) return;
+
+      Array.prototype.slice.call(page.classList).forEach(function (clase) {
+        if (clase.indexOf(PREFIJO) !== 0) return;
+        if (tags.indexOf(clase.slice(PREFIJO.length)) === -1) page.classList.remove(clase);
+      });
+
+      tags.forEach(function (tag) {
+        page.classList.add(PREFIJO + tag);
+      });
+    }
+
+    function pasada() {
+      pendiente = false;
+      var paginas = document.querySelectorAll('div.page[id]');
+      for (var i = 0; i < paginas.length; i++) marcar(paginas[i]);
+    }
+
+    // El store avisa de cada acción y el observer de cada nodo: las dos cosas
+    // se juntan en un solo repaso por cuadro. El repaso es una vuelta sobre
+    // las páginas montadas, que en este sitio son unas pocas.
+    function pedirPasada() {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(pasada);
+    }
+
+    function arrancar(intento) {
+      if (!window.store || !window.store.getState) {
+        if (intento < INTENTOS) {
+          setTimeout(function () {
+            arrancar(intento + 1);
+          }, ESPERA);
+        }
+        return;
+      }
+
+      pasada();
+
+      // Las gavetas se montan cuando se abren, no al cargar el sitio: sin el
+      // observer una ficha abierta desde la vitrina saldría sin clases.
+      new MutationObserver(pedirPasada).observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+      });
+
+      // Y esto es para el editor: cambiar el tag de una página repinta el
+      // punto sin recargar. Cambiar clases no dispara `childList`, así que no
+      // hay bucle entre el observer y nosotros.
+      try {
+        window.store.subscribe(pedirPasada);
+      } catch (e) {}
+    }
+
+    arrancar(0);
+  })();
+</script>

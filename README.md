@@ -31,15 +31,34 @@ npm run dev        # abre el tablero de datos en localhost:4321
 
 ## El widget del home
 
-Se ve en **`/preview/home`**. Es el lanzamiento y nada más: dos piezas del mismo
-release —un video y la carátula— que se turnan la caja de arriba y la de abajo,
-y el título en la mitad haciendo de interruptor. Al pasar el puntero por el
-título el video se sale de su caja y toma el marco entero; al salir, corte seco,
-y las dos piezas quedaron cambiadas de sitio.
+Se ve en **`/preview/home`**. Es el lanzamiento y nada más. En reposo no hay
+composición: hay una **cenefa** —el video ocupando solo la franja del título, de
+borde a borde, sobre negro— con el nombre del disco encima. Tomar el título con
+la mano abre esa grieta en las dos cajas del lanzamiento: la carátula y el
+video, una arriba y otro abajo. Al soltar se vuelve a cerrar, y la pasada
+siguiente abre la composición contraria.
 
 Sale de `data/home.json`, con respaldo automático al release más reciente si no
 hay destacado. Qué se pega en Cargo y cómo se calibra:
 **[cargo/snippets/home.md](cargo/snippets/home.md)**.
+
+## El widget del about
+
+Se ve en **`/preview/about`**. Es el mismo stack, **invertido**: el intersticio
+va abajo. En reposo es negro absoluto con un solo renglón de texto —*Sonic
+hustlers since 2020 / Run by DJ Lomalinda, Nyksan and Verraco.*— y nada más: sin
+imagen, sin loop, sin destello. Pasar la mano por un nombre invoca el emblema
+kitsch de ese DJ en una posición **aleatoria**, que vive un segundo y se apaga
+sola; la grieta de abajo lo muestra aplastado de borde a borde. **El santo es el
+link:** el que lleva al Instagram es el emblema, no el nombre.
+
+Sale de `data/about.json`. El ensayo del *third space* es no verbal a propósito:
+no hay manifiesto ni citas. El acuerdo está en **[BRIEF-ABOUT.md](BRIEF-ABOUT.md)**
+y lo que se pega en Cargo en **[cargo/snippets/about.md](cargo/snippets/about.md)**.
+
+> Los tres emblemas de hoy son **relleno** —estampas generadas, marcadas
+> `RELLENO` en la imagen— para poder calibrar sin esperar al sello. Se
+> reemplazan sobreescribiendo los seis archivos de `media/about/`.
 
 ## El widget de catálogo
 
@@ -55,6 +74,24 @@ del carril.
 Qué se pega en Cargo y cómo se calibra sin tocar código:
 **[cargo/snippets/catalogo.md](cargo/snippets/catalogo.md)**.
 
+## La merca
+
+Se ve, con el home corriendo detrás, en **`/preview/merca`** (`?ver=item`
+abre la ficha, `?stock=out-of-stock` la pone agotada).
+
+Es la única pantalla que **no** es un widget: la vitrina y las fichas son
+páginas de Cargo, con su `gallery-grid` y sus `column-set`, para que el
+equipo las edite sin pasar por el repo. Lo que ponemos nosotros es el CSS
+—uno solo, global, que se aplica por llevar la banda y no por id de página—
+y el ancla.
+
+El ancla es lo que la ata al resto del sitio: la gaveta no flota a una altura
+propia, **cuelga de la barra de la mitad**. El widget del stack mide su banda
+y publica `--ttx-ancla`; el CSS de Cargo la lee. Mover el visor mueve la
+merca con él.
+
+Qué se pega y por qué: **[cargo/snippets/merca.md](cargo/snippets/merca.md)**.
+
 ```
 src/widgets/
 ├── index.js            Entrada del bundle
@@ -67,7 +104,8 @@ src/widgets/
 │   ├── format.js       Rol__ Valor, fechas, URLs de carátula
 │   └── dom.js          `elemento()`, lo único que hace falta sin framework
 ├── catalogo/           El carril y el acordeón
-└── home/               El lanzamiento y su intercambio
+├── home/               El lanzamiento y su intercambio
+└── about/              El stack invertido y las apariciones
 ```
 
 ---
@@ -128,8 +166,9 @@ todo queda en `note` y se pueden ir pasando a `credits` con calma. El tablero de
 
 ```
 data/        La fuente de verdad. Es lo único que el equipo necesita entender.
-media/       El material propio: el video del home y las carátulas que no
-             vienen de Bandcamp. Se versiona; `public/` es generado y se borra
+media/       El material propio: el video del home, los emblemas del about y
+             las carátulas que no vienen de Bandcamp. Se versiona; `public/`
+             es generado y se borra
              entera en cada compilación, así que ahí no puede vivir.
 src/widgets/ Lo que corre DENTRO de Cargo: JS sin framework, CSS scopeado.
 src/pages/   El taller: tablero, previews y (pronto) el panel de edición.

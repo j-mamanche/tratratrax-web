@@ -201,6 +201,53 @@ if (existsSync(join(root, 'data', 'home.json'))) {
   }
 }
 
+// ─── about.json ──────────────────────────────────────────────────────────────
+//
+// El About no tiene respaldo, y esa es la diferencia con el home. Allá, si el
+// destacado falla, queda el release más reciente; aquí el único texto de la
+// página y los tres disparadores salen de este archivo. Un DJ a medias no es un
+// About pobre: es un nombre en la línea que no responde a la mano, o un santo
+// que no lleva a ninguna parte. Así que aquí casi todo es ERROR.
+
+if (existsSync(join(root, 'data', 'about.json'))) {
+  const about = load('about.json') ?? {};
+
+  if (!about.lema) warn('about.json', 'sin `lema` — el primer renglón queda vacío');
+
+  const djs = about.djs;
+  if (!Array.isArray(djs) || djs.length === 0) {
+    err('about.json', 'falta `djs` — sin DJs no hay nada que invocar');
+  } else {
+    // Son tres. Si algún día son otros, esto es lo que hay que venir a cambiar
+    // —y hay que venir, porque el brief cerró la línea con los tres nombres.
+    if (djs.length !== 3) {
+      warn('about.json', `hay ${djs.length} DJs y el brief cerró tres. ¿Es a propósito?`);
+    }
+
+    const nombres = new Set();
+    for (const [i, dj] of djs.entries()) {
+      const at = `about djs[${i}] "${dj.nombre ?? '¿?'}"`;
+
+      if (!dj.nombre) err(at, 'falta `nombre` — es el disparador y el texto de la línea');
+      else if (nombres.has(dj.nombre)) err(at, `nombre duplicado "${dj.nombre}"`);
+      else nombres.add(dj.nombre);
+
+      if (!dj.instagram) err(at, 'falta `instagram` — el emblema es el link, sin él no lleva a nada');
+      else if (!isHttpUrl(dj.instagram)) err(at, `instagram no es una URL válida: "${dj.instagram}"`);
+
+      if (!dj.emblema) err(at, 'falta `emblema` (el GIF)');
+      else revisarMedia(at, '`emblema`', dj.emblema);
+
+      // El cuadro fijo no es opcional: un GIF animado no se puede pausar por
+      // CSS, así que sin PNG no hay forma de respetar `prefers-reduced-motion`.
+      if (!dj.quieto) err(at, 'falta `quieto` (el PNG) — es lo que se sirve con prefers-reduced-motion');
+      else revisarMedia(at, '`quieto`', dj.quieto);
+
+      if (dj.relleno) warn(at, 'marcado como `relleno`: el emblema es material de prueba');
+    }
+  }
+}
+
 // ─── merch.json ──────────────────────────────────────────────────────────────
 
 const STOCK = ['in', 'few', 'out'];

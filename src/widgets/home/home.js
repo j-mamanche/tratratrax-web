@@ -5,27 +5,28 @@ import { elemento } from '../_runtime/dom.js';
 import { cover, numeroCatalogo, nombresArtistas } from '../_runtime/format.js';
 import './home.css';
 
-// El home: el lanzamiento, y nada más. Dos piezas del mismo release —un video
-// y la carátula— que se turnan la caja de arriba y la de abajo. El interruptor
-// es el título, o sea la banda del centro: el canal de información es la
-// bisagra entre las otras dos bandas, no un rótulo pasivo.
+// El home: el lanzamiento, y nada más. En reposo no hay composición: hay una
+// **cenefa** —el video ocupando solo la franja del título, de borde a borde,
+// sobre negro— y el nombre del disco encima. Tomar el título con la mano es lo
+// que abre esa grieta en las dos cajas del lanzamiento.
 //
-//   REPOSO A          carátula arriba, video abajo
-//   MANO ENCIMA       el video se sale de su caja y toma el marco, el aire de
-//                     los lados y la franja del título. La carátula sigue en
-//                     su sitio, recortada contra él
-//   REPOSO B          video arriba, carátula abajo
+//   REPOSO            la cenefa: el video vive dentro de la franja del título
+//   MANO ENCIMA A     la grieta se abre — carátula arriba, video abajo
+//   MANO ENCIMA B     la grieta se abre al revés — video arriba, carátula abajo
 //
-// Se conmuta **saliendo, no entrando**: uno no aprieta nada, uno pasa, y al
-// pasar el sitio quedó de otra manera. Corte seco en las tres transiciones.
+// La composición **es el gesto**: existe mientras alguien la sostiene y se
+// vuelve a cerrar al soltarla. Y cada pasada abre la contraria de la anterior,
+// porque el cambio de A a B ocurre al cerrar, con la cenefa ya en pantalla:
+// nadie ve el cambio, uno vuelve a pasar y encontró la otra. Corte seco en las
+// tres transiciones.
 //
 // Hay un solo `<video>`, cubre el host entero y nunca para. Lo único que
 // cambia entre los tres estados es el rectángulo por el que se ve, y como los
 // tres recortes son un rectángulo simple, los tres son un `clip-path: inset()`
 // que vive en el CSS. Todo el estado del widget son dos atributos en el host:
 //
-//   data-home="a|b"   qué caja tiene la carátula
-//   data-invade       mientras hay una mano encima
+//   data-home="a|b"   cuál de las dos composiciones abre la próxima pasada
+//   data-abierto      mientras la composición está abierta
 //
 // No hay animación que cancelar, no hay posición que recalcular, no hay video
 // que resincronizar.
@@ -39,8 +40,8 @@ import './home.css';
  * Lo mínimo que dura un estado antes de que pueda entrar el siguiente.
  *
  * **No es un retardo.** Entrar al título cambia la pantalla en el acto; lo que
- * se controla es lo de después: pasar el ratón por encima muy rápido disparaba
- * invasión y conmutación en el mismo fotograma y se leía como un parpadeo. Con
+ * se controla es lo de después: pasar el ratón por encima muy rápido abría y
+ * cerraba la composición en el mismo fotograma y se leía como un parpadeo. Con
  * 100 ms de piso cada estado alcanza a existir, y la pasada se ve como una
  * decisión y no como un glitch.
  *
@@ -50,10 +51,16 @@ import './home.css';
 const MINIMO = 100;
 
 /**
- * Cuánto tiene que estar quieto un teléfono para que las piezas se intercambien
- * solas. En pantalla ancha no corre: ahí está la mano.
+ * El respiro del teléfono. Cinco segundos de franja, un destello de composición
+ * y otra vez la franja. En pantalla ancha no corre: ahí está la mano.
+ *
+ * **Es un destello, no un turno.** Un segundo alcanza para ver qué hay —la
+ * carátula, el lanzamiento— y es demasiado poco para instalarse: la composición
+ * sigue siendo lo que uno saca con la mano, y esto solo avisa que está ahí. Con
+ * turnos parejos el teléfono acababa contando otra historia que el escritorio.
  */
-const OCIO = 6000;
+const OCIO = 5000;
+const DESTELLO = 1000;
 
 registrar('home', async (host) => {
   // El destacado curado manda; si falta, el release visible más reciente.
@@ -211,7 +218,7 @@ function crearTitulo(pieza, interruptor) {
 /**
  * El estado, y el ritmo mínimo al que puede cambiar la pantalla.
  *
- * Lo lógico pasa **en el acto** —quién está invadiendo, en qué orden ocurrió
+ * Lo lógico pasa **en el acto** —si hay una mano puesta, en qué orden ocurrió
  * cada cosa— y lo que se ve pasa lo antes posible, que casi siempre es también
  * en el acto. Lo único que se impone es un piso entre un cambio y el
  * siguiente: si el anterior acaba de escribirse, este espera a que se cumplan
@@ -226,7 +233,7 @@ function crearTitulo(pieza, interruptor) {
 function estado(host, minimo) {
   const cola = [];
   let timer = null;
-  let invadiendo = false;
+  let mano = false;
   // El instante más temprano en que se puede volver a escribir. Arranca en el
   // pasado: el primer cambio de una racha nunca espera.
   let libre = -Infinity;
@@ -258,28 +265,55 @@ function estado(host, minimo) {
     host.dataset.home = host.dataset.home === 'a' ? 'b' : 'a';
   };
 
+  const abrir = () => {
+    host.dataset.abierto = '';
+  };
+
+  /**
+   * Cerrar y voltear son **el mismo gesto**, y en este orden. La composición
+   * cambia en el fotograma en que la cenefa vuelve a tapar todo, así que el
+   * cambio no se ve: uno suelta, queda la grieta, y la próxima vez que pase
+   * encuentra la otra. Volteando al abrir se vería el cambio y sería un
+   * carrusel; volteando al cerrar es que el sitio quedó de otra manera.
+   */
+  const cerrar = () => {
+    delete host.dataset.abierto;
+    voltear();
+  };
+
+  const abierto = () => 'abierto' in host.dataset;
+
   return {
-    get invadiendo() {
-      return invadiendo;
+    /** Si hay una mano puesta ahora mismo — no si está abierto: el ocio también abre. */
+    get mano() {
+      return mano;
+    },
+    get abierto() {
+      return abierto();
     },
     entrar() {
-      if (invadiendo) return;
-      invadiendo = true;
-      agendar(() => {
-        host.dataset.invade = '';
-      });
+      if (mano) return;
+      mano = true;
+      agendar(abrir);
     },
     salir() {
-      if (!invadiendo) return;
-      invadiendo = false;
-      agendar(() => {
-        delete host.dataset.invade;
-        voltear();
-      });
+      if (!mano) return;
+      mano = false;
+      agendar(cerrar);
     },
-    /** Enter y espacio, y el latido de ocio. */
+    /** Enter y espacio: la mano sigue puesta, así que cambia la composición en el sitio. */
     conmutar() {
       agendar(voltear);
+    },
+    // Las dos del destello de ocio. Hacen lo mismo que entrar y salir —cerrar
+    // también voltea— pero sin tocar `mano`: nadie puso la mano, y si el
+    // destello se hiciera pasar por una, el `pointerdown` de después se
+    // encontraría con que ya hay mano puesta y no abriría nada.
+    abrirSinMano() {
+      agendar(abrir);
+    },
+    cerrarSinMano() {
+      agendar(cerrar);
     },
     soltar() {
       clearTimeout(timer);
@@ -290,17 +324,17 @@ function estado(host, minimo) {
 
 /**
  * Los disparos. Es el mismo gesto en las tres entradas —entrar, mantener,
- * salir— y en las tres se conmuta al salir:
+ * salir— y en las tres se abre al entrar y se cierra al salir:
  *
- *   ratón     pointerenter → invade      pointerleave            → conmuta
- *   tacto     pointerdown  → invade      pointerup / cancel      → conmuta
- *   teclado   focus        → invade      blur                    → conmuta
+ *   ratón     pointerenter → abre      pointerleave            → cierra
+ *   tacto     pointerdown  → abre      pointerup / cancel      → cierra
+ *   teclado   focus        → abre      blur                    → cierra
  *
  * Van separados por `pointerType` a propósito. Un toque dispara también
  * `pointerenter` y `pointerleave`, así que atender los cinco eventos sin
- * distinguir haría dos conmutaciones por toque y el sitio quedaría igual que
- * antes. El `invadiendo` del estado es el segundo cinturón: salir dos veces
- * seguidas no conmuta dos veces.
+ * distinguir haría dos aperturas por toque y el sitio quedaría igual que
+ * antes. El `mano` del estado es el segundo cinturón: salir dos veces
+ * seguidas no cierra dos veces.
  */
 function disparos(titulo, est) {
   const ac = new AbortController();
@@ -319,7 +353,7 @@ function disparos(titulo, est) {
   on('pointerdown', (e) => {
     if (raton(e)) return;
     // Con la captura, soltar el dedo fuera del título sigue avisando aquí; sin
-    // ella un deslizamiento hacia afuera dejaba el home invadido para siempre.
+    // ella un deslizamiento hacia afuera dejaba el home abierto para siempre.
     try {
       titulo.setPointerCapture(e.pointerId);
     } catch {
@@ -336,8 +370,8 @@ function disparos(titulo, est) {
   on('focus', () => tecla(titulo) && entrar());
   on('blur', () => salir());
 
-  // Enter y espacio conmutan en el sitio. El foco no se ha ido, así que sigue
-  // invadido: es la misma pasada, repetida.
+  // Enter y espacio cambian la composición en el sitio. El foco no se ha ido,
+  // así que sigue abierta: es la misma pasada, repetida.
   on('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     e.preventDefault(); // el espacio, si no, hace scroll de la página
@@ -348,21 +382,33 @@ function disparos(titulo, est) {
 }
 
 /**
- * El gesto de ocio: en teléfono, si nadie toca durante seis segundos, las dos
- * piezas se intercambian solas, y siguen turnándose mientras el sitio siga
- * quieto. Al primer toque se para y no vuelve hasta seis segundos después de
- * que la mano se retire.
+ * El respiro del teléfono. Cinco segundos de franja, **un destello de un
+ * segundo** con la composición abierta, y otra vez la franja. Al cerrarse
+ * voltea, como siempre, así que un destello enseña una composición y el
+ * siguiente la otra. Sigue respirando mientras el sitio esté quieto.
  *
- * Es la única cosa del home que se mueve sin que nadie la mueva, y va solo
- * donde no hay mano: en pantalla ancha el intercambio ya tiene quien lo
- * dispare, y ahí sí sería un parpadeo gratis. El corte de teléfono es el mismo
- * de siempre —seco, sin apagón, sin grieta—: es un intercambio, no una
- * invasión sin dedo.
+ * **Es un destello, no un turno**, y ahí está la diferencia con el intercambio
+ * que había antes: un segundo alcanza para ver que hay un lanzamiento debajo y
+ * es demasiado poco para instalarse. La composición sigue siendo lo que uno
+ * saca con la mano; esto solo avisa que está ahí.
  *
- * No corre con `prefers-reduced-motion: reduce`. El intercambio a mano sigue
+ * **Con el home invertido esto dejó de ser un adorno.** En reposo no se ve la
+ * carátula, y en teléfono no hay hover: sin el destello, quien no sepa que el
+ * título se puede mantener pulsado no vería nunca el lanzamiento, solo una
+ * grieta de video. Es la única cosa del home que se mueve sin que nadie la
+ * mueva, y va solo donde no hay mano — en pantalla ancha la composición ya
+ * tiene quien la abra, y ahí sí sería un parpadeo gratis.
+ *
+ * **Cualquier cosa que haga el usuario lo apaga y reinicia la cuenta**: si el
+ * destello está en pantalla se cierra en el acto, y los cinco segundos empiezan
+ * otra vez desde la franja cuando el usuario suelte. Nunca hay que esperar a
+ * que termine un destello para volver a tener el home quieto.
+ *
+ * No corre con `prefers-reduced-motion: reduce`. Abrir a mano sigue
  * funcionando ahí porque es un corte y lo pide el usuario; este no lo pide
  * nadie, y movimiento que uno no provocó es justamente lo que esa preferencia
- * viene a apagar.
+ * viene a apagar. Ahí el teléfono se queda en la cenefa: el `poster` del video
+ * dentro de la franja, y la carátula a un toque sostenido.
  */
 function ocio(host, est) {
   const movil = matchMedia('(max-width: 46rem)');
@@ -377,17 +423,35 @@ function ocio(host, est) {
     timer = null;
   };
 
+  /**
+   * Vuelve a la franja y empieza a contar de cero.
+   *
+   * Lo llama cualquier actividad del usuario, y también los cambios de
+   * `matchMedia` y de visibilidad. Por eso lo primero es apagar el destello si
+   * estaba encendido: el respiro no sobrevive a que lo interrumpan —quien toca
+   * el sitio manda sobre lo que el sitio hace solo—, y ese mismo cierre es el
+   * que salva el caso de quedarse abierto para siempre cuando el ocio deja de
+   * correr a mitad de destello (la ventana se hizo ancha, entró la preferencia
+   * de menos movimiento). Con la mano puesta no se toca nada: la composición es
+   * suya hasta que la suelte, y el `pointerup` vuelve a pasar por aquí.
+   */
   const armar = () => {
     parar();
-    // Con el dedo encima no hay ocio que medir: lo vuelve a armar el
-    // `pointerup`, que llega siempre.
-    if (!movil.matches || menos.matches || est.invadiendo) return;
-    timer = setTimeout(latir, OCIO);
+    if (!est.mano && est.abierto) est.cerrarSinMano();
+    if (!movil.matches || menos.matches || est.mano) return;
+    timer = setTimeout(destellar, OCIO);
   };
 
-  const latir = () => {
-    est.conmutar();
-    armar();
+  /**
+   * El destello: abre, y al segundo vuelve a la franja — que es exactamente lo
+   * que `armar` ya sabe hacer. Terminar un destello y ser interrumpido por el
+   * usuario son la misma cosa vistas desde aquí: en los dos casos se cierra y
+   * la cuenta empieza de cero. Lo único que cambia es quién apaga el
+   * temporizador.
+   */
+  const destellar = () => {
+    est.abrirSinMano();
+    timer = setTimeout(armar, DESTELLO);
   };
 
   // Cualquier cosa que haga el usuario reinicia la cuenta. Van sobre el host y

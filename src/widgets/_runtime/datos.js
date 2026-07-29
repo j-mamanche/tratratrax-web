@@ -87,6 +87,30 @@ export function cargarHome() {
   return promesaHome;
 }
 
+let promesaAbout = null;
+
+/**
+ * `about.json`: el lema y los tres DJs con su emblema y su Instagram.
+ *
+ * **Sí rechaza**, al contrario que `cargarHome()`. El home tiene de dónde
+ * caerse —el release más reciente— y el About no: el único texto de la página
+ * y los tres disparadores salen de este archivo. Sin él no hay una versión
+ * pobre que valga, así que se deja fallar y el loader pinta su mensaje. Callar
+ * antes que pintar una página negra que parece terminada.
+ */
+export function cargarAbout() {
+  if (promesaAbout) return promesaAbout;
+
+  promesaAbout = fetch(new URL('about.json', BASE)).then(exigirOk);
+
+  // Un fallo de red no puede dejar la página envenenada para siempre.
+  promesaAbout.catch(() => {
+    promesaAbout = null;
+  });
+
+  return promesaAbout;
+}
+
 function exigirOk(r) {
   if (!r.ok) throw new Error(`${r.status} al pedir ${r.url}`);
   return r.json();
