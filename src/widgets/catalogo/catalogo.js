@@ -4,6 +4,7 @@ import { crearStack, proyectar, precargar } from '../_runtime/stack.js';
 import { espejo } from '../_runtime/espejo.js';
 import { hscroll } from '../_runtime/hscroll.js';
 import { cover, numeroCatalogo, lineasCredito, nombresArtistas } from '../_runtime/format.js';
+import { elemento } from '../_runtime/dom.js';
 import './catalogo.css';
 
 // El catálogo: visor arriba, carril de carátulas abajo, y una etiqueta por
@@ -266,14 +267,4 @@ function medirItems(host, carril) {
   });
   ro.observe(cuerpo);
   return () => ro.disconnect();
-}
-
-// ── Utilidad ────────────────────────────────────────────────────────────
-
-/** Los `null` y `false` se ignoran, para poder escribir `cond && elemento(…)`. */
-function elemento(tag, props = {}, ...hijos) {
-  const el = document.createElement(tag);
-  for (const [k, v] of Object.entries(props)) el.setAttribute(k, v);
-  el.append(...hijos.filter((h) => h !== null && h !== undefined && h !== false && h !== ''));
-  return el;
 }

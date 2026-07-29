@@ -1,0 +1,12 @@
+{
+  "destacado": {
+    "titulo": "Killing Mariposas",
+    "artista": "Luca Durán",
+    "fecha": "091826",
+    "caratula": "media/killing-mariposas.jpg",
+    "video": {
+      "mp4": "media/killing-mariposas.mp4",
+      "poster": "media/killing-mariposas-poster.jpg"
+    }
+  }
+}

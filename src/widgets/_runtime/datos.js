@@ -24,6 +24,19 @@ export function baseDatos() {
 // se resuelve al cargar el módulo, no dentro de cargar().
 const BASE = baseDatos();
 
+/**
+ * La raíz del sitio publicado — de ahí cuelgan `data/` y `media/`.
+ *
+ * Los archivos de `data/*.json` guardan rutas relativas a esa raíz
+ * (`media/tra032.mp4`), no a la carpeta de datos: son rutas del sitio, no de
+ * un JSON en particular, y así siguen sirviendo si algún día un dato se muda
+ * de archivo. Una URL absoluta se respeta tal cual.
+ */
+export function urlMedia(ruta) {
+  if (!ruta) return '';
+  return /^(?:https?:)?\/\//i.test(ruta) ? ruta : new URL(ruta, new URL('..', BASE)).href;
+}
+
 let promesa = null;
 
 /**
@@ -49,6 +62,29 @@ export function cargar() {
   });
 
   return promesa;
+}
+
+let promesaHome = null;
+
+/**
+ * `home.json` va aparte de `cargar()`: es el único que lo usa y el catálogo no
+ * tiene por qué pedirlo.
+ *
+ * **Nunca rechaza.** Si el archivo no existe todavía o la red falla, resuelve
+ * a `null` y el home cae a su respaldo. Un home pobre es aceptable; un home
+ * roto no.
+ */
+export function cargarHome() {
+  if (promesaHome) return promesaHome;
+
+  promesaHome = fetch(new URL('home.json', BASE))
+    .then((r) => (r.ok ? r.json() : null))
+    .catch(() => {
+      promesaHome = null; // un fallo de red no envenena la página para siempre
+      return null;
+    });
+
+  return promesaHome;
 }
 
 function exigirOk(r) {

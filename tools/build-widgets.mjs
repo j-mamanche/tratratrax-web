@@ -5,6 +5,7 @@
 //   public/ttx.css   ← el mismo CSS suelto, solo para los que tengan cacheada
 //                      una versión vieja del bundle que todavía lo pide
 //   public/data/*.json ← los datos, servidos desde el mismo origen
+//   public/media/*   ← el video y las carátulas propias del home
 //
 // **Por qué el CSS va adentro del JS.** Estaban separados y el loader
 // inyectaba un `<link>`. GitHub Pages los cachea diez minutos cada uno, por
@@ -16,6 +17,7 @@
 // `public/` es generado: no se versiona. La fuente es `src/widgets/` y `data/`.
 
 import { build, context } from 'esbuild';
+import { existsSync } from 'node:fs';
 import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -48,9 +50,22 @@ async function copiarDatos() {
   }
 }
 
+/**
+ * El material propio del sitio —el video del home y las carátulas que no
+ * vienen de Bandcamp— vive en `media/` y se versiona. No puede vivir
+ * directamente en `public/` porque esta misma línea de abajo borra esa
+ * carpeta entera en cada compilación: `public/` es generado.
+ */
+async function copiarMedia() {
+  const origen = join(raiz, 'media');
+  if (!existsSync(origen)) return;
+  await cp(origen, join(salida, 'media'), { recursive: true });
+}
+
 await rm(salida, { recursive: true, force: true });
 await mkdir(salida, { recursive: true });
 await copiarDatos();
+await copiarMedia();
 
 /**
  * Dos pasadas, porque el CSS tiene que existir antes de poder meterlo en el

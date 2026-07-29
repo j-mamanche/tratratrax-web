@@ -1,0 +1,92 @@
+---
+// El widget del home aislado, con los datos reales y el mismo bundle que se
+// carga en Cargo. Lo que se ve aquí es lo que se ve allá.
+//
+// El chrome de abajo es una imitación del de Cargo — la barra que el video no
+// invade. Está solo para juzgar las proporciones; no es parte del widget.
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TraTraTrax · preview del home</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        /* Claro a propósito: es lo único que deja ver dónde termina el
+           recorte de los cuatro lados, ahora que el widget es negro. */
+        background: #d8d5cf;
+        color: #000;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        overscroll-behavior: none;
+      }
+
+      .chrome {
+        position: fixed;
+        inset: auto 0 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 1.6rem;
+        padding: 0 0.6rem;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        background: #fff;
+        border-top: 1px solid rgba(0, 0, 0, 0.22);
+      }
+      .chrome b { font-weight: 700; }
+
+      /* Solo del preview: para ver el home pobre sin tener que vaciar el
+         JSON. En Cargo esto no existe. */
+      .respaldo {
+        position: fixed;
+        top: 0;
+        right: 0;
+        padding: 0.35rem 0.6rem;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #000;
+        background: #d8d5cf;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Así se calibra sin tocar el widget: las variables van en el propio
+         placeholder, que es lo único que se pega en la página de Cargo. Un
+         `style` inline le gana a cualquier CSS, incluido el global de Cargo.
+
+         `--ttx-margen` recorta por los cuatro lados y `--ttx-nav-h` deja
+         abajo el hueco de la barra de Cargo — el que el video no invade. -->
+    <div data-ttx="home" style="--ttx-margen: 10px; --ttx-nav-h: 1.6rem"></div>
+
+    <a class="respaldo" href="?respaldo" data-quitar>ver el respaldo →</a>
+
+    <div class="chrome">
+      <span>2026 © Todos los izquierdos públicos</span>
+      <span>TraTraTrax</span>
+      <span>Menu: About Catalog Merca Blog</span>
+    </div>
+
+    <!-- Antes del bundle: el widget lee el atributo al montar. Va aquí y no en
+         el frontmatter porque el sitio se compila estático y `?respaldo` solo
+         existe en el navegador. -->
+    <script is:inline>
+      if (location.search.includes('respaldo')) {
+        document.querySelector('[data-ttx="home"]').setAttribute('data-respaldo', '');
+        const a = document.querySelector('[data-quitar]');
+        a.href = location.pathname;
+        a.textContent = '← ver el destacado';
+      }
+    </script>
+
+    <!-- `data-ttx-datos` solo existe aquí: en Cargo la URL sale del propio
+         src del script. -->
+    <script is:inline src={`${base}ttx.js`} data-ttx-datos={`${base}data/`} defer></script>
+  </body>
+</html>

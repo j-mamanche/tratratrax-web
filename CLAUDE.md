@@ -22,6 +22,10 @@ Lee **PLAN.md** antes de proponer arquitectura. Ahí está lo decidido y el porq
   más. Es el bug clásico de este enfoque.
 - **No usar jsDelivr para los datos.** Cachea 12h una rama: se publicaría un
   release y aparecería al día siguiente. GitHub Pages para todo.
+- **El material propio va en `media/`, nunca en `public/`.** `public/` es
+  generado: `tools/build-widgets.mjs` la borra entera en cada compilación. El
+  build copia `media/` adentro. Las rutas en `data/*.json` son relativas a la
+  raíz del sitio (`media/tra032.mp4`), no a la carpeta de datos.
 
 ## Cómo se resolvió el scroll horizontal
 

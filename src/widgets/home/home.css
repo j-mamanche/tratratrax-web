@@ -1,0 +1,274 @@
+/* El home: dos cajas que se turnan el video y la carátula, y el título en la
+   mitad haciendo de bisagra. Todo cuelga de [data-ttx='home'].
+
+   La estructura, que es la misma del stack de siempre:
+
+     host  (relative; el papel negro, siempre)
+      ├─ .ttx-home-video   abs, inset: 0, z: 0   ← clip-path según el estado
+      └─ .ttx-marco        rel,           z: 1   ← fondo transparente
+          ├─ .ttx-home-caja.ttx-home-arriba   (el visor del stack)
+          ├─ .ttx-banda                       (el título, encima de todo)
+          └─ .ttx-home-caja.ttx-home-abajo    (el contenido del stack)
+
+   El fondo negro lo pone el **host**, así que se ve por el aire de los lados,
+   por la franja del título y por donde el video no llegue. Las dos cajas van
+   encima del video: la que tiene la carátula la pinta y tapa lo que haya
+   debajo, la otra es transparente y lo deja pasar. */
+
+[data-ttx='home'] {
+  /* Tinta invertida: el home es negro con texto blanco, al revés que el
+     catálogo. Los tokens ya lo permiten; no hay CSS nuevo por esto. */
+  --ttx-papel: #000;
+  --ttx-tinta: #fff;
+  --ttx-tinta-floja: rgba(255, 255, 255, 0.55);
+
+  /* El filtro de dos tonos no se usa aquí. El home es el único sitio donde
+     las piezas se ven como son: el video limpio y la carátula limpia, en las
+     tres posiciones. El filtro se queda para el catálogo, donde su trabajo es
+     que 35 carátulas no compitan entre ellas. */
+  --ttx-visor-fx: none;
+
+  /* La caja de arriba mide esto y la de abajo se queda con el resto. */
+  --ttx-visor-h: 34%;
+  --ttx-banda-h: 1.9rem;
+
+  /* Cómo entra cada pieza en su hueco. La carátula entra distinto según en qué
+     caja esté, y esa asimetría es la composición:
+
+       arriba  full bleed. Llena el módulo de borde a borde y se recorta lo que
+               sobre. Es la primera cosa que se ve al entrar al sitio y tiene
+               que llegar a los bordes, no flotar.
+       abajo   la carátula entera, cuadrada y centrada, con negro alrededor.
+               Ahí ya no encabeza: acompaña.
+
+     El video va `cover` siempre, porque nunca es una ventana propia: cubre el
+     host entero y lo único que cambia es el rectángulo por el que se ve. */
+  --ttx-home-ajuste-arriba: cover;
+  --ttx-home-ajuste-abajo: contain;
+  --ttx-home-video-ajuste: cover;
+
+  /* La franja dice `KILLING MARIPOSAS KELMAN DURÁN 091826`: los tres campos
+     pegados, sin un carácter de por medio, y diferenciados solo por el peso.
+     Es el mismo gesto del menú del nav —`ABOUT CATALOG MERCA BLOG`— y de la
+     etiqueta del catálogo: lo que separa es la letra, no un signo.
+
+     El separador queda en la variable, vacío, por si alguna vez se quiere. */
+  --ttx-home-titulo-sep: '';
+  --ttx-home-titulo-gap: 0.03em;
+
+  position: relative;
+  background: var(--ttx-papel);
+}
+
+/* ── La capa de video ─────────────────────────────────────────────────
+   Un solo `<video>`, cubriendo el host entero, que nunca para. Los tres
+   estados son tres rectángulos, así que los tres son un `inset()`. */
+[data-ttx='home'] .ttx-home-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: var(--ttx-home-video-ajuste);
+  clip-path: var(--ttx-home-recorte);
+  /* Corte seco en las tres transiciones: sin fundido, sin deslizamiento, sin
+     easing. Cero milisegundos. Es lo único que no se puede leer como
+     efectismo — y por eso aquí no hay ninguna `transition` que quitar. */
+  pointer-events: none;
+}
+
+/* Los altos van medidos y publicados por el JS (`--ttx-home-visor-h`,
+   `--ttx-home-banda-h`). Los tokens quedan de respaldo para el primer
+   fotograma, antes de que el ResizeObserver haya dicho nada. */
+[data-ttx='home'] {
+  --ttx-home-caja-h: var(--ttx-home-visor-h, var(--ttx-visor-h));
+  --ttx-home-franja-h: var(--ttx-home-banda-h, var(--ttx-banda-h));
+}
+
+/* Reposo A — la carátula arriba, el video en la caja de abajo. */
+[data-ttx='home'][data-home='a'] {
+  --ttx-home-recorte: inset(
+    calc(var(--ttx-margen) + var(--ttx-home-caja-h) + var(--ttx-home-franja-h))
+    var(--ttx-margen)
+    calc(var(--ttx-margen) + var(--ttx-nav-h))
+    var(--ttx-margen)
+  );
+}
+
+/* Reposo B — el video arriba, la carátula abajo. */
+[data-ttx='home'][data-home='b'] {
+  --ttx-home-recorte: inset(
+    var(--ttx-margen)
+    var(--ttx-margen)
+    calc(100% - var(--ttx-margen) - var(--ttx-home-caja-h))
+    var(--ttx-margen)
+  );
+}
+
+/* Mano encima — apagón. La carátula se va, el video se sale de su caja y lo
+   único que queda encendido en toda la pantalla es **la franja del título**:
+   una grieta de video de borde a borde, con el nombre del disco encima.
+
+   Ahí está el hallazgo entero. El canal de información no se ilumina porque
+   sea importante: se ilumina porque es la bisagra, y mientras uno la tiene en
+   la mano el sitio entero se apaga alrededor. El video deja de ser contenido y
+   pasa a ser el intersticio.
+
+   Va a los lados sin `--ttx-margen`: la grieta atraviesa, no se queda dentro
+   del marco.
+
+   Va después de los dos reposos y con la misma especificidad: gana el último. */
+[data-ttx='home'][data-invade] {
+  --ttx-home-recorte: inset(
+    calc(var(--ttx-margen) + var(--ttx-home-caja-h))
+    0
+    calc(100% - var(--ttx-margen) - var(--ttx-home-caja-h) - var(--ttx-home-franja-h))
+    0
+  );
+}
+
+/* ── El marco y las dos cajas ─────────────────────────────────────────
+   El stack pinta el marco y el visor de papel; aquí los dos tienen que ser
+   transparentes o taparían el video, que va debajo. */
+[data-ttx='home'] .ttx-marco {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  /* Sin recorte: la caja de abajo llega hasta el borde y no hay carril que
+     se salga. Y así el foco del título no queda cortado. */
+  overflow: visible;
+}
+
+[data-ttx='home'] .ttx-home-caja {
+  background-color: transparent;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  overflow: hidden;
+}
+
+[data-ttx='home'] .ttx-home-arriba {
+  background-size: var(--ttx-home-ajuste-arriba);
+}
+
+[data-ttx='home'] .ttx-home-abajo {
+  background-size: var(--ttx-home-ajuste-abajo);
+}
+
+/* El respaldo de teléfono del visor no pinta nada aquí: la caja de arriba es
+   una de las dos piezas, no la proyección de un ítem activo. */
+[data-ttx='home'] .ttx-visor-fondo {
+  display: none;
+}
+
+/* El home pobre — el respaldo, sin video. No hay nada que turnarse, así que
+   dos cajas no significan nada: la de arriba se queda con todo el alto, la de
+   abajo colapsa y el título baja a apoyarse en la barra. Es la misma
+   maquetación con una fila en cero, no otra pantalla.
+
+   Media pantalla en negro vacío se leería como que algo falló, y el respaldo
+   está justamente para que eso no pase. */
+[data-ttx='home'][data-pobre] .ttx-marco {
+  grid-template-rows: minmax(0, 1fr) auto 0;
+}
+
+/* Qué caja tiene la carátula. Lo demás lo enseña el video. */
+[data-ttx='home'][data-home='a'] .ttx-home-arriba,
+[data-ttx='home'][data-home='b'] .ttx-home-abajo {
+  background-image: var(--ttx-home-caratula);
+}
+
+/* Con la mano encima se apaga también la carátula: de la grieta para afuera no
+   queda nada. Es lo que hace que la franja sea lo único que se ve, y no una
+   franja más brillante entre dos cosas que siguen ahí. */
+[data-ttx='home'][data-invade] .ttx-home-caja {
+  background-image: none;
+}
+
+/* ── El título ────────────────────────────────────────────────────────
+   La banda es transparente: en reposo se ve el negro del host, con la mano
+   encima se ve el video. El título se queda encima y aguanta — a veces se
+   leerá bien y a veces se perderá contra la imagen, y eso está decidido así.
+
+   A diferencia del catálogo, aquí el texto **envuelve**: es el único texto de
+   la página y perder el nombre del artista en un `overflow: hidden` sería
+   peor que una segunda línea. La fila del grid es `auto` y el JS mide, así
+   que dos líneas no descuadran ningún recorte. */
+[data-ttx='home'] .ttx-banda {
+  position: relative;
+  padding: 0;
+  background: transparent;
+  white-space: normal;
+  overflow: visible;
+}
+
+[data-ttx='home'] .ttx-home-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  /* Centrado vertical de las líneas dentro de la franja: `align-items` alinea
+     los campos entre sí por la base, pero no coloca la línea en su caja. */
+  align-content: center;
+  justify-content: center;
+  gap: var(--ttx-home-titulo-gap);
+  width: 100%;
+  min-height: var(--ttx-banda-h);
+  /* La sangría va en el botón y no en la franja: así lo que responde a la mano
+     es la franja entera —es la bisagra, no un rótulo—. Con el texto centrado
+     solo se nota cuando la línea es larga y tiene que envolver. */
+  padding: 0.35em var(--ttx-inset);
+  color: var(--ttx-tinta);
+  font-size: var(--ttx-home-titulo-fs, var(--ttx-chrome));
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  /* El título es el interruptor y en teléfono se mantiene el dedo encima:
+     sin esto sale la lupa, la selección de texto o el menú de iOS. */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Solo cuando es interruptor de verdad. En el respaldo no hay video que
+   conmutar y el título es un `<span>`: no puede parecer que se puede tocar. */
+[data-ttx='home'] button.ttx-home-titulo {
+  cursor: pointer;
+}
+
+[data-ttx='home'] .ttx-home-titulo:focus-visible {
+  outline: 1px solid var(--ttx-tinta);
+  outline-offset: -2px;
+}
+
+/* El separador, vacío por defecto: los campos van pegados. Nace del campo que
+   sigue y no del hueco, así que si falta el artista o la fecha no queda un
+   signo suelto colgando. `pre` protege los espacios de alrededor por si el que
+   se ponga los lleva —el colapso de blancos se los comería. */
+[data-ttx='home'] .ttx-home-titulo > span:not(.ttx-oculto) + span:not(.ttx-oculto)::before {
+  content: var(--ttx-home-titulo-sep, '');
+  white-space: pre;
+}
+
+/* Alternando negrita y no negrita, categoría por categoría, como el menú del
+   nav. Sin separadores, el peso es lo único que dice dónde termina el disco y
+   empieza el artista — y como alterna por posición y no por campo, si falta
+   uno los que queden siguen alternando.
+
+   El peso normal va escrito y no omitido: el CSS global de Cargo engorda cosas
+   por su cuenta. */
+[data-ttx='home'] .ttx-home-titulo > span {
+  font-weight: 400;
+}
+
+[data-ttx='home'] .ttx-home-titulo > span:nth-child(odd) {
+  font-weight: 700;
+}
+
+/* El mismo aire que el nav le da al link activo: una palabra en negrita se
+   come el espacio de la que sigue, y sin esto se leen como una sola. */
+[data-ttx='home'] .ttx-home-titulo > span:nth-child(odd) + span {
+  margin-left: 0.05em;
+}
+

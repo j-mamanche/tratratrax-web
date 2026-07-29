@@ -58,6 +58,7 @@ const orden = [...releases].sort((a, b) => b.date.localeCompare(a.date));
       p { opacity: 0.55; text-transform: none; max-width: 44rem; }
       .widgets { margin: -1.5rem 0 2.5rem; opacity: 1; text-transform: uppercase; }
       .widgets a { color: inherit; }
+      .widgets a + a { margin-left: 1.5rem; }
     </style>
   </head>
   <body>
@@ -65,7 +66,9 @@ const orden = [...releases].sort((a, b) => b.date.localeCompare(a.date));
       <h1>TraTraTrax — estado de los datos</h1>
 
       <p class="widgets">
-        Widgets: <a href={`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}preview/catalogo`}>catálogo →</a>
+        Widgets:
+        <a href={`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}preview/home`}>home →</a>
+        <a href={`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}preview/catalogo`}>catálogo →</a>
       </p>
 
       <div class="cifras">

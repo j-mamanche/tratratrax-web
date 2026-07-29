@@ -140,6 +140,67 @@ for (const a of artists) {
   if (!usedArtists.has(a.slug)) warn(`artists "${a.display}"`, 'aparece en el filtro pero no tiene ningún release');
 }
 
+// ─── home.json ───────────────────────────────────────────────────────────────
+//
+// El home es curado con respaldo automático. Si hay `destacado`, ese manda —y
+// puede ser una pieza que todavía no existe en el catálogo, que es justo para
+// lo que está—. Si falta, el home cae al release visible más reciente y
+// degrada: carátula arriba, sin intercambio y sin interruptor.
+//
+// Por eso lo que se exige es que **si hay destacado, esté entero**. Un
+// destacado a medias es peor que ninguno: el respaldo da un home pobre, uno a
+// medias da un home roto.
+
+/** Ruta a un archivo del sitio (`media/…`), o una URL absoluta. */
+function revisarMedia(at, campo, ruta) {
+  if (!ruta) return;
+  if (isHttpUrl(ruta)) return;
+  if (ruta.startsWith('/')) {
+    err(at, `${campo} "${ruta}" es absoluta — se espera una ruta del repo, como "media/tra032.mp4"`);
+    return;
+  }
+  if (!existsSync(join(root, ruta))) {
+    err(at, `${campo} apunta a "${ruta}", que no existe en el repo`);
+  }
+}
+
+if (existsSync(join(root, 'data', 'home.json'))) {
+  const home = load('home.json') ?? {};
+  const d = home.destacado;
+
+  if (d && typeof d === 'object' && Object.keys(d).length > 0) {
+    const at = `home destacado "${d.titulo ?? '¿?'}"`;
+
+    if (!d.titulo) err(at, 'falta `titulo`');
+    if (!d.artista) err(at, 'falta `artista`');
+    if (!d.caratula) err(at, 'falta `caratula`');
+    if (!d.video?.mp4) err(at, 'falta `video.mp4` — sin video no hay intercambio');
+
+    revisarMedia(at, '`caratula`', d.caratula);
+    revisarMedia(at, '`video.mp4`', d.video?.mp4);
+    revisarMedia(at, '`video.poster`', d.video?.poster);
+
+    if (!d.video?.poster) {
+      warn(at, 'sin `video.poster` — es lo que se ve con prefers-reduced-motion');
+    }
+    // El tercer campo de la franja: `KILLING MARIPOSAS KELMAN DURÁN 091826`.
+    // Manda la fecha; el número es el respaldo, para una pieza que ya lo tenga.
+    if (!d.fecha && !d.catalogo) {
+      warn(at, 'sin `fecha` ni `catalogo` — la franja se queda en título y artista');
+    }
+    // `release` es opcional: solo sirve para enlazarlo con el catálogo el día
+    // que la pieza ya exista ahí.
+    if (d.release && !ids.has(d.release)) {
+      warn(at, `\`release\` "${d.release}" no existe en releases.json`);
+    }
+    if (d.relleno) {
+      warn(at, 'marcado como `relleno`: el video y la carátula son material de prueba');
+    }
+  } else if (d !== null && d !== undefined) {
+    warn('home.json', '`destacado` está vacío — el home usa el respaldo automático');
+  }
+}
+
 // ─── merch.json ──────────────────────────────────────────────────────────────
 
 const STOCK = ['in', 'few', 'out'];

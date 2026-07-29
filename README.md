@@ -29,6 +29,18 @@ npm run dev        # abre el tablero de datos en localhost:4321
 
 ---
 
+## El widget del home
+
+Se ve en **`/preview/home`**. Es el lanzamiento y nada más: dos piezas del mismo
+release —un video y la carátula— que se turnan la caja de arriba y la de abajo,
+y el título en la mitad haciendo de interruptor. Al pasar el puntero por el
+título el video se sale de su caja y toma el marco entero; al salir, corte seco,
+y las dos piezas quedaron cambiadas de sitio.
+
+Sale de `data/home.json`, con respaldo automático al release más reciente si no
+hay destacado. Qué se pega en Cargo y cómo se calibra:
+**[cargo/snippets/home.md](cargo/snippets/home.md)**.
+
 ## El widget de catálogo
 
 Se ve corriendo, con los datos reales y el mismo bundle que carga Cargo, en
@@ -52,8 +64,10 @@ src/widgets/
 │   ├── datos.js        Un solo fetch de data/*.json por página
 │   ├── stack.js        Visor · banda · contenido, y la proyección
 │   ├── hscroll.js      Arrastre, rueda y flechas. El resto es nativo
-│   └── format.js       Rol__ Valor, fechas, URLs de carátula
-└── catalogo/           El widget
+│   ├── format.js       Rol__ Valor, fechas, URLs de carátula
+│   └── dom.js          `elemento()`, lo único que hace falta sin framework
+├── catalogo/           El carril y el acordeón
+└── home/               El lanzamiento y su intercambio
 ```
 
 ---
@@ -114,6 +128,9 @@ todo queda en `note` y se pueden ir pasando a `credits` con calma. El tablero de
 
 ```
 data/        La fuente de verdad. Es lo único que el equipo necesita entender.
+media/       El material propio: el video del home y las carátulas que no
+             vienen de Bandcamp. Se versiona; `public/` es generado y se borra
+             entera en cada compilación, así que ahí no puede vivir.
 src/widgets/ Lo que corre DENTRO de Cargo: JS sin framework, CSS scopeado.
 src/pages/   El taller: tablero, previews y (pronto) el panel de edición.
 tools/       Importador de Bandcamp y validador.

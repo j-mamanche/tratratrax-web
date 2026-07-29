@@ -7,6 +7,7 @@
 
 import './tokens.css';
 import './catalogo/catalogo.js';
+import './home/home.js';
 
 import { iniciar } from './_runtime/mount.js';
 

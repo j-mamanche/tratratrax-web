@@ -70,7 +70,7 @@ function desmontar(host) {
 function mensajeDeError() {
   const p = document.createElement('p');
   p.className = 'ttx-error';
-  p.textContent = 'No se pudo cargar el catálogo.';
+  p.textContent = 'No se pudo cargar el contenido.';
   return p;
 }
 
