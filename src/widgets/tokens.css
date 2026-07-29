@@ -25,7 +25,15 @@
      pantalla. */
   --ttx-w-max: 88vw;
   --ttx-w-item: min(var(--ttx-cuerpo-h, 40vh), var(--ttx-w-max));
-  --ttx-panel-w: 21rem;
+  --ttx-panel-w: 19rem;
+
+  /* El aire lateral del chrome: la sangría de las etiquetas y la de la
+     columna de créditos son el mismo número, porque tienen que caer en la
+     misma vertical — la etiqueta abierta arranca donde arranca su panel.
+     Vale casi el doble que el aire de arriba de la etiqueta: la gaveta se
+     abre pegada a la carátula del release anterior, y sin esa sangría el
+     texto empezaba contra la imagen de al lado. */
+  --ttx-inset: 1.4rem;
 
   /* ── Movimiento ───────────────────────────────────────────────────── */
   --ttx-dur: 0.5s;
@@ -202,7 +210,7 @@
   align-items: center;
   gap: 0;
   min-height: var(--ttx-banda-h);
-  padding: 0 0.5rem;
+  padding: 0 var(--ttx-inset);
   font-size: var(--ttx-chrome);
   text-transform: uppercase;
   letter-spacing: 0.04em;

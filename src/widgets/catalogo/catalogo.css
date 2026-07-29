@@ -60,7 +60,9 @@
   gap: var(--ttx-etiqueta-gap, 0);
   width: 100%;
   height: 100%;
-  padding: 0 0.5rem;
+  /* La misma sangría que la columna de créditos: en el ítem abierto la
+     etiqueta y el bloque de texto caen en una sola vertical. */
+  padding: 0 var(--ttx-inset);
   background: var(--ttx-gris);
   font-size: var(--ttx-chrome);
   line-height: 1;
@@ -124,8 +126,14 @@
 [data-ttx='catalogo'] .ttx-panel-col {
   width: var(--ttx-panel-w);
   /* El aire de arriba vale una línea: pegado al borde, CREDITS se leía como
-     parte de la etiqueta y no como el comienzo del panel. */
-  padding: 0.9rem 1.25rem 1.5rem 0.5rem;
+     parte de la etiqueta y no como el comienzo del panel.
+
+     A los lados va el mismo `--ttx-inset` por izquierda y por derecha: el
+     bloque de texto queda flotando entre dos carátulas —la del release
+     anterior y la suya— y un aire parejo es lo que lo separa de las dos. La
+     columna de lectura termina midiendo unos 20em, que es donde la nota
+     deja de romperse en líneas de tres palabras. */
+  padding: 0.9rem var(--ttx-inset) 1.5rem;
   font-size: var(--ttx-cuerpo-fs);
   line-height: 1.45;
 }
@@ -238,6 +246,11 @@
     --ttx-chrome: 11px;
     --ttx-cuerpo-fs: 13px;
     --ttx-banda-h: 1.9rem;
+    /* La sangría de escritorio separa el panel de la carátula de al lado; en
+       columna no hay carátula al lado, el panel ocupa el ancho entero y esa
+       misma sangría sería un margen de libro. Se achica, y como etiqueta y
+       créditos la comparten, siguen alineados. */
+    --ttx-inset: 0.75rem;
   }
 
   [data-ttx='catalogo'] .ttx-carril {
@@ -334,7 +347,7 @@
 
   [data-ttx='catalogo'] .ttx-panel-col {
     width: 100%;
-    padding: 1.1rem 0.6rem 1.5rem;
+    padding: 1.1rem var(--ttx-inset) 1.5rem;
   }
 
   /* Un reflejo que corre a lo ancho no significa nada cuando lo de abajo se
