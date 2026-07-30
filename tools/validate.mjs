@@ -212,7 +212,10 @@ if (existsSync(join(root, 'data', 'home.json'))) {
 if (existsSync(join(root, 'data', 'about.json'))) {
   const about = load('about.json') ?? {};
 
-  if (!about.lema) warn('about.json', 'sin `lema` — el primer renglón queda vacío');
+  // Los dos bloques de la barra. Sin uno de ellos la línea sigue en pie, pero
+  // pierde la mitad de lo que dice: por eso aviso y no error.
+  if (!about.lema) warn('about.json', 'sin `lema` — el bloque de la izquierda queda vacío');
+  if (!about.sello) warn('about.json', 'sin `sello` — la línea arranca directo en los nombres');
 
   const djs = about.djs;
   if (!Array.isArray(djs) || djs.length === 0) {

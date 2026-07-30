@@ -1,36 +1,83 @@
 /* El About. Todo cuelga de [data-ttx='about'].
 
-   El stack de siempre, **invertido**: el intersticio va abajo y el visor baja
-   con él.
+   El stack **sin visor**: banda y contenido, nada más.
 
      .ttx-marco
-      ├─ .ttx-visor      grid-row 3   ← la grieta: el emblema aplastado
-      ├─ .ttx-banda      grid-row 2   ← la bisagra: el único texto de la página
-      └─ .ttx-contenido  grid-row 1   ← el campo donde caen las apariciones
+      ├─ .ttx-visor      display: none  ← la grieta, que ya no está
+      ├─ .ttx-banda      grid-row 2     ← la bisagra: el único texto de la página
+      └─ .ttx-contenido  grid-row 1/-1  ← el campo: las tres filas a la vez
 
-   Invertir es reasignar filas, no reescribir el stack: `tokens.css:142,207,221`
-   ya les pone `grid-row` a mano a las tres, precisamente para poder moverlas. El
-   orden del DOM no cambia —lo pone `crearStack` y de él sale el orden de
-   tabulación, que aquí importa: del nombre se tabula al emblema. */
+   La grieta —el mismo emblema aplastado a la fuerza de borde a borde— existió y
+   se quitó. Era la lectura literal del third space, *el hueco deforma lo que
+   pasa por él*, y en pantalla resultó una barra distorsionada compitiendo con la
+   aparición. El visor se esconde en vez de no crearse: `crearStack` es el mismo
+   runtime de las otras tres páginas y no se toca por una decisión de esta.
+
+   El campo cruza las filas, así que se superpone a la banda y el reparto lo hace
+   el `z-index`: la banda encima del campo. Reasignar filas es todo lo que hace
+   falta: `tokens.css:142,207,221` ya les pone `grid-row` a mano a las tres,
+   precisamente para poder moverlas. El orden del DOM no cambia —lo pone
+   `crearStack` y de él sale el orden de tabulación, que aquí importa: del nombre
+   se tabula al emblema. */
 
 [data-ttx='about'] {
-  /* Negro absoluto y tinta blanca. **El fondo no cambia nunca**: ni se tiñe ni
-     se ilumina en ninguno de los estados. En un sitio que es blanco y negro en
-     todas las demás pantallas, las apariciones son lo único cromático — y eso
-     es lo que impide que se lean como contenido. */
-  --ttx-papel: #000;
-  --ttx-tinta: #fff;
-  --ttx-tinta-floja: rgba(255, 255, 255, 0.55);
+  /* El gris del chrome, el mismo de la franja de etiquetas del catálogo y del
+     panel de créditos (`tokens.css:60`). La banda no se pinta aparte: **el
+     texto va sobre el mismo gris que todo lo demás**, sin una barra que lo
+     enmarque, y por eso la línea se lee como chrome del sitio y no como el
+     encabezado de esta pantalla.
 
-  /* Los emblemas entran **tal cual son**: el rosado, el celeste y el dorado de
-     una estampa. El filtro de dos tonos es del catálogo, donde su trabajo es
-     que 35 carátulas no compitan; aquí borraría justamente el dato. */
-  --ttx-visor-fx: none;
+     **El fondo no cambia nunca**: ni se tiñe ni se ilumina en ninguno de los
+     estados. En un sitio que es blanco y negro en todas las demás pantallas,
+     las apariciones son lo único cromático — y eso es lo que impide que se lean
+     como contenido. La tinta vuelve a la de la casa, negra sobre claro. */
+  --ttx-papel: var(--ttx-gris);
 
-  /* La grieta es lo más chico de la pantalla: una franja, no una banda. */
-  --ttx-visor-h: clamp(18px, 3.5vh, 40px);
-  /* Dos renglones, y en teléfono tres. Es un mínimo: la fila es `auto`. */
-  --ttx-banda-h: 3.2rem;
+  /* **Un solo renglón**, del grosor de la banda del home: el intersticio es la
+     misma barra de chrome en las tres páginas, y por eso se reconoce de una a
+     otra. Es un mínimo, no una altura fija: la fila del grid es `auto`. */
+  --ttx-banda-h: 1.9rem;
+
+  /* El aire que queda **encima** de la línea de texto. Es lo único que decide
+     dónde se para la banda: la fila de arriba mide esto y la línea cae justo
+     debajo, alta en la ventana y no a media pantalla. Todo lo que sobra queda
+     abajo, vacío. */
+  --ttx-about-aire: clamp(48px, 12vh, 132px);
+
+  /* La junta entre grupos. **Casi cero, y tiene que serlo**: los grupos van
+     pegados y lo único que los separa es que el peso alterna, igual que la
+     franja del home (`--ttx-home-titulo-gap`) y que el menú del nav. Los
+     espacios que se ven en la línea son los de adentro de un grupo —`SONIC
+     HUSTLERS` son dos palabras—, no juntas. Abrir esto convierte la línea en
+     una frase con espacios y se pierde el gesto entero. */
+  --ttx-about-junta: 0.03em;
+
+  /* La banda no tiene fondo propio: transparente es, literalmente, del color
+     del papel. Y es lo que deja que una aparición **pase por detrás del
+     texto** en vez de cortarse contra una barra invisible — que es lo que pasa
+     si aquí se pone `var(--ttx-papel)`. Eso también es una salida: pintarla
+     deja la línea siempre legible, a cambio de una franja donde el emblema
+     desaparece. */
+  --ttx-about-banda-fondo: transparent;
+
+  /* **La zona donde cae el azar**, en porcentaje del campo y sobre el *centro*
+     del emblema. El JS no sabe nada de esto: sortea dos números de 0 a 1 y aquí
+     se estiran hasta la zona que toque.
+
+     En pantalla ancha es **la mitad derecha**. La línea de texto arranca por la
+     izquierda, así que el emblema tiene su propio lado y las dos cosas se leen a
+     la vez en vez de pelearse. En teléfono la zona se acuesta: pasa a ser **la
+     mitad de abajo**, porque ahí la línea ocupa el ancho entero y ya no hay
+     derecha que dejarle (ver el bloque de teléfono, al final).
+
+     Que el `1` sea `100%` y no `100% - ancho` es a propósito: el emblema se
+     coloca por el centro, así que en el extremo sale con la mitad afuera y el
+     marco lo corta. Ese es el derecho a cortarse, y se pierde si esto se
+     "arregla". */
+  --ttx-about-x0: 50%;
+  --ttx-about-x1: 100%;
+  --ttx-about-y0: 0%;
+  --ttx-about-y1: 100%;
 
   /* **Tamaño fijo.** El azar hace una sola cosa —la posición— y por eso se lee.
      Si además cambiara el tamaño, cada aparición sería un accidente distinto y
@@ -38,35 +85,47 @@
   --ttx-about-emblema-w: clamp(116px, 24vmin, 240px);
 
   --ttx-about-texto-fs: var(--ttx-chrome);
-  --ttx-about-texto-lh: 1.5;
+  --ttx-about-texto-lh: 1.2;
 }
 
-/* La inversión. La fila del campo es `minmax(0, 1fr)` —se queda con lo que
-   sobre— y la del texto es `auto`, así que la línea puede envolver a tres
-   renglones sin descuadrar nada. */
+/* Tres filas para dos cosas. La primera es el aire de arriba, que es lo que sube
+   la línea; la de la banda es `auto` —en pantalla ancha vale exactamente
+   `--ttx-banda-h` y en teléfono deja pasar la segunda línea sin descuadrar
+   nada—; la tercera se queda con todo lo que sobre, vacía.
+
+   Ninguna de las dos primeras tiene dueño propio y no les hace falta: el campo
+   las cruza todas. */
 [data-ttx='about'] .ttx-marco {
-  grid-template-rows: minmax(0, 1fr) auto var(--ttx-visor-h);
+  grid-template-rows: var(--ttx-about-aire) auto minmax(0, 1fr);
 }
 
 [data-ttx='about'] .ttx-contenido {
-  grid-row: 1;
+  grid-row: 1 / -1;
 }
 
 [data-ttx='about'] .ttx-banda {
   grid-row: 2;
 }
 
+/* La grieta, fuera. Se esconde y no se deja de crear: el visor sale de
+   `crearStack`, que es de todas las páginas. */
 [data-ttx='about'] .ttx-visor {
-  grid-row: 3;
+  display: none;
 }
 
 /* ── El campo ─────────────────────────────────────────────────────────
-   Vacío en reposo, y eso es el diseño: negro absoluto. Ni una imagen, ni un
-   loop, ni luz en la grieta. Quien no mueva la mano no ve nunca nada.
+   **Toda la ventana.** El campo cruza las tres filas, así que las coordenadas
+   se cuentan contra la pantalla entera y la zona se recorta con los cuatro
+   límites de arriba, no con el tamaño de una fila. Cambiar dónde aparecen los
+   emblemas es mover cuatro números, no rehacer la maquetación.
 
-   `overflow: visible` para que una aparición pueda **pisar la línea de
-   nombres** — el marco sigue teniendo `overflow: hidden` (`tokens.css:136`), y
-   de ahí sale gratis el derecho a cortarse contra el borde de la pantalla. */
+   Vacío en reposo, y eso es el diseño: gris y nada más. Ni una imagen, ni un
+   loop, ni un destello. Quien no mueva la mano no ve nunca nada.
+
+   `overflow: visible` no cambia nada ahora que el campo llega a los bordes,
+   pero se queda: el marco sigue teniendo `overflow: hidden`
+   (`tokens.css:136`) y de ahí sale gratis el derecho a cortarse contra el borde
+   de la pantalla. */
 [data-ttx='about'] .ttx-about-campo {
   position: relative;
   z-index: 0;
@@ -74,22 +133,53 @@
 }
 
 /* ── Las apariciones ──────────────────────────────────────────────────
-   El emblema se coloca por su **centro**, en porcentaje del campo, con las dos
-   variables que el JS le escribe al nacer. Por eso puede salir medio cortado:
-   un centro en el 2% de la izquierda deja la mitad afuera. Sin retícula, sin
-   zona segura, sin memoria de posición.
+   El emblema se coloca por su **centro**. El JS le escribe al encender dos
+   números de 0 a 1 —`--ttx-about-rx` y `--ttx-about-ry`, el azar puro— y aquí
+   se estiran hasta la zona:
+
+     0   → el borde de arranque de la zona
+     1   → el borde de llegada
+     0.5 → la mitad
+
+   Separar las dos cosas es lo que permite mover la zona sin tocar el widget: en
+   pantalla ancha los emblemas caen a la derecha, en teléfono abajo, y el JS
+   sigue sorteando lo mismo. Dentro de la zona no hay retícula, ni zona segura,
+   ni memoria de posición; y como el ancla es el centro, en los extremos sale
+   medio cortado.
 
    Nada de `transition` ni de `animation`: la aparición es un corte y la
    desaparición es otro. Lo único que se mueve dentro del emblema es el GIF, que
    es el material, no un efecto. */
 [data-ttx='about'] .ttx-about-emblema {
   position: absolute;
-  left: var(--ttx-about-x, 50%);
-  top: var(--ttx-about-y, 50%);
+  left: calc(
+    var(--ttx-about-x0) + (var(--ttx-about-x1) - var(--ttx-about-x0)) * var(--ttx-about-rx, 0.5)
+  );
+  top: calc(
+    var(--ttx-about-y0) + (var(--ttx-about-y1) - var(--ttx-about-y0)) * var(--ttx-about-ry, 0.5)
+  );
   transform: translate(-50%, -50%);
   width: var(--ttx-about-emblema-w);
   line-height: 0;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* **Apagado, no quitado.** Los tres emblemas están puestos desde que carga la
+   página y no se van nunca; esto es todo lo que separa un santo visible de uno
+   que no lo está.
+
+   Y tiene que ser `opacity`. `display: none` y `visibility: hidden` sacan al
+   elemento del pintado y con él se para el GIF, que es exactamente lo que no
+   puede pasar: la animación sigue corriendo por debajo mientras nadie la ve,
+   para que la próxima aparición la agarre donde vaya y no arranque siempre en
+   el mismo cuadro. El JS lo explica al derecho en `crearEmblema`.
+
+   `pointer-events` va de más —el `inert` del JS ya lo cubre— y está para los
+   navegadores donde `inert` no llegó: un link invisible que se puede clicar es
+   peor que no tenerlo. */
+[data-ttx='about'] .ttx-about-emblema[data-apagado] {
+  opacity: 0;
+  pointer-events: none;
 }
 
 [data-ttx='about'] .ttx-about-emblema img {
@@ -105,50 +195,79 @@
 }
 
 /* ── La bisagra: el único texto de la página ──────────────────────────
-   Un solo bloque, y nada más. Las citas de Bhabha no se transcriben: el third
-   space se demuestra, no se explica.
+   Una barra de un renglón, de borde a borde, con los dos bloques empujados
+   cada uno a su lado:
+
+     SONIC HUSTLERS SINCE 2020        TRATRATRAX IS A LABEL RUN BY DJ LOMALINDA…
+
+   El hueco del medio no es un espacio escrito: es lo que sobra de la barra
+   (`justify-content: space-between`). Al cambiar el ancho de la ventana el
+   hueco se abre y se cierra, y los dos bloques se quedan clavados en su borde
+   — la barra se lee como el chrome de la página, no como una frase centrada.
+
+   Las citas de Bhabha no se transcriben: el third space se demuestra, no se
+   explica.
 
    Va **encima** de las apariciones. Al revés —el emblema encima— el emblema
    taparía su propio disparador y el nombre quedaría inalcanzable justo cuando
    la mano está puesta. Que un santo choque contra la línea es aceptable; que se
-   coma el nombre que lo invocó, no. */
+   coma el nombre que lo invocó, no.
+
+   Encima, pero sin fondo: el emblema pasa por detrás del texto y se sigue
+   viendo. Ver `--ttx-about-banda-fondo`. */
 [data-ttx='about'] .ttx-banda {
   position: relative;
   z-index: 1;
-  display: block;
   min-height: var(--ttx-banda-h);
-  padding: 0.6rem var(--ttx-inset);
-  white-space: normal;
+  background: var(--ttx-about-banda-fondo);
   /* Que el foco del nombre no quede cortado contra el borde de la franja. */
   overflow: visible;
 }
 
 [data-ttx='about'] .ttx-about-texto {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--ttx-about-junta);
+  min-width: 0;
   font-size: var(--ttx-about-texto-fs);
   line-height: var(--ttx-about-texto-lh);
+  /* El peso normal va escrito y no omitido: el CSS global de Cargo engorda
+     cosas por su cuenta. */
+  font-weight: 400;
 }
 
-[data-ttx='about'] .ttx-about-lema,
-[data-ttx='about'] .ttx-about-run {
-  display: block;
+/* Cada bloque es una tira de campos con la junta de por medio. Las versalitas,
+   el tracking y el `nowrap` los pone el token de la banda (`tokens.css:207`);
+   aquí solo se arma la tira. */
+[data-ttx='about'] .ttx-about-bloque {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ttx-about-junta);
 }
 
-/* Los nombres van en negrita y el resto del renglón no. Es lo mismo que hacen
-   el menú del nav y la franja del home: **lo que separa es el peso**, no un
-   signo ni un color ni un subrayado. Y de paso es lo que dice, sin decirlo, que
-   ahí hay algo que tomar con la mano.
+/* **Lo único que separa un grupo del siguiente es el peso.** Ni un signo, ni un
+   espacio, ni un color: todo el renglón va en la misma tinta negra. Un segundo
+   tono sería un tercer nivel de información en una línea que solo tiene dos, y
+   la haría parecer una frase con partes secundarias — que es exactamente lo que
+   no es. Los grupos alternan y ya, como la franja del home
+   (`KILLING MARIPOSAS KELMAN DURÁN`) y el menú del nav.
 
-   Subrayarlos sería mentir: el nombre no es el link. El link es el emblema.
+   Los nombres entran en la misma alternancia y no se distinguen de `TRATRATRAX`
+   o de `2020`. Es a propósito: el nombre no anuncia que se pueda tocar, y el
+   link ni siquiera es él sino el santo que invoca. Un link que hay que cazar no
+   se señala. */
+[data-ttx='about'] .ttx-about-fuerte {
+  font-weight: 700;
+}
 
-   El peso normal va escrito y no omitido: el CSS global de Cargo engorda cosas
-   por su cuenta. */
-[data-ttx='about'] .ttx-about-texto {
+[data-ttx='about'] .ttx-about-suave {
   font-weight: 400;
 }
 
 [data-ttx='about'] .ttx-about-nombre {
   padding: 0;
-  font-weight: 700;
   letter-spacing: inherit;
   text-transform: inherit;
   vertical-align: baseline;
@@ -167,31 +286,50 @@
   outline-offset: 2px;
 }
 
-/* ── La grieta ────────────────────────────────────────────────────────
-   El emblema **comprimido a la fuerza en su altura, de borde a borde**. Toda la
-   información está ahí y la forma se perdió: queda una barra de color
-   irrepetible de esa imagen. Es la lectura literal del third space — el hueco
-   deforma lo que pasa por él.
+/* ── Teléfono ─────────────────────────────────────────────────────────
+   La línea no cabe. Son ochenta y pico de caracteres en versalitas y una
+   pantalla de 390 puntos: forzarla a un renglón sería o tipografía de seis
+   píxeles o la mitad de los nombres cortada contra el borde — y los nombres son
+   los disparadores, sin ellos la página no hace nada.
 
-   `background-size: 100% 100%` es el `object-fit: fill` de un fondo: la única
-   regla de todo el sitio que rompe la proporción a propósito.
+   Así que aquí, y solo aquí, la barra envuelve: se parte por las juntas, que es
+   exactamente para lo que están, y crece a dos o tres renglones. El renglón
+   único es una regla de pantalla ancha, no del texto.
 
-   Va por encima del campo: si una aparición grande llegara hasta abajo, lo que
-   se tiene que ver en la franja es el aplastado, no el emblema entero pasando
-   por delante.
+   El tamaño sube al del catálogo en teléfono (`catalogo.css:246`): 9px de
+   chrome ahí es ilegible, y encima hay que atinarle con el dedo. */
+@media (max-width: 46rem) {
+  [data-ttx='about'] {
+    --ttx-chrome: 11px;
+    --ttx-inset: 0.75rem;
 
-   Tres cosas del visor de siempre no valen aquí: el desborde del `-7%` (que
-   está para darle material al blur), la volteada (el visor del catálogo es un
-   reflejo; esta grieta no refleja, deforma) y el `cover` (que es justamente lo
-   contrario de aplastar). El cambio es por **corte seco**, como todo en la
-   casa: no hay `transition` que quitar porque nunca hubo. */
-[data-ttx='about'] .ttx-visor {
-  z-index: 2;
-}
+    /* **La zona se acuesta.** En pantalla ancha el emblema tiene la mitad
+       derecha porque la línea de texto arranca por la izquierda; aquí la línea
+       ocupa el ancho entero y envuelve, así que no hay derecha que dejarle. Lo
+       que sí sobra es lo de abajo — la mitad inferior, que en un teléfono es
+       además donde está la mano. */
+    --ttx-about-x0: 0%;
+    --ttx-about-x1: 100%;
+    --ttx-about-y0: 50%;
+    --ttx-about-y1: 100%;
+  }
 
-[data-ttx='about'] .ttx-visor-fondo {
-  display: block;
-  inset: 0;
-  transform: none;
-  background-size: 100% 100%;
+  [data-ttx='about'] .ttx-banda {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+
+  /* El bloque envuelve por las juntas, que es exactamente para lo que están: se
+     parte entre grupos y nunca dentro de uno. */
+  [data-ttx='about'] .ttx-about-texto,
+  [data-ttx='about'] .ttx-about-bloque {
+    flex-wrap: wrap;
+    row-gap: 0.35em;
+  }
+
+  /* Sin el empujón a los dos bordes: envuelto, `space-between` dejaría huecos
+     de cualquier ancho en medio de la frase. */
+  [data-ttx='about'] .ttx-about-texto {
+    justify-content: flex-start;
+  }
 }

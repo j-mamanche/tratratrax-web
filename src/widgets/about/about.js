@@ -7,56 +7,71 @@ import './about.css';
 // El About: un solo renglón de texto y un gesto que se sostiene con la mano.
 // El ensayo es **no verbal** — el third space se demuestra, no se explica.
 //
-//   REPOSO                          MANO EN UN NOMBRE (pasada rápida)
-//   ┌──────────────────────────┐    ┌──────────────────────────┐
-//   │                          │    │   ✝◉✝        ✝◉✝         │
-//   │      negro absoluto      │    │  negro    ✝◉✝            │  ← el campo
-//   ├──────────────────────────┤    ├──────────────────────────┤
-//   │ Sonic hustlers since 2020│    │ Sonic hustlers since 2020│
-//   │ Run by LOMALINDA, NYKSAN │    │ Run by LOMALINDA, NYKSAN │  ← la bisagra
-//   │ and VERRACO.             │    │ and VERRACO.             │
-//   ├──────────────────────────┤    ├──────────────────────────┤
-//   │                          │    │▓▓░░██▒▒░███▒▒░░▓▓█▒▒░░▓▓█│  ← la grieta
-//   └──────────────────────────┘    └──────────────────────────┘
+//   REPOSO                        MANO EN UN NOMBRE (escritorio)
+//   ┌────────────────────────┐    ┌────────────────────────┐
+//   │                        │    │              ✝◉✝       │
+//   │ SONIC HUSTLERS… TRATRA…│    │ SONIC HUSTLERS… TRA✝◉✝│  ← la bisagra
+//   │                        │    │                        │
+//   │     gris y nada más    │    │  gris          ✝◉✝     │  ← el campo
+//   │                        │    │                        │
+//   └────────────────────────┘    └────────────────────────┘
+//                                 └── la mitad derecha ────┘
 //
-// Es el stack de siempre con las filas al revés: **el intersticio va abajo** y
-// el visor baja con él. La inversión es CSS (`about.css`), no código.
+// **No hay tercera banda.** El About usa el stack sin visor: banda y contenido,
+// nada más. La grieta —el emblema aplastado de borde a borde— existió y se
+// quitó: deformar el material era una idea sobre el third space, y la página
+// funciona mejor sin ella. `about.css` esconde el visor que `crearStack` crea
+// igual.
+//
+// El campo **es toda la ventana**, pero el azar no cae en toda la ventana: la
+// zona la recorta el CSS —la mitad derecha en pantalla ancha, la mitad de abajo
+// en teléfono—, así que la línea de texto casi nunca se ve invadida y el
+// emblema tiene un sitio propio en la composición. El JS solo sortea dos
+// números de 0 a 1.
 //
 // Lo que hay que entender antes de tocar nada:
 //
-//   - **En reposo no pasa nada.** Negro absoluto: ni una imagen, ni un loop, ni
-//     luz en la grieta, tampoco en teléfono. Quien no mueva la mano no ve nunca
-//     nada. No hay destello de ocio como en el home, y eso es a propósito: allá
-//     el destello avisa que hay un lanzamiento debajo, aquí no hay nada que
-//     avisar.
-//   - **Cada aparición vive su segundo** y se apaga sola, contando desde que
-//     nació, sin mirar a las otras. Pasada rápida → los tres a la vez en tres
-//     sitios, apagándose en el orden en que salieron. **El ritmo de la mano es
-//     lo que compone.** No hay cola ni piso de milisegundos como en el home
-//     (`home.js:229-231`): allá sumarse era un parpadeo, aquí sumarse *es* el
-//     gesto.
-//   - **El azar es puro.** Sin retícula, sin zona segura, sin memoria de
-//     posición. Puede salir medio cortado por el borde —el `overflow: hidden`
-//     del marco lo corta gratis—, puede quedar en una esquina ridícula, dos
-//     pueden caer encima. Todos son resultados legales: es el pop-up de los
-//     noventa, el kitsch entrando por el comportamiento.
+//   - **En reposo no pasa nada.** El gris del chrome y la línea de texto: ni una
+//     imagen, ni un loop, ni un destello, tampoco en teléfono. Quien no
+//     mueva la mano no ve nunca nada. No hay destello de ocio como en el home, y
+//     eso es a propósito: allá el destello avisa que hay un lanzamiento debajo,
+//     aquí no hay nada que avisar.
+//   - **La aparición no se mueve.** Sale donde le tocó y ahí se queda: mientras
+//     la mano siga puesta no salta a otro sitio, y cuando la mano se va todavía
+//     dura `VIDA` más, quieta, para que se alcance con el ratón. Sostener no
+//     produce una ráfaga; produce una imagen que espera.
+//   - **Hay un solo emblema por DJ y nunca se va del DOM**, solo se apaga
+//     (`about.css`, la regla de `[data-apagado]`). Un
+//     GIF que se quita y se vuelve a poner reinicia su animación y el santo
+//     saldría siempre en el mismo cuadro; dejándolo puesto, el loop sigue
+//     corriendo por debajo y cada aparición lo agarra donde vaya.
+//   - **El azar es puro dentro de la zona.** Lo único que se decidió es en qué
+//     mitad de la pantalla pasa esto; adentro no hay retícula, no hay zona
+//     segura y no hay memoria de posición. Puede salir medio cortado por el
+//     borde —el `overflow: hidden` del marco lo corta gratis—, puede quedar en
+//     una esquina ridícula, dos pueden caer encima. Todos son resultados
+//     legales: es el pop-up de los noventa, el kitsch entrando por el
+//     comportamiento. Lo que sí es fijo es que **el sitio se sortea al aparecer,
+//     nunca mientras se ve**.
 //   - **El santo es el link**, no el nombre. El nombre solo invoca; clic en el
 //     emblema lleva al Instagram de ese DJ. Un link que hay que cazar.
 //
 // Opciones que acepta el placeholder de Cargo:
 //   <div data-ttx="about"></div>
-//   <div data-ttx="about" data-vida="1400"></div>   ← ms que vive una aparición
+//   <div data-ttx="about" data-vida="2000"></div>   ← ms que dura la cola
 
 /**
- * Lo que dura una aparición, contado desde que nació. Se calibra con
- * `data-vida` en el placeholder, igual que `data-minimo` en el home.
+ * **La cola**: lo que la aparición se queda después de que la mano se fue.
+ * Antes era lo que vivía desde que nació, y era otra cosa — el reloj corría
+ * contra el gesto y una mano quieta veía saltar el santo. Ahora el reloj
+ * arranca cuando el gesto termina: mientras haya mano no hay reloj.
  *
- * Un segundo es lo que hace que sea un gesto y no un estado: alcanza para
- * verlo y para alcanzarlo con el ratón, y no alcanza para instalarse. Subirlo
- * mucho convierte la página en una composición fija; bajarlo mucho convierte
- * el link en algo imposible de cazar.
+ * Segundo y medio es lo que alcanza para soltar el nombre y llegar al emblema
+ * con el ratón —que es cómo se caza el link— sin que la imagen se instale.
+ * Se calibra con `data-vida` en el placeholder, igual que `data-minimo` en el
+ * home.
  */
-const VIDA = 1000;
+const VIDA = 1500;
 
 registrar('about', async (host) => {
   const about = await cargarAbout();
@@ -64,37 +79,54 @@ registrar('about', async (host) => {
   const djs = (about?.djs ?? []).map(normalizar).filter(Boolean);
   if (!djs.length) throw new Error('about.json no trae ningún DJ con emblema');
 
-  // El stack de siempre, con banda. Las filas las reasigna `about.css`: el
-  // campo arriba, la línea de texto en la mitad y la grieta abajo.
+  // El stack de siempre, con banda y **sin visor**: `crearStack` lo crea igual
+  // —es el mismo runtime de las otras páginas— y `about.css` lo esconde. Las
+  // filas las reasigna ahí mismo: aire, la línea de texto, y el campo cruzando
+  // todo.
   //
-  // `ancla: false` porque el About no es página índice y su banda está mucho
-  // más abajo: publicar `--ttx-ancla` desde aquí desalinearía la gaveta de la
-  // merca en la navegación siguiente. Ver el bloque del ancla en `stack.js`.
+  // `ancla: false` porque el About no es página índice y su banda no está donde
+  // el resto del sitio la espera: publicar `--ttx-ancla` desde aquí desalinearía
+  // la gaveta de la merca en la navegación siguiente. Ver el ancla en
+  // `stack.js`.
   const { banda, contenido: campo } = crearStack(host, { banda: true, ancla: false });
   campo.classList.add('ttx-about-campo');
 
   const menos = matchMedia('(prefers-reduced-motion: reduce)');
   const vida = Number(host.dataset.vida) || VIDA;
-  const grieta = crearGrieta(host);
+  // Los tres emblemas se cuelgan del campo apagados y **se quedan ahí**. Ya no
+  // es solo una precarga: es lo que mantiene el GIF corriendo por debajo para
+  // que ninguna aparición empiece en el primer cuadro. La precarga sigue para
+  // el otro archivo, el que hoy no está puesto.
+  precargar(djs.map((dj) => (menos.matches ? dj.emblema : dj.quieto)));
 
-  // Sin esto la primera pasada por un nombre no muestra nada: el GIF llegaría
-  // cuando la aparición ya se murió. Es una precarga, no un destello — no
-  // pinta nada en pantalla.
-  precargar(djs.map((dj) => (menos.matches ? dj.quieto : dj.emblema)));
-
-  const estados = djs.map((dj) => crearEstado(dj, { campo, grieta, vida, menos }));
-  banda.append(crearTexto(about.lema, estados));
+  const estados = djs.map((dj) => crearEstado(dj, { campo, vida, menos }));
+  banda.append(crearTexto(about, estados));
 
   const soltarDisparos = disparos(host, estados);
+  // La preferencia se puede cambiar con la página abierta: ahí hay que
+  // cambiarle el archivo al emblema, que ya no se vuelve a crear nunca.
+  const soltarMenos = escuchar(menos, () => {
+    for (const est of estados) est.revisarMovimiento();
+  });
 
   return {
     destruir() {
       soltarDisparos();
+      soltarMenos();
       for (const est of estados) est.soltar();
-      grieta.apagar();
     },
   };
 });
+
+/** `MediaQueryList` viejo no tiene `addEventListener`, solo `addListener`. */
+function escuchar(mq, fn) {
+  if (mq.addEventListener) {
+    mq.addEventListener('change', fn);
+    return () => mq.removeEventListener('change', fn);
+  }
+  mq.addListener(fn);
+  return () => mq.removeListener(fn);
+}
 
 /**
  * Un DJ sirve si tiene con qué invocarlo y a dónde llevar. A medias no: un
@@ -118,167 +150,191 @@ function normalizar(dj) {
 // ── El texto ────────────────────────────────────────────────────────────
 
 /**
- * El único bloque de texto de la página. Dos renglones:
+ * El único texto de la página, en **un solo renglón** de punta a punta:
  *
- *   Sonic hustlers since 2020
- *   Run by DJ Lomalinda, Nyksan and Verraco.
+ *   SONIC HUSTLERS SINCE 2020        TRATRATRAX IS A LABEL RUN BY DJ LOMALINDA…
+ *   └──────── el lema ───────┘       └──────────────── el sello ─────────────┘
  *
- * La línea se **compone** desde el array de `about.json` para que los nombres y
- * sus disparadores tengan una sola fuente: agregar un cuarto DJ es agregarlo al
- * JSON, no editar una frase en un sitio y una lista en otro.
+ * Dos bloques y el hueco entre ellos, que no es un espacio escrito sino lo que
+ * sobra de la barra: el CSS los empuja a los dos bordes.
+ *
+ * **Adentro de un bloque los grupos van pegados, sin espacio**, y lo único que
+ * los separa es que el peso alterna: fuerte, liviano, fuerte, liviano. Los
+ * espacios que sí existen son los de adentro de un grupo —`SONIC HUSTLERS` son
+ * dos palabras— porque ahí son parte del texto. Por eso el copy llega marcado
+ * con asteriscos:
+ *
+ *   *SONIC HUSTLERS*SINCE*2020*
+ *   ─────fuerte──── liviano fuerte
+ *
+ * Cada asterisco es una junta y **no se imprime**; no es un espacio, es el
+ * punto donde cambia el peso.
+ *
+ * **Los tres nombres siguen la misma alternancia**, y por eso se pegan al final
+ * del segundo bloque en vez de ir en una lista aparte: `DJ LOMALINDA` fuerte,
+ * `NYKSAN` liviano, `VERRACO` fuerte. La cuenta no se reinicia — sigue desde el
+ * último campo de la frase, que es lo que hace que los nombres se lean como más
+ * campos de la misma línea y no como una enumeración pegada al final.
+ *
+ * Nada de comas ni de "and". La línea se **compone** desde `about.json` para
+ * que los nombres y sus disparadores tengan una sola fuente — agregar un cuarto
+ * DJ es agregarlo al JSON, no editar una frase en un sitio y una lista en otro.
  *
  * Cada nombre es un `<button>` de verdad —el teclado sale gratis, como el
  * título del home—, no un `<span>` con eventos.
  */
-function crearTexto(lema, estados) {
-  const run = elemento('span', { class: 'ttx-about-run' }, 'Run by ');
+function crearTexto(about, estados) {
+  const lema = partir(about.lema);
+  const sello = partir(about.sello);
 
-  estados.forEach((est, i) => {
-    if (i > 0) run.append(i === estados.length - 1 ? ' and ' : ', ');
-    run.append(est.boton);
-  });
-  run.append('.');
+  // La alternancia del segundo bloque no se reinicia en los nombres: sigue
+  // contando desde donde la dejó la frase.
+  for (const [i, est] of estados.entries()) est.vestir(liviano(sello.length + i));
 
   return elemento(
     'p',
     { class: 'ttx-about-texto' },
-    lema && elemento('span', { class: 'ttx-about-lema' }, lema),
-    run,
+    lema.length > 0 && elemento('span', { class: 'ttx-about-bloque' }, ...lema.map(crearCampo)),
+    elemento(
+      'span',
+      { class: 'ttx-about-bloque' },
+      ...sello.map(crearCampo),
+      ...estados.map((est) => est.boton),
+    ),
   );
 }
 
-// ── La grieta ───────────────────────────────────────────────────────────
-
 /**
- * La grieta muestra **el mismo emblema comprimido a la fuerza en su altura, de
- * borde a borde**. Toda la información está ahí y la forma se perdió: queda una
- * barra de color irrepetible de esa imagen. Es la lectura literal del third
- * space — *el hueco deforma lo que pasa por él*.
+ * El asterisco es **la junta**, y así llega el copy escrito:
  *
- * Con varios emblemas vivos muestra **el más reciente**; cuando ese muere, cae
- * al siguiente que siga vivo; sin ninguno, se apaga a negro. Así la grieta
- * sigue siendo proyección de lo activo y no contenido propio, que es la regla
- * del stack (`stack.js:1-19`).
+ *   "*Sonic hustlers*since*2020*"  →  ["Sonic hustlers", "since", "2020"]
  *
- * El apagado no es una regla nueva: al quitar `--ttx-visor-img` del `style` del
- * host, el token `[data-ttx]:not([style*='--ttx-visor-img'])` ya deja el visor
- * en cero (`tokens.css:201-203`).
+ * No se imprime nunca; solo dice dónde termina un grupo y empieza el otro. Los
+ * grupos alternan peso empezando por el fuerte, que es lo único que los separa:
+ * entre uno y otro no va ni un espacio.
+ *
+ * Se guarda así en `data/about.json`, con los asteriscos, porque es la única
+ * forma de que el sello escriba la línea entera —texto y ritmo— en un solo
+ * sitio. Una frase sin asteriscos es un grupo fuerte y ya: no se rompe nada.
  */
-function crearGrieta(host) {
-  const vivos = [];
-
-  const pintar = () => {
-    const ultimo = vivos[vivos.length - 1];
-    if (ultimo) host.style.setProperty('--ttx-visor-img', `url("${ultimo.url}")`);
-    else host.style.removeProperty('--ttx-visor-img');
-  };
-
-  return {
-    nacer(el, url) {
-      vivos.push({ el, url });
-      pintar();
-    },
-    morir(el) {
-      const i = vivos.findIndex((v) => v.el === el);
-      if (i >= 0) vivos.splice(i, 1);
-      pintar();
-    },
-    apagar() {
-      vivos.length = 0;
-      pintar();
-    },
-  };
+function partir(frase) {
+  if (!frase) return [];
+  return String(frase)
+    .split('*')
+    .map((t) => t.trim())
+    .filter(Boolean);
 }
+
+/** Los impares van livianos: el primer grupo de cada bloque siempre es fuerte. */
+const liviano = (i) => i % 2 === 1;
+
+function crearCampo(texto, i) {
+  return elemento('span', { class: peso(liviano(i)) }, texto);
+}
+
+const peso = (esLiviano) => (esLiviano ? 'ttx-about-suave' : 'ttx-about-fuerte');
 
 // ── Las apariciones ─────────────────────────────────────────────────────
 
 /**
  * El estado de un DJ. No hay estado global: no hay cola, no hay uno-a-la-vez,
  * no hay nada que coordinar entre los tres. Cada uno sabe si su disparador
- * está activo y si tiene un emblema vivo, y eso es todo.
+ * está activo y si su emblema está encendido, y eso es todo.
  *
  * **Las fuentes se cuentan, no se pisan.** El mismo nombre puede estar activo
  * por el ratón y por el teclado a la vez (foco puesto y el puntero encima), y
  * soltar una no puede apagar la otra. Es el `mano` del home, con nombre.
  *
- * **Persistente** es cuando la aparición no se muere sola:
+ * El ciclo entero son tres reglas:
  *
- *   - **teclado**, porque un link que vive un segundo y salta de sitio es
- *     inalcanzable con Tab. El teclado no es una mano y no puede "pasar".
- *   - **`prefers-reduced-motion: reduce`**, donde la aparición se queda —es un
- *     corte y la pide el usuario— pero no hay reciclaje, que es movimiento que
- *     nadie pidió.
+ *   1. Se enciende cuando llega la primera fuente, en un sitio sorteado **en
+ *      ese instante**.
+ *   2. Mientras haya una fuente puesta no hay reloj: la imagen no se mueve, no
+ *      se recicla y no se apaga por su cuenta.
+ *   3. Cuando se va la última fuente arranca la cola de `vida` ms, quieta en el
+ *      mismo sitio. Volver antes de que se cumpla **cancela la cola y no
+ *      resortea**: no hay forma de hacer que el santo brinque con la mano
+ *      encima.
  *
- * En los dos casos el emblema se va con el disparador, no con el reloj.
+ * El emblema no se crea ni se destruye nunca —eso lo hace `crearEmblema`, una
+ * sola vez— porque quitar un GIF del DOM le reinicia la animación.
  */
-function crearEstado(dj, { campo, grieta, vida, menos }) {
+function crearEstado(dj, { campo, vida, menos }) {
   const fuentes = new Set();
-  let vivo = null;
+  const el = crearEmblema(dj, menos.matches);
+  const boton = crearBoton(dj);
+  campo.append(el);
+
+  let encendido = false;
   let timer = null;
 
-  const persistente = () => fuentes.has('tecla') || menos.matches;
+  const fuente = () => (menos.matches ? dj.quieto : dj.emblema);
 
-  const sembrar = () => {
-    const el = crearEmblema(dj, menos.matches);
-    campo.append(el);
-    vivo = el;
-    grieta.nacer(el, menos.matches ? dj.quieto : dj.emblema);
-    // Cada aparición agenda su propia muerte al nacer, sin mirar a las otras.
-    timer = persistente() ? null : setTimeout(cumplir, vida);
-  };
-
-  const quitar = () => {
-    if (!vivo) return;
+  const encender = () => {
     clearTimeout(timer);
     timer = null;
-    grieta.morir(vivo);
-    vivo.remove();
-    vivo = null;
+    if (encendido) return;
+    // El sorteo ocurre aquí y solo aquí: apagado el emblema, nadie lo ve
+    // moverse. Con el emblema encendido esta función ya se salió arriba.
+    //
+    // Salen dos números de 0 a 1, no dos porcentajes. **La zona la pone el
+    // CSS** —la derecha en pantalla ancha, abajo en teléfono— y esto es
+    // solamente el azar: dónde cae dentro de la zona que le toque. Poner el
+    // recorte aquí obligaría al JS a saber de anchos de pantalla, que es la
+    // única cosa que este widget nunca ha tenido que saber.
+    el.style.setProperty('--ttx-about-rx', Math.random().toFixed(4));
+    el.style.setProperty('--ttx-about-ry', Math.random().toFixed(4));
+    el.removeAttribute('data-apagado');
+    el.removeAttribute('inert');
+    encendido = true;
   };
 
-  /**
-   * Se le acabó el segundo. Si el disparador sigue activo, nace otro del mismo
-   * DJ en posición nueva: sostener produce una ráfaga saltando por la pantalla,
-   * no una imagen congelada.
-   */
-  function cumplir() {
-    quitar();
-    if (fuentes.size) sembrar();
-  }
-
-  const boton = crearBoton(dj);
+  const apagar = () => {
+    clearTimeout(timer);
+    timer = null;
+    if (!encendido) return;
+    el.setAttribute('data-apagado', '');
+    el.setAttribute('inert', '');
+    encendido = false;
+  };
 
   return {
     boton,
+
+    /**
+     * El peso que le toca al nombre en la alternancia de la línea. Lo decide
+     * `crearTexto`, que es el único que sabe cuántos campos vinieron antes.
+     */
+    vestir(esLiviano) {
+      boton.classList.add(peso(esLiviano));
+    },
+
     /** ¿Tiene el foco de teclado como fuente? Lo pregunta `disparos`. */
     conTecla: () => fuentes.has('tecla'),
-    /** ¿El foco está dentro de su emblema vivo? El caso de tabular hasta el santo. */
-    tieneFoco: (el) => Boolean(vivo && el && vivo.contains(el)),
+    /** ¿El foco está dentro de su emblema encendido? El caso de tabular hasta el santo. */
+    tieneFoco: (nodo) => Boolean(encendido && nodo && el.contains(nodo)),
 
-    activar(fuente) {
-      fuentes.add(fuente);
-      // Sin emblema vivo, siembra. Con uno vivo no siembra otro: la segunda
-      // fuente no es una pasada nueva, es la misma mano contada dos veces.
-      if (!vivo) sembrar();
-      else if (persistente() && timer) {
-        // Llegó el teclado sobre una aparición que ya estaba contando: se le
-        // quita el reloj y se queda a esperar a que la alcancen.
-        clearTimeout(timer);
-        timer = null;
-      }
+    activar(f) {
+      fuentes.add(f);
+      encender();
     },
 
-    desactivar(fuente) {
-      if (!fuentes.delete(fuente)) return;
-      if (fuentes.size) return;
-      // Sin reloj es persistente y se va con el disparador. Con reloj es
-      // efímero y se queda a terminar su segundo: al morir ya no habrá
-      // disparador activo y no sembrará otro. Eso es lo que hace que una pasada
-      // rápida deje tres emblemas apagándose en el orden en que salieron.
-      if (!timer) quitar();
+    desactivar(f) {
+      if (!fuentes.delete(f)) return;
+      // Queda otra mano puesta: no empieza a contar nada.
+      if (fuentes.size || !encendido) return;
+      clearTimeout(timer);
+      timer = setTimeout(apagar, vida);
     },
 
-    soltar: quitar,
+    /** Cambió `prefers-reduced-motion` con la página abierta. */
+    revisarMovimiento() {
+      const url = fuente();
+      const img = el.querySelector('img');
+      if (img && img.src !== url) img.src = url;
+    },
+
+    soltar: apagar,
   };
 }
 
@@ -300,25 +356,39 @@ function crearBoton(dj) {
 }
 
 /**
- * Una aparición. El emblema **es** el link: `<a>` con el GIF dentro y el nombre
- * accesible en un `.ttx-oculto` (`catalogo.css:224-231`).
+ * El emblema, **uno por DJ y para toda la vida de la página**. Nace apagado y
+ * se queda colgado del campo: encender y apagar es quitar y poner
+ * `data-apagado`, nunca `append` ni `remove`.
  *
- * La posición es el centro, en porcentaje del campo, y va en dos variables que
- * el CSS traduce a `left`/`top` con un `translate(-50%,-50%)`. Que sea el
- * centro es lo que le da el **derecho a cortarse**: un emblema en el 2% de la
+ * Esa es la regla que no se puede relajar. Un GIF que se saca del DOM y se
+ * vuelve a meter arranca de cero, así que cada aparición salía en el mismo
+ * primer cuadro y el santo se veía siempre igual. Dejándolo puesto —apagado,
+ * pero puesto— el navegador sigue corriendo el loop por debajo y la aparición
+ * lo agarra donde vaya. Por eso el CSS lo apaga con `opacity` y no con
+ * `display: none` ni `visibility: hidden`, que sí pausan la animación.
+ *
+ * El emblema **es** el link: `<a>` con el GIF dentro y el nombre accesible en
+ * un `.ttx-oculto` (`catalogo.css:224-231`). Apagado también deja de ser
+ * alcanzable —ni con el ratón ni con Tab—, o habría tres links invisibles
+ * repartidos por la pantalla.
+ *
+ * La posición es el centro, en porcentaje del campo, en dos variables que el
+ * CSS traduce a `left`/`top` con un `translate(-50%,-50%)`. Que sea el centro
+ * es lo que le da el **derecho a cortarse**: un emblema en el 2% de la
  * izquierda sale con la mitad afuera y el marco lo corta. Que vaya en
- * porcentaje evita medir el campo desde el JS —una lectura de layout por
- * aparición, y por ráfaga son varias— y de paso el emblema no se descoloca si
- * la ventana cambia de tamaño mientras vive.
- *
- * `--ttx-about-x` va en el `style` del elemento, no en una clase: el azar no
- * tiene retícula y por eso no tiene clases posibles.
+ * porcentaje evita medir el campo desde el JS y de paso el emblema no se
+ * descoloca si la ventana cambia de tamaño mientras se ve. Las escribe
+ * `crearEstado` al encender; aquí solo nace en el centro, donde nadie lo ve.
  */
 function crearEmblema(dj, quieto) {
-  const a = elemento(
+  return elemento(
     'a',
     {
       class: 'ttx-about-emblema',
+      // Apagado y fuera del alcance: `inert` le quita el clic y el Tab sin
+      // tocar cómo se pinta, que es justo lo que no se puede tocar aquí.
+      'data-apagado': '',
+      inert: '',
       href: dj.instagram,
       target: '_blank',
       rel: 'noopener',
@@ -328,10 +398,6 @@ function crearEmblema(dj, quieto) {
     elemento('img', { src: quieto ? dj.quieto : dj.emblema, alt: '', draggable: 'false' }),
     elemento('span', { class: 'ttx-oculto' }, `${dj.nombre} on Instagram`),
   );
-
-  a.style.setProperty('--ttx-about-x', `${Math.random() * 100}%`);
-  a.style.setProperty('--ttx-about-y', `${Math.random() * 100}%`);
-  return a;
 }
 
 // ── Los disparos ────────────────────────────────────────────────────────

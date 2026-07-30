@@ -1,26 +1,24 @@
 {
-  "lema": "Sonic hustlers since 2020",
+  "lema": "*Sonic hustlers*since*2020*",
+  "sello": "*TraTraTrax*is a label run by*",
   "djs": [
     {
       "nombre": "DJ Lomalinda",
       "instagram": "https://www.instagram.com/djlomalinda/",
       "emblema": "media/about/lomalinda.gif",
-      "quieto": "media/about/lomalinda.png",
-      "relleno": true
+      "quieto": "media/about/lomalinda.png"
     },
     {
       "nombre": "Nyksan",
       "instagram": "https://www.instagram.com/nyksan_/",
       "emblema": "media/about/nyksan.gif",
-      "quieto": "media/about/nyksan.png",
-      "relleno": true
+      "quieto": "media/about/nyksan.png"
     },
     {
       "nombre": "Verraco",
       "instagram": "https://www.instagram.com/verraco__/",
       "emblema": "media/about/verraco.gif",
-      "quieto": "media/about/verraco.png",
-      "relleno": true
+      "quieto": "media/about/verraco.png"
     }
   ]
 }
