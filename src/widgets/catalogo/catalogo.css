@@ -195,8 +195,15 @@
   white-space: nowrap;
 }
 
-[data-ttx='catalogo'] .ttx-nota {
+/* Las líneas sin rótulo cierran el bloque de créditos. Llevan aire encima
+   porque empiezan un párrafo; dos seguidas son el mismo párrafo y no lo
+   llevan. Es el mismo ritmo que tenía la nota cuando vivía aparte. */
+[data-ttx='catalogo'] .ttx-credito-libre {
   margin-top: 1.4em;
+}
+
+[data-ttx='catalogo'] .ttx-credito-libre.ttx-pegada {
+  margin-top: 0;
 }
 
 [data-ttx='catalogo'] .ttx-enlaces {
@@ -217,17 +224,6 @@
 [data-ttx='catalogo'] .ttx-enlace:hover,
 [data-ttx='catalogo'] .ttx-enlace:focus-visible {
   text-decoration-thickness: 2px;
-}
-
-/* El enlace nombra el álbum para que un lector de pantalla lo entienda
-   fuera de contexto; en pantalla solo se lee PURCHASE / LISTEN. */
-[data-ttx] .ttx-oculto {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
 }
 
 /* ── Teléfono: el carril se para ──────────────────────────────────────

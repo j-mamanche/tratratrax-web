@@ -13,6 +13,11 @@ import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+// La regla de qué release puede salir sorteado en el home vive con el widget
+// que la usa (`format.js`), no copiada aquí: si se escriben dos veces, un día
+// el validador aprueba un home que el sitio no va a poder pintar.
+import { cumpleHome } from '../src/widgets/_runtime/format.js';
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
 const warnings = [];
@@ -51,6 +56,19 @@ const isHttpUrl = (s) => {
     return false;
   }
 };
+
+/** Ruta a un archivo del sitio (`media/…`), o una URL absoluta. */
+function revisarMedia(at, campo, ruta) {
+  if (!ruta) return;
+  if (isHttpUrl(ruta)) return;
+  if (ruta.startsWith('/')) {
+    err(at, `${campo} "${ruta}" es absoluta — se espera una ruta del repo, como "media/tra032.mp4"`);
+    return;
+  }
+  if (!existsSync(join(root, ruta))) {
+    err(at, `${campo} apunta a "${ruta}", que no existe en el repo`);
+  }
+}
 
 // ─── artists.json ────────────────────────────────────────────────────────────
 
@@ -104,10 +122,20 @@ for (const [i, r] of releases.entries()) {
   }
 
   if (!isRealDate(r.date)) err(at, `fecha inválida "${r.date}" — se espera AAAA-MM-DD`);
-  else if (r.date > today) warn(at, `fecha en el futuro (${r.date})`);
+  // Una fecha futura en algo que ya está publicado casi siempre es un dedazo.
+  // En un anuncio —`visible: false`— es justo lo que se está diciendo.
+  else if (r.date > today && r.visible !== false) warn(at, `fecha en el futuro (${r.date})`);
 
-  if (!BC_IMAGE.test(r.bcImageId ?? '')) {
-    err(at, `bcImageId inválido "${r.bcImageId}" — se espera algo como a750972864`);
+  // La carátula de Bandcamp es obligatoria para lo que se ve en el catálogo.
+  // Un lanzamiento por anunciar —`visible: false`, con su bloque `home`— puede
+  // no estar todavía en Bandcamp: ahí lo que se ve es `home.arte`, y el día
+  // que se haga visible este mismo error lo reclama.
+  if (r.bcImageId || r.visible !== false) {
+    if (!BC_IMAGE.test(r.bcImageId ?? '')) {
+      err(at, `bcImageId inválido "${r.bcImageId}" — se espera algo como a750972864`);
+    }
+  } else if (!r.home?.arte) {
+    err(at, 'sin `bcImageId` y sin `home.arte` — no hay ninguna imagen que mostrar');
   }
 
   if (!r.purchaseUrl) warn(at, 'sin `purchaseUrl` (link de compra en Bandcamp)');
@@ -116,8 +144,30 @@ for (const [i, r] of releases.entries()) {
   if (!r.listenUrl) warn(at, 'sin `listenUrl` (linktree para escuchar)');
   else if (!isHttpUrl(r.listenUrl)) err(at, `listenUrl no es una URL válida: "${r.listenUrl}"`);
 
+  // Un crédito es una junta `Rol__ Valor` o una línea suelta (`texto`), que
+  // es como cierra el bloque: «All NRG programmed by…», la nota con asterisco.
   for (const [j, c] of (r.credits ?? []).entries()) {
-    if (!c.role || !c.name) err(`${at} credits[${j}]`, 'necesita `role` y `name`');
+    if (c?.role && c?.name) continue;
+    if (typeof c?.texto === 'string' && c.texto.trim()) continue;
+    err(`${at} credits[${j}]`, 'o `role` y `name`, o una línea suelta en `texto`');
+  }
+
+  // El material del home vive con su release. Es opcional —casi ningún release
+  // sale en el home—, pero a medias no sirve: sin arte no hay composición.
+  if (r.home) {
+    if (!r.home.arte) err(`${at} home`, 'falta `arte` — es lo único que la composición no puede inventar');
+    revisarMedia(`${at} home`, '`arte`', r.home.arte);
+
+    if (r.home.video) {
+      if (!r.home.video.mp4) err(`${at} home`, 'hay `video` pero sin `mp4`');
+      revisarMedia(`${at} home`, '`video.mp4`', r.home.video.mp4);
+      revisarMedia(`${at} home`, '`video.poster`', r.home.video.poster);
+      if (!r.home.video.poster) {
+        warn(`${at} home`, 'sin `video.poster` — es lo que se ve con prefers-reduced-motion');
+      }
+    }
+
+    if (r.home.relleno) warn(`${at} home`, 'marcado como `relleno`: el material del home es de prueba');
   }
 
   if (typeof r.order !== 'number') err(at, 'falta `order` (número)');
@@ -142,62 +192,52 @@ for (const a of artists) {
 
 // ─── home.json ───────────────────────────────────────────────────────────────
 //
-// El home es curado con respaldo automático. Si hay `destacado`, ese manda —y
-// puede ser una pieza que todavía no existe en el catálogo, que es justo para
-// lo que está—. Si falta, el home cae al release visible más reciente y
-// degrada: carátula arriba, sin intercambio y sin interruptor.
+// `home.json` ya no guarda contenido: guarda **la política**. El destacado es
+// un release del catálogo y su material vive en el bloque `home` de ese
+// release, que es lo que se validó arriba.
 //
-// Por eso lo que se exige es que **si hay destacado, esté entero**. Un
-// destacado a medias es peor que ninguno: el respaldo da un home pobre, uno a
-// medias da un home roto.
+//   { "modo": "fijo", "release": "killing-mariposas" }
+//   { "modo": "auto" }
+//
+// Los dos modos tienen respaldo —el release visible más reciente—, así que
+// aquí casi nada es error: lo que se persigue es el silencio. Un `fijo` que
+// apunta a un release borrado no rompe el home, pero deja al sello creyendo
+// que publicó algo que nadie está viendo.
 
-/** Ruta a un archivo del sitio (`media/…`), o una URL absoluta. */
-function revisarMedia(at, campo, ruta) {
-  if (!ruta) return;
-  if (isHttpUrl(ruta)) return;
-  if (ruta.startsWith('/')) {
-    err(at, `${campo} "${ruta}" es absoluta — se espera una ruta del repo, como "media/tra032.mp4"`);
-    return;
-  }
-  if (!existsSync(join(root, ruta))) {
-    err(at, `${campo} apunta a "${ruta}", que no existe en el repo`);
-  }
-}
+const MODOS = ['fijo', 'auto'];
 
 if (existsSync(join(root, 'data', 'home.json'))) {
   const home = load('home.json') ?? {};
-  const d = home.destacado;
+  const modo = home.modo ?? (home.release ? 'fijo' : 'auto');
 
-  if (d && typeof d === 'object' && Object.keys(d).length > 0) {
-    const at = `home destacado "${d.titulo ?? '¿?'}"`;
+  if (home.destacado) {
+    err(
+      'home.json',
+      'todavía tiene `destacado` — el material del home se mudó al bloque `home` del release, y aquí solo va `modo` + `release`',
+    );
+  }
 
-    if (!d.titulo) err(at, 'falta `titulo`');
-    if (!d.artista) err(at, 'falta `artista`');
-    if (!d.caratula) err(at, 'falta `caratula`');
-    if (!d.video?.mp4) err(at, 'falta `video.mp4` — sin video no hay intercambio');
-
-    revisarMedia(at, '`caratula`', d.caratula);
-    revisarMedia(at, '`video.mp4`', d.video?.mp4);
-    revisarMedia(at, '`video.poster`', d.video?.poster);
-
-    if (!d.video?.poster) {
-      warn(at, 'sin `video.poster` — es lo que se ve con prefers-reduced-motion');
+  if (!MODOS.includes(modo)) {
+    err('home.json', `modo "${home.modo}" desconocido — se espera ${MODOS.join(' | ')}`);
+  } else if (modo === 'fijo') {
+    const r = releases.find((x) => x.id === home.release);
+    if (!home.release) {
+      err('home.json', 'modo `fijo` sin `release` — falta decir cuál');
+    } else if (!r) {
+      err('home.json', `\`release\` "${home.release}" no existe en releases.json`);
+    } else if (!r.home?.arte) {
+      err(`home.json "${r.album}"`, 'el release destacado no tiene `home.arte` — el home caería al respaldo');
+    } else if (!r.home.video?.mp4) {
+      warn(`home.json "${r.album}"`, 'sin `home.video` — el home se queda quieto, sin cenefa ni intercambio');
     }
-    // El tercer campo de la franja: `KILLING MARIPOSAS KELMAN DURÁN 091826`.
-    // Manda la fecha; el número es el respaldo, para una pieza que ya lo tenga.
-    if (!d.fecha && !d.catalogo) {
-      warn(at, 'sin `fecha` ni `catalogo` — la franja se queda en título y artista');
+  } else {
+    const candidatos = releases.filter(cumpleHome);
+    if (!candidatos.length) {
+      warn(
+        'home.json',
+        'modo `auto` y ningún release cumple (arte, texto, `purchaseUrl` y `listenUrl`, y visible) — el home usa el respaldo automático',
+      );
     }
-    // `release` es opcional: solo sirve para enlazarlo con el catálogo el día
-    // que la pieza ya exista ahí.
-    if (d.release && !ids.has(d.release)) {
-      warn(at, `\`release\` "${d.release}" no existe en releases.json`);
-    }
-    if (d.relleno) {
-      warn(at, 'marcado como `relleno`: el video y la carátula son material de prueba');
-    }
-  } else if (d !== null && d !== undefined) {
-    warn('home.json', '`destacado` está vacío — el home usa el respaldo automático');
   }
 }
 
@@ -212,10 +252,46 @@ if (existsSync(join(root, 'data', 'home.json'))) {
 if (existsSync(join(root, 'data', 'about.json'))) {
   const about = load('about.json') ?? {};
 
-  // Los dos bloques de la barra. Sin uno de ellos la línea sigue en pie, pero
-  // pierde la mitad de lo que dice: por eso aviso y no error.
-  if (!about.lema) warn('about.json', 'sin `lema` — el bloque de la izquierda queda vacío');
+  // Los enunciados de la barra. Sin uno de ellos la línea sigue en pie, pero
+  // pierde una parte de lo que dice: por eso aviso y no error.
+  if (!about.lema) warn('about.json', 'sin `lema` — la línea abierta pierde SONIC HUSTLERS');
   if (!about.sello) warn('about.json', 'sin `sello` — la línea arranca directo en los nombres');
+
+  // **Las sílabas son la grieta.** Sin ellas no hay nombre partido, y sin
+  // nombre partido no hay hueco que abrir: la página se queda sin su gesto
+  // principal y con tres cuartos del texto inalcanzables. Por eso es error.
+  const silabas = about.silabas;
+  if (!Array.isArray(silabas) || silabas.length < 2) {
+    err('about.json', 'falta `silabas` con al menos dos partes — es la grieta, el gesto de la página');
+  } else if (silabas.some((s) => typeof s !== 'string' || !s.trim())) {
+    err('about.json', '`silabas` trae alguna vacía — cada una es una sílaba del nombre');
+  }
+
+  // Las tres redes del sello. No las de los DJs: esas son el destino de los
+  // emblemas y van en `djs[].instagram`.
+  const redes = about.redes;
+  if (!Array.isArray(redes) || redes.length === 0) {
+    warn('about.json', 'sin `redes` — la línea abierta se queda sin INSTAGRAM / YOUTUBE / BANDCAMP');
+  } else {
+    for (const [i, r] of redes.entries()) {
+      const at = `about redes[${i}] "${r?.nombre ?? '¿?'}"`;
+      if (!r?.nombre) err(at, 'falta `nombre` — es lo que se lee en la línea');
+      if (!r?.url) err(at, 'falta `url`');
+      else if (!isHttpUrl(r.url)) err(at, `url no es válida: "${r.url}"`);
+    }
+  }
+
+  // El correo. Es un grupo solo —los dos puntos son parte del texto, no una
+  // junta— y el `mailto:` sale del campo de al lado.
+  if (!about.bookings?.texto) {
+    warn('about.json', 'sin `bookings.texto` — la línea abierta cierra sin el correo');
+  } else if (!about.bookings.email) {
+    warn('about.json', 'sin `bookings.email` — el link se arma con el texto entero, que casi nunca es una dirección');
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(about.bookings.email)) {
+    err('about.json', `bookings.email no parece un correo: "${about.bookings.email}"`);
+  } else if (!about.bookings.texto.includes(about.bookings.email)) {
+    warn('about.json', 'el correo de `bookings.email` no aparece en `bookings.texto`: se lee uno y se escribe a otro');
+  }
 
   const djs = about.djs;
   if (!Array.isArray(djs) || djs.length === 0) {

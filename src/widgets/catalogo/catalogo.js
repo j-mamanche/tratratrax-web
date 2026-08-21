@@ -3,7 +3,13 @@ import { cargar } from '../_runtime/datos.js';
 import { crearStack, proyectar, precargar } from '../_runtime/stack.js';
 import { espejo } from '../_runtime/espejo.js';
 import { hscroll } from '../_runtime/hscroll.js';
-import { cover, numeroCatalogo, lineasCredito, nombresArtistas } from '../_runtime/format.js';
+import {
+  cover,
+  numeroCatalogo,
+  lineasCredito,
+  nombresArtistas,
+  grupos,
+} from '../_runtime/format.js';
 import { elemento } from '../_runtime/dom.js';
 import './catalogo.css';
 
@@ -51,6 +57,7 @@ registrar('catalogo', async (host) => {
   const soltarScroll = hscroll(carril);
   const soltarMedidas = medirItems(host, carril);
   const soltarCentro = seguirCentro(host, carril);
+  const soltarHash = seguirHash(host, carril);
 
   // La carátula abre el release igual que la etiqueta. El estado y los
   // atributos ARIA siguen viviendo en la etiqueta, que es el `<button>`:
@@ -80,6 +87,7 @@ registrar('catalogo', async (host) => {
       soltarScroll();
       soltarMedidas();
       soltarCentro();
+      soltarHash();
     },
   };
 });
@@ -121,7 +129,6 @@ function crearItem(r, indiceArtistas, sufijo) {
         { class: 'ttx-panel-col' },
         elemento('h3', { class: 'ttx-titulo-panel' }, 'Credits'),
         creditos(r),
-        r.note && elemento('p', { class: 'ttx-nota' }, r.note),
         enlaces(r),
       ),
     ),
@@ -155,26 +162,34 @@ function creditos(r) {
   // `Rol__ Valor` es como el sello ya escribe en Bandcamp. Se guarda
   // estructurado y se serializa aquí, no al revés.
   //
-  // Los guiones bajos van en su propio `<span>` porque necesitan tracking
-  // negativo para leerse como una línea continua, y ese tracking no puede
-  // tocar la palabra del rol. La primera línea es la fecha y se separa del
-  // bloque de roles, como en el sitio viejo.
+  // Es **la misma regla** de la línea del About y de la franja del home, vista
+  // de otra manera: el rol es un grupo con junta y el valor es el grupo que
+  // cierra. Por eso pasa por el mismo helper — así el espacio después del `__`
+  // es un solo número en todo el sitio y no uno por pantalla. Lo que no aplica
+  // aquí es la alternancia de peso (`peso: false`): en el panel lo que separa
+  // el rol del valor es la junta y la columna, y engordar los valores metería
+  // un segundo nivel de información que no existe.
+  //
+  // La primera línea es la fecha y se separa del bloque de roles, como en el
+  // sitio viejo.
   return elemento(
     'ul',
     { class: 'ttx-creditos' },
-    ...lineas.map(({ rol, valor, suelta }) =>
-      elemento(
+    ...lineas.map(({ rol, valor, suelta, texto, libre, pegada }) => {
+      // Una línea suelta no tiene rótulo, así que tampoco tiene junta: pasarla
+      // por `grupos` le colgaría un `____` de un valor que no rotula nada.
+      if (libre) {
+        return elemento('li', { class: `ttx-credito-libre${pegada ? ' ttx-pegada' : ''}` }, texto);
+      }
+
+      const [grupoRol, grupoValor] = grupos([rol, valor], { peso: false });
+      return elemento(
         'li',
         suelta ? { class: 'ttx-credito-fecha' } : {},
-        elemento(
-          'span',
-          { class: 'ttx-rol' },
-          rol,
-          elemento('span', { class: 'ttx-guion' }, '__'),
-        ),
-        ` ${valor}`,
-      ),
-    ),
+        elemento('span', { class: `ttx-rol ${grupoRol.clase}` }, grupoRol.texto),
+        grupoValor?.texto ?? '',
+      );
+    }),
   );
 }
 
@@ -230,6 +245,80 @@ function cerrar(item) {
 
 function proyectarItem(host, item) {
   if (item) proyectar(host, { img: item.dataset.visor });
+}
+
+/**
+ * Llegar desde afuera con un release en el bolsillo. La franja del home enlaza
+ * `/catalog#killing-mariposas`, y esto es lo que hace que ese link signifique
+ * algo: al montar —y cada vez que el hash cambie sin recargar— se abre ese
+ * release y el carril se va hasta él.
+ *
+ * Es el único sitio donde abrir **sí mueve el carril**. Al hacer clic no se
+ * mueve, a propósito: uno ya está mirando el ítem. Aquí uno viene de otra
+ * página y el ítem puede estar a treinta discos de distancia.
+ *
+ * Un hash que no corresponde a ningún ítem no hace nada: puede ser de otra
+ * cosa de la página, o un release que dejó de estar visible.
+ */
+function seguirHash(host, carril) {
+  const ac = new AbortController();
+
+  const abrir = () => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+
+    const item = [...carril.children].find((el) => el.dataset.id === id);
+    if (!item || item.hasAttribute('data-abierto')) return;
+
+    alternar(host, carril, item);
+    cuandoMida(host, () => llevar(carril, item));
+  };
+
+  window.addEventListener('hashchange', abrir, { signal: ac.signal });
+  abrir();
+  return () => ac.abort();
+}
+
+/**
+ * Espera a que un ítem tenga ancho, y entonces hace lo suyo.
+ *
+ * Al montar, un ítem todavía no mide lo que va a medir: su ancho sale de
+ * `--ttx-cuerpo-h`, que la publica el ResizeObserver de `medirItems` cuando el
+ * grid ya midió, y hasta entonces vale el respaldo del CSS. Desplazarse contra
+ * esa geometría deja el release a media pantalla de donde debía, y por unos
+ * cientos de píxeles que además dependen de cuántos ítems vengan antes.
+ *
+ * Contar fotogramas a mano no sirve —cuántos hagan falta depende de la
+ * máquina— y mirar si el ítem se quedó quieto tampoco: entre dos medidas
+ * iguales cabe perfectamente el fotograma en que todavía no había medido
+ * nadie. Lo que sí es un hecho es la variable: existe o no existe. Se espera a
+ * que exista, y un fotograma más para que el navegador la haya usado.
+ *
+ * El tope de intentos es para que esto no se quede corriendo en una pestaña de
+ * fondo, donde los fotogramas no llegan.
+ */
+function cuandoMida(host, fn, intentos = 60) {
+  const paso = () => {
+    if (host.style.getPropertyValue('--ttx-cuerpo-h')) return requestAnimationFrame(fn);
+    if (intentos-- <= 0) return fn();
+    requestAnimationFrame(paso);
+  };
+
+  requestAnimationFrame(paso);
+}
+
+/**
+ * Lleva el carril hasta un ítem, esté acostado o parado. No se pregunta cuál
+ * de los dos es: se mide la distancia en los dos ejes y se desplaza, y el eje
+ * que no tiene desborde ignora lo suyo.
+ *
+ * Con `scrollIntoView` no: ese sube por todos los ancestros y terminaría
+ * moviendo también la página de Cargo que hay alrededor.
+ */
+function llevar(carril, item) {
+  const caja = item.getBoundingClientRect();
+  const marco = carril.getBoundingClientRect();
+  carril.scrollBy({ left: caja.left - marco.left, top: caja.top - marco.top });
 }
 
 /**

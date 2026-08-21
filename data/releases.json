@@ -1,5 +1,28 @@
 [
   {
+    "id": "killing-mariposas",
+    "catalog": "",
+    "album": "Killing Mariposas",
+    "artists": [
+      "luca-duran"
+    ],
+    "date": "2026-09-18",
+    "bcImageId": "",
+    "purchaseUrl": "",
+    "listenUrl": "",
+    "credits": [],
+    "order": 0,
+    "visible": false,
+    "home": {
+      "arte": "media/killing-mariposas.jpg",
+      "video": {
+        "mp4": "media/killing-mariposas.mp4",
+        "poster": "media/killing-mariposas-poster.jpg"
+      },
+      "relleno": true
+    }
+  },
+  {
     "id": "mzansi-bass-compilation",
     "catalog": "",
     "album": "Mzansi Bass compilation",
@@ -20,7 +43,6 @@
         "name": "Beau Thomas"
       }
     ],
-    "note": "",
     "order": 1,
     "visible": true
   },
@@ -39,9 +61,11 @@
       {
         "role": "Mastering",
         "name": "Beau Thomas at Ten Eight Seven"
+      },
+      {
+        "texto": "All NRG programmed by Ehua, Flore, dBridge, Martyn between London, Lyon, Phuket, and Washington D.C."
       }
     ],
-    "note": "All NRG programmed by Ehua, Flore, dBridge, Martyn between London, Lyon, Phuket, and Washington D.C.",
     "order": 2,
     "visible": true
   },
@@ -64,9 +88,11 @@
       {
         "role": "Mastering",
         "name": "Beau Thomas at Ten Eight Seven"
+      },
+      {
+        "texto": "All NRG programmed by 1OO1O, WOST, DNZA between Mexico D.F and Bogotá"
       }
     ],
-    "note": "All NRG programmed by 1OO1O, WOST, DNZA between Mexico D.F and Bogotá",
     "order": 3,
     "visible": true
   },
@@ -93,9 +119,11 @@
       {
         "role": "Mastering",
         "name": "Beau Thomas at Ten Eight Seven"
+      },
+      {
+        "texto": "All NRG programmed by LWS, WOST & DJ Yirvin between Edinburgh, Bogotá and Caracas."
       }
     ],
-    "note": "All NRG programmed by LWS, WOST & DJ Yirvin between Edinburgh, Bogotá and Caracas.",
     "order": 4,
     "visible": true
   },
@@ -124,7 +152,6 @@
         "name": "J Guzmán"
       }
     ],
-    "note": "",
     "order": 5,
     "visible": true
   },
@@ -153,7 +180,6 @@
         "name": "Caterina Haddad"
       }
     ],
-    "note": "",
     "order": 6,
     "visible": true
   },
@@ -176,9 +202,11 @@
       {
         "role": "Mastering",
         "name": "Seph"
+      },
+      {
+        "texto": "*Call Super & Parris remix mastered by Beau Thomas"
       }
     ],
-    "note": "*Call Super & Parris remix mastered by Beau Thomas",
     "order": 7,
     "visible": true
   },
@@ -201,9 +229,11 @@
       {
         "role": "Artwork",
         "name": "cmdp.fk"
+      },
+      {
+        "texto": "*Convextion remix is available only on Bandcamp"
       }
     ],
-    "note": "*Convextion remix is available only on Bandcamp",
     "order": 8,
     "visible": true
   },
@@ -237,7 +267,6 @@
         "name": "Phillip Windly Kim"
       }
     ],
-    "note": "",
     "order": 9,
     "visible": true
   },
@@ -252,8 +281,26 @@
     "bcImageId": "a4155131059",
     "purchaseUrl": "https://nicknoexit.bandcamp.com/album/a-tropical-entropy",
     "listenUrl": "",
-    "credits": [],
-    "note": "Programmed & Mixed by Nick León\n\nArtwork by Ezra Miller\n\nDesign & Art Direction by Caterina Haddad\n\nAdditional Mixing by James Rand on 1,4,8,9,11\n\nMastered by Beau Thomas\n\nBikini Mastered by Rashad Becker",
+    "credits": [
+      {
+        "texto": "Programmed & Mixed by Nick León"
+      },
+      {
+        "texto": "Artwork by Ezra Miller"
+      },
+      {
+        "texto": "Design & Art Direction by Caterina Haddad"
+      },
+      {
+        "texto": "Additional Mixing by James Rand on 1,4,8,9,11"
+      },
+      {
+        "texto": "Mastered by Beau Thomas"
+      },
+      {
+        "texto": "Bikini Mastered by Rashad Becker"
+      }
+    ],
     "order": 10,
     "visible": true
   },
@@ -280,9 +327,11 @@
       {
         "role": "Additional design",
         "name": "Julian Guzman"
+      },
+      {
+        "texto": "All NRG programmed by artistas que nos traman mucho"
       }
     ],
-    "note": "All NRG programmed by artistas que nos traman mucho",
     "order": 11,
     "visible": true
   },
@@ -297,8 +346,23 @@
     "bcImageId": "a1937582818",
     "purchaseUrl": "https://lechugazafiro.bandcamp.com/album/desde-los-o-dos-de-un-sapo",
     "listenUrl": "",
-    "credits": [],
-    "note": "All nrg recorded, programmed and mixed by Lechuga Zafiro in Uruguay.\n\nMastered by Rashad Becker\n\nCover design by Weirdcore\n\nPhoto by Bruno Gentile\n\nDesign layout by Jimena Madero",
+    "credits": [
+      {
+        "texto": "All nrg recorded, programmed and mixed by Lechuga Zafiro in Uruguay."
+      },
+      {
+        "texto": "Mastered by Rashad Becker"
+      },
+      {
+        "texto": "Cover design by Weirdcore"
+      },
+      {
+        "texto": "Photo by Bruno Gentile"
+      },
+      {
+        "texto": "Design layout by Jimena Madero"
+      }
+    ],
     "order": 12,
     "visible": true
   },
@@ -324,7 +388,6 @@
         "name": "Seph"
       }
     ],
-    "note": "",
     "order": 13,
     "visible": true
   },
@@ -340,8 +403,26 @@
     "bcImageId": "a1690245655",
     "purchaseUrl": "https://nicknoexit.bandcamp.com/track/bikini",
     "listenUrl": "",
-    "credits": [],
-    "note": "Produced by Nick León, Sammy\n\nVocals by Erika de Casier\n\nWritten by Nick León, Erika de Casier, Sammy\n\nMixed by James Rand\n\nMastered by Rashad Becker\n\nArtwork by Ezra Miller",
+    "credits": [
+      {
+        "texto": "Produced by Nick León, Sammy"
+      },
+      {
+        "texto": "Vocals by Erika de Casier"
+      },
+      {
+        "texto": "Written by Nick León, Erika de Casier, Sammy"
+      },
+      {
+        "texto": "Mixed by James Rand"
+      },
+      {
+        "texto": "Mastered by Rashad Becker"
+      },
+      {
+        "texto": "Artwork by Ezra Miller"
+      }
+    ],
     "order": 14,
     "visible": true
   },
@@ -366,7 +447,6 @@
         "name": "Cmdp"
       }
     ],
-    "note": "",
     "order": 15,
     "visible": true
   },
@@ -392,7 +472,6 @@
         "name": "Seph"
       }
     ],
-    "note": "",
     "order": 16,
     "visible": true
   },
@@ -415,9 +494,11 @@
       {
         "role": "Mastering",
         "name": "Seph"
+      },
+      {
+        "texto": "** Shipping costs have got a bit crazy recently and we know times are tough so we looked into it and cheaper shipping is available. If you want to opt for the more affordable service, please put a note in the order form when checking out and we’ll get in touch. Please note however it can take up to four weeks outside of Europe (within Europe, it’s seven working days), and does not come with tracking so shipping is entirely at your own risk."
       }
     ],
-    "note": "** Shipping costs have got a bit crazy recently and we know times are tough so we looked into it and cheaper shipping is available. If you want to opt for the more affordable service, please put a note in the order form when checking out and we’ll get in touch. Please note however it can take up to four weeks outside of Europe (within Europe, it’s seven working days), and does not come with tracking so shipping is entirely at your own risk.",
     "order": 17,
     "visible": true
   },
@@ -442,7 +523,6 @@
         "name": "Seph"
       }
     ],
-    "note": "",
     "order": 18,
     "visible": true
   },
@@ -465,9 +545,11 @@
       {
         "role": "Mastering",
         "name": "Seph"
+      },
+      {
+        "texto": "All NRG programmed by sound designers from Latino América, África and Europa."
       }
     ],
-    "note": "All NRG programmed by sound designers from Latino América, África and Europa.",
     "order": 19,
     "visible": true
   },
@@ -490,9 +572,11 @@
       {
         "role": "Artwork",
         "name": "Wurdex"
+      },
+      {
+        "texto": "All NRG programmed by Luca Durán, Parco Palaz, Perko & Laksa between Zurich, Copenhagen and London | 2023."
       }
     ],
-    "note": "All NRG programmed by Luca Durán, Parco Palaz, Perko & Laksa between Zurich, Copenhagen and London | 2023.",
     "order": 20,
     "visible": true
   },
@@ -515,9 +599,11 @@
       {
         "role": "Artwork",
         "name": "Julián Guzmán"
+      },
+      {
+        "texto": "All NRG programmed by Badsista, DJ Marfox & Batu between Sao Paulo, Lisboa & Bristol | 2022 – 2023."
       }
     ],
-    "note": "All NRG programmed by Badsista, DJ Marfox & Batu between Sao Paulo, Lisboa & Bristol | 2022 – 2023.",
     "order": 21,
     "visible": true
   },
@@ -540,9 +626,11 @@
       {
         "role": "Artwork",
         "name": "Cmdp.fk"
+      },
+      {
+        "texto": "All NRG programmed by 3Phaz, Amazondotcom, E-Saggila, ZULI & OMAAR, between El Cairo, Montreal, el Estado de México & Los Ángeles 2022 – 2023."
       }
     ],
-    "note": "All NRG programmed by 3Phaz, Amazondotcom, E-Saggila, ZULI & OMAAR, between El Cairo, Montreal, el Estado de México & Los Ángeles 2022 – 2023.",
     "order": 22,
     "visible": true
   },
@@ -565,9 +653,11 @@
       {
         "role": "Artwork",
         "name": "Sometimes Always"
+      },
+      {
+        "texto": "All NRG programmed by Doctor Jeep, Aquarian, Hodge & Sam Binga between NYC, Berlin & Bristol 2022 – 2023"
       }
     ],
-    "note": "All NRG programmed by Doctor Jeep, Aquarian, Hodge & Sam Binga between NYC, Berlin & Bristol 2022 – 2023",
     "order": 23,
     "visible": true
   },
@@ -590,9 +680,11 @@
       {
         "role": "Artwork",
         "name": "Otis Verhoeve"
+      },
+      {
+        "texto": "All NRG programmed by Tomás Urquieta, re:ni, Rhyw and Siu Mata & Amor Satyr between NYC, Berlin, London and Paris 2021 – 2022"
       }
     ],
-    "note": "All NRG programmed by Tomás Urquieta, re:ni, Rhyw and Siu Mata & Amor Satyr between NYC, Berlin, London and Paris 2021 – 2022",
     "order": 24,
     "visible": true
   },
@@ -615,9 +707,11 @@
       {
         "role": "Mastering",
         "name": "Seph"
+      },
+      {
+        "texto": "All NRG programmed by latinxs + diáspora sudaca 2021 – 2022"
       }
     ],
-    "note": "All NRG programmed by latinxs + diáspora sudaca 2021 – 2022",
     "order": 25,
     "visible": true
   },
@@ -640,9 +734,11 @@
       {
         "role": "Artwork",
         "name": "pktwidz"
+      },
+      {
+        "texto": "All NRG programmed by Quixosis, Mike Parker, Cando & Flore between Quito, Buffalo, Bristol & Lyon 2021 – 2022"
       }
     ],
-    "note": "All NRG programmed by Quixosis, Mike Parker, Cando & Flore between Quito, Buffalo, Bristol & Lyon 2021 – 2022",
     "order": 26,
     "visible": true
   },
@@ -665,9 +761,11 @@
       {
         "role": "Artwork",
         "name": "Shinzo Noda"
+      },
+      {
+        "texto": "All NRG programmed by Nick León, DJ Babatr, Pearson Sound & Doctor Jeep between Miami, Caracas, NY, London 2021 – 2022"
       }
     ],
-    "note": "All NRG programmed by Nick León, DJ Babatr, Pearson Sound & Doctor Jeep between Miami, Caracas, NY, London 2021 – 2022",
     "order": 27,
     "visible": true
   },
@@ -691,9 +789,11 @@
       {
         "role": "Artwork",
         "name": "Sonja Camara"
+      },
+      {
+        "texto": "All NRG programmed by Dengue Dengue Dengue, Prisma, DJ Python, Verraco between Berlin, New York & Medallo 2021 – 2022 |  www.tratratrax.com"
       }
     ],
-    "note": "All NRG programmed by Dengue Dengue Dengue, Prisma, DJ Python, Verraco between Berlin, New York & Medallo 2021 – 2022 |  www.tratratrax.com",
     "order": 28,
     "visible": true
   },
@@ -717,9 +817,11 @@
       {
         "role": "Artwork",
         "name": "Paula de Álvaro"
+      },
+      {
+        "texto": "All NRG programmed by PVSSY, Entrañas, Lechuga Zafiro, Menzi between Sur América & Sur África, 2021 – 2022 |  www.insurgentes.co"
       }
     ],
-    "note": "All NRG programmed by PVSSY, Entrañas, Lechuga Zafiro, Menzi between Sur América & Sur África, 2021 – 2022 |  www.insurgentes.co",
     "order": 29,
     "visible": true
   },
@@ -742,9 +844,11 @@
       {
         "role": "Artwork",
         "name": "Pedro Ajo"
+      },
+      {
+        "texto": "All nrg programmed by Nicola Cruz, Isabella Lovestory and Ehua between Quito, Montreal and London. Additional keys on 'O sea, sí te quiero' by Juan Diego Illescas"
       }
     ],
-    "note": "All nrg programmed by Nicola Cruz, Isabella Lovestory and Ehua between Quito, Montreal and London. Additional keys on 'O sea, sí te quiero' by Juan Diego Illescas",
     "order": 30,
     "visible": true
   },
@@ -767,9 +871,11 @@
       {
         "role": "Artwork",
         "name": "Colin Dörffler"
+      },
+      {
+        "texto": "Programmed by Nick León, Henzo, Kelman Duran, Maral between USA, UK & Sur América, 2021"
       }
     ],
-    "note": "Programmed by Nick León, Henzo, Kelman Duran, Maral between USA, UK & Sur América, 2021",
     "order": 31,
     "visible": true
   },
@@ -792,9 +898,11 @@
       {
         "role": "Artwork",
         "name": "Sonja Camara"
+      },
+      {
+        "texto": "All NRG programmed by Luca Durán, Parco Palaz, Badsista, Ikonika between Europe & Sur América, 2021 |  www.insurgentes.co"
       }
     ],
-    "note": "All NRG programmed by Luca Durán, Parco Palaz, Badsista, Ikonika between Europe & Sur América, 2021 |  www.insurgentes.co",
     "order": 32,
     "visible": true
   },
@@ -817,9 +925,11 @@
       {
         "role": "Artwork",
         "name": "Cmdp"
+      },
+      {
+        "texto": "Programmed by OCTUBRXLIBRV + Florentino + AYA between Colombia & UK, 2020 — 2021 |  www.insurgentes.co"
       }
     ],
-    "note": "Programmed by OCTUBRXLIBRV + Florentino + AYA between Colombia & UK, 2020 — 2021 |  www.insurgentes.co",
     "order": 33,
     "visible": true
   },
@@ -843,9 +953,11 @@
       {
         "role": "Artwork",
         "name": "Pedro Ajo"
+      },
+      {
+        "texto": "Programed by Bitter Babe x Nick León + Simo Cell between Miami, Bogotá & París, 2020"
       }
     ],
-    "note": "Programed by Bitter Babe x Nick León + Simo Cell between Miami, Bogotá & París, 2020",
     "order": 34,
     "visible": true
   },
@@ -868,9 +980,11 @@
       {
         "role": "Artwork",
         "name": "Pedro Ajo"
+      },
+      {
+        "texto": "All energy programmed by DJ Pai en la Loma del Chocho, 2019 - 2020 |  www.insurgentes.co"
       }
     ],
-    "note": "All energy programmed by DJ Pai en la Loma del Chocho, 2019 - 2020 |  www.insurgentes.co",
     "order": 35,
     "visible": true
   }
