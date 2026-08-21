@@ -58,6 +58,13 @@ const ruido = (n) => {
  * @param {object} opciones
  *   `paso`/`jitter`          ms por letra escrita, ± la variación. La variación
  *                            es la que hace que suene a mano y no a máquina.
+ *                            **Nunca es mayor que el paso**, igual que en el
+ *                            borrado: con un paso corto —el About teclea a 10ms
+ *                            y el jitter del nav es de 42— la mitad de los tics
+ *                            pediría un tiempo negativo, el `PISO` los subiría
+ *                            a todos al mismo número y la variación terminaría
+ *                            haciendo lo contrario de lo que está para hacer:
+ *                            frenar de a ratos, en vez de sonar irregular.
  *   `borrado`/`jitterBorrado` lo mismo, borrando.
  *   `cola`                   letras de ruido que arrastra el cursor al escribir.
  *                            Borrar es siempre limpio, como en el nav.
@@ -136,7 +143,7 @@ export function maquina(raiz, opciones = {}) {
     const ms =
       (subiendo && n === 0 ? espera : 0) +
       (subiendo
-        ? paso + (Math.random() * 2 - 1) * jitter
+        ? paso + (Math.random() * 2 - 1) * Math.min(jitter, paso)
         : msBorrado + (Math.random() * 2 - 1) * Math.min(jitterBorrado, msBorrado));
 
     timer = setTimeout(() => {

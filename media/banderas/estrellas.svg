@@ -1,43 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1440 1024">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: none;
-      }
-
-      .cls-2 {
-        fill: #ffff01;
-      }
-
-      .cls-3 {
-        fill: #0015ff;
-      }
-
-      .cls-4 {
-        fill: #1f191b;
-      }
-
-      .cls-5 {
-        fill: red;
-      }
-
-      .cls-6 {
-        clip-path: url(#clippath);
-      }
-    </style>
-    <clipPath id="clippath">
-      <rect class="cls-1" width="1440" height="1024"/>
-    </clipPath>
-  </defs>
-  <g id="Layer_1-2" data-name="Layer 1">
-    <g class="cls-6">
-      <g>
-        <rect class="cls-2" width="1440" height="1024"/>
-        <path class="cls-3" d="M720,393l17.74,54.59h57.4l-46.43,33.74,17.74,54.59-46.44-33.74-46.43,33.74,17.74-54.59-46.43-33.74h57.4l17.74-54.59Z"/>
-        <path class="cls-4" d="M512,472l17.74,54.59h57.4l-46.43,33.74,17.74,54.59-46.43-33.74-46.43,33.74,17.74-54.59-46.43-33.74h57.4l17.74-54.59Z"/>
-        <path class="cls-5" d="M928.01,472l17.74,54.59h57.4l-46.44,33.74,17.74,54.59-46.43-33.74-46.43,33.74,17.74-54.59-46.43-33.74h57.4l17.74-54.59Z"/>
-      </g>
-    </g>
+<!-- estrellas — solo las marcas, sobre un cuadrado de 1000×1000.
+     El racimo va en la mitad y ocupa el 55,3% del lado. Las otras tres banderas
+     escalan su arte por la proporción horizontal del original (1000/1440)
+     porque su dibujo va amarrado al ancho —la palabra, las barras—; aquí no hay
+     nada a qué amarrarse, así que el racimo se mide contra el lado corto
+     (1000/1024) y conserva el tamaño que tenía.
+     El campo de color no está aquí: lo pinta el script de la bandera (nav.md,
+     sección 7) sobre la pantalla entera, para que una sola geometría mande en
+     cada región y no haya costura contra el cuadrado.
+     El original de 1440×1024, completo, está en originales/. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
+  <g transform="translate(-203.17 7.86) scale(0.9765625)">
+    <path fill="#0015ff" d="M720,393l17.74,54.59h57.4l-46.43,33.74,17.74,54.59-46.44-33.74-46.43,33.74,17.74-54.59-46.43-33.74h57.4l17.74-54.59Z"/>
+    <path fill="#1f191b" d="M512,472l17.74,54.59h57.4l-46.43,33.74,17.74,54.59-46.43-33.74-46.43,33.74,17.74-54.59-46.43-33.74h57.4l17.74-54.59Z"/>
+    <path fill="red" d="M928.01,472l17.74,54.59h57.4l-46.44,33.74,17.74,54.59-46.43-33.74-46.43,33.74,17.74-54.59-46.43-33.74h57.4l17.74-54.59Z"/>
   </g>
 </svg>

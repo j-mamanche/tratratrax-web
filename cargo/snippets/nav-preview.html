@@ -907,19 +907,72 @@
 (function () {
   // Las cuatro del sello, publicadas por Pages junto al resto del material.
   //
+  // **Cada bandera son dos piezas: un campo y un cuadrado.**
+  //
+  //   fondo   — el color, pintado sobre la pantalla entera por CSS.
+  //   archivo — el dibujo (las estrellas, la palabra, los letreros), en un SVG
+  //             cuadrado que se planta en la mitad midiendo `LADO`.
+  //
+  // Antes era una sola pieza: el SVG de 1440×1024 entero, a sangre con
+  // `object-fit: cover`. En una pantalla de teléfono eso recortaba por el lado
+  // largo y de `TRATRRRRRATRAX` se veían cinco letras. Partido en dos, el
+  // dibujo siempre cabe —el cuadrado mide el lado corto de la ventana— y lo que
+  // se estira es únicamente el color, que es lo que se puede estirar sin que
+  // nadie lo note.
+  //
+  // **Cada región tiene una sola geometría.** El campo no está también dentro
+  // del SVG: si estuviera, el borde del cuadrado sería una costura entre dos
+  // dibujos que tienen que coincidir al píxel, y no coincidirían. Por eso los
+  // SVG de `media/banderas/` no traen fondo — el original completo, de 1440,
+  // está guardado al lado en `originales/`.
+  //
+  // Los números de los `calc` salen del arte y están explicados en el LEEME de
+  // esa carpeta. `0.08681` es el grosor de una franja de `sur`; `LADO / 6`, el
+  // medio ancho de la barra roja de `de colombia`.
+  //
   // **La tinta va escrita al lado, y no se mide.** El script del blanco/negro
   // (sección 4) mide con `elementsFromPoint`, y la bandera es `pointer-events:
   // none` —tiene que serlo, o se comería los clics de la página—, así que
   // sencillamente no la ve. Como son cuatro y no cambian, la tinta de cada una
   // se midió una vez y se dejó escrita: negro sobre las tres claras, blanco
-  // sobre la azul y roja. Si algún día entra una bandera nueva, esto es lo que
-  // hay que decidirle.
+  // sobre la azul y roja. El nav va abajo, así que lo que se midió es **el pie
+  // de la pantalla**: ahí las cuatro son del mismo color a cualquier ancho, y
+  // por eso la tabla sigue valiendo con el nuevo reparto. Si algún día entra
+  // una bandera nueva, esto es lo que hay que decidirle.
   var BASE = "../../media/banderas/";  // en Cargo: https://j-mamanche.github.io/tratratrax-web/media/banderas/
   var BANDERAS = [
-    { archivo: "estrellas.svg",   tinta: "black" },  // amarillo
-    { archivo: "sur.svg",         tinta: "black" },  // verde claro
-    { archivo: "diagonal.svg",    tinta: "black" },  // gris y amarillo
-    { archivo: "de-colombia.svg", tinta: "white" }   // azul y rojo
+    {
+      // amarillo de pared a pared; el racimo en la mitad.
+      archivo: "estrellas.svg", tinta: "black",
+      fondo: "#ffff01"
+    },
+    {
+      // Las dos franjas van pegadas al borde de arriba y **no** al cuadrado:
+      // flotando a media pantalla parecerían una bandera pequeña puesta encima
+      // de otra cosa. Cruzan la ventana entera y solo su grosor sigue al lado.
+      archivo: "sur.svg", tinta: "black",
+      fondo: "linear-gradient(to bottom," +
+             "red 0 calc(0.08681 * var(--ttx-lado))," +
+             "#1f191b calc(0.08681 * var(--ttx-lado)) calc(0.17362 * var(--ttx-lado))," +
+             "#b4ff9c calc(0.17362 * var(--ttx-lado)) 100%)"
+    },
+    {
+      // El diagonal del cuadrado es el de sus esquinas: 45 grados. Prolongado
+      // hasta los bordes es exactamente la línea de 45 grados que pasa por el
+      // centro de la ventana, y eso es lo que hace un `135deg` con un corte
+      // seco al 50%. Por eso el corte y el cuadrado nunca se pelean.
+      archivo: "diagonal.svg", tinta: "black",
+      fondo: "linear-gradient(135deg,#ffff01 0 50%,#d9d9d9 50% 100%)"
+    },
+    {
+      // Las tres barras son verticales: estirarlas es prolongarlas de arriba
+      // abajo, y la roja se queda en el tercio del medio del cuadrado.
+      archivo: "de-colombia.svg", tinta: "white",
+      fondo: "linear-gradient(to right," +
+             "#0015ff 0 calc(50% - var(--ttx-lado) / 6)," +
+             "red calc(50% - var(--ttx-lado) / 6) calc(50% + var(--ttx-lado) / 6)," +
+             "#0015ff calc(50% + var(--ttx-lado) / 6) 100%)"
+    }
   ];
 
   var NAV_SEL = '[id="L3482832595"], [id="N1901077103"]';
@@ -951,18 +1004,51 @@
     "position:fixed;inset:0;z-index:" + Z + ";opacity:0;pointer-events:none;" +
     "visibility:hidden;contain:strict";
 
-  var imgs = [];
+  // **El lado del cuadrado**, que es lo único que hay que saber para armar
+  // cualquiera de las cuatro: el lado corto de la ventana. En desktop lo manda
+  // el alto y el color se va hacia los lados; en teléfono lo manda el ancho y
+  // el color se va hacia arriba y hacia abajo.
+  //
+  // Se calcula en JS y no con `min(100vw, 100vh)` por dos razones. Una: `100vw`
+  // cuenta la barra de scroll y la capa no la tiene, así que el cuadrado
+  // quedaría unos píxeles corrido del campo. Y dos: en iOS `100vh` es la
+  // ventana grande, la de antes de que se recoja la barra de direcciones,
+  // mientras que la capa —`fixed`, `inset: 0`— mide la de verdad; midiendo la
+  // capa las dos piezas no se pueden desalinear nunca.
+  function medir() {
+    capa.style.setProperty(
+      "--ttx-lado", Math.min(capa.clientWidth, capa.clientHeight) + "px");
+  }
+
+  var capas = [];
   for (var i = 0; i < BANDERAS.length; i++) {
+    var una = document.createElement("div");
+    una.style.cssText =
+      "position:absolute;inset:0;opacity:0;background:" + BANDERAS[i].fondo;
+
     var img = document.createElement("img");
     img.src = BASE + BANDERAS[i].archivo;
     img.alt = "";
     img.draggable = false;
+    // `pointer-events: none` otra vez, aunque la capa entera ya lo tenga: es
+    // barato y deja escrito que el dibujo tampoco se toca. Lo de al lado es
+    // para el dedo y para el ratón que arrastra — una bandera no se arranca de
+    // la pantalla ni saca el menú de guardar imagen.
     img.style.cssText =
-      "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" +
-      "opacity:0;display:block";
-    capa.appendChild(img);
-    imgs.push(img);
+      "position:absolute;left:50%;top:50%;display:block;" +
+      "width:var(--ttx-lado);height:var(--ttx-lado);" +
+      "transform:translate(-50%,-50%);pointer-events:none;user-select:none;" +
+      "-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none";
+
+    una.appendChild(img);
+    capa.appendChild(una);
+    capas.push(una);
   }
+
+  // Medir se mide **después de colgar la capa**, en `montar`: un nodo suelto
+  // no tiene caja y `clientWidth` daría cero, que dejaría el cuadrado en nada.
+  window.addEventListener("resize", medir, { passive: true });
+  window.addEventListener("orientationchange", medir, { passive: true });
 
   var puesta = false;   // ¿hay bandera en pantalla?
   var porMano = false;  // ¿la puso el logo? entonces no la quita ningún reloj
@@ -983,11 +1069,11 @@
   function mostrar() {
     var k;
     do {
-      k = Math.floor(Math.random() * imgs.length);
-    } while (imgs.length > 1 && k === ultima);
+      k = Math.floor(Math.random() * capas.length);
+    } while (capas.length > 1 && k === ultima);
     ultima = k;
 
-    for (var j = 0; j < imgs.length; j++) imgs[j].style.opacity = j === k ? "1" : "0";
+    for (var j = 0; j < capas.length; j++) capas[j].style.opacity = j === k ? "1" : "0";
     capa.style.visibility = "visible";
     capa.style.opacity = "1";
     // La tinta **antes** que la bandera no cambia nada —las dos ocurren en el
@@ -1135,7 +1221,10 @@
     // Cargo reescribe el <body> en cada navegación: si la capa se fue con él,
     // se vuelve a colgar. Los <img> son los mismos, así que no se vuelven a
     // pedir ni a decodificar.
-    if (capa.parentNode !== document.body) document.body.appendChild(capa);
+    if (capa.parentNode !== document.body) {
+      document.body.appendChild(capa);
+      medir();  // recién ahora tiene caja que medir
+    }
 
     if (location.href !== donde) {
       // Página nueva: el reloj arranca de cero y hay que volver a preguntar si

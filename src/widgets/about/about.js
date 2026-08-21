@@ -2,7 +2,7 @@ import { registrar } from '../_runtime/mount.js';
 import { cargarAbout, urlMedia } from '../_runtime/datos.js';
 import { crearStack, precargar } from '../_runtime/stack.js';
 import { elemento } from '../_runtime/dom.js';
-import { maquina, NAV } from '../_runtime/escribir.js';
+import { maquina } from '../_runtime/escribir.js';
 import { partir, grupos } from '../_runtime/format.js';
 import './about.css';
 
@@ -79,7 +79,7 @@ import './about.css';
 //   <div data-ttx="about"></div>
 //   <div data-ttx="about" data-vida="2000"></div>     ← ms de cola del emblema
 //   <div data-ttx="about" data-grieta="2500"></div>   ← ms de cola de la grieta
-//   <div data-ttx="about" data-letra="40"></div>      ← ms por letra de la entrada
+//   <div data-ttx="about" data-letra="20"></div>      ← ms por letra de la entrada
 
 /**
  * **La cola del emblema**: lo que la aparición se queda después de que la mano
@@ -111,6 +111,26 @@ const LINGER = 1500;
  * `--ttx-dur` se mueve, esto se mueve.
  */
 const ESPERA = 200;
+
+/**
+ * **Los ms por letra de la entrada.** Se calibra con `data-letra`.
+ *
+ * Los del lema del nav son 58, y aquí estuvieron: es el mismo gesto y la idea
+ * era que sonara igual. Pero el lema del nav son cuatro palabras y esta línea
+ * son ochenta letras — el lema, las tres redes y el correo—, así que a 58 la
+ * línea tardaba cuatro segundos y medio en acabar de salir. Eso ya no es un
+ * gesto: es una espera, con el nombre del sello encogido a un lado mientras
+ * pasa. La medida que puso el sello es que **cuando la palabra `hustlers`
+ * termina de escribirse, el resto ya tiene que estar** — y `hustlers` acaba en
+ * la letra 14.
+ *
+ * A 10ms la línea entera cabe en esos 800ms. Es lo más rápido que puede ir sin
+ * mentir: por debajo de los 8ms del `PISO` de `escribir.js` un `setTimeout` ya
+ * no cumple lo que promete. Sigue siendo el mismo mecanismo —el ruido del
+ * cursor, las letras empujando lo escrito— corriendo diez veces más rápido: se
+ * ve escribir, no se espera a que escriba.
+ */
+const LETRA = 10;
 
 /**
  * **Y lo que tarda en cerrarse**, que es el techo del borrado entero.
@@ -157,11 +177,12 @@ registrar('about', async (host) => {
   const { texto, grieta, extra, vivo } = crearTexto(about, estados);
   banda.append(texto);
 
-  // La máquina de escribir de la entrada. Los números son los del lema del nav
-  // —es el mismo gesto y tiene que sonar igual— con una sola excepción, el
-  // borrado: ver `escribir.js` y `--ttx-dur`.
+  // La máquina de escribir de la entrada. El mecanismo es el del lema del nav
+  // —el mismo ruido en el cursor, las mismas letras empujando— pero **no el
+  // mismo reloj**: aquí hay ochenta letras que leer y no cuatro palabras. Ver
+  // `LETRA`, y `CIERRE` para el borrado.
   const letras = maquina(vivo, {
-    paso: Number(host.dataset.letra) || NAV.paso,
+    paso: Number(host.dataset.letra) || LETRA,
     espera: ESPERA,
     techoBorrado: CIERRE,
   });
