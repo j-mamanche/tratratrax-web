@@ -37,6 +37,10 @@
 		background: #101010;
 	}
 
+	/* En Cargo esto lo pone el CSS de la página del nav (sección 2 de nav.md):
+	   `position: relative; z-index: 9999`. Acá va `fixed` porque hay que emular
+	   la superposición de páginas de Cargo. El 9999 es el mismo, y es lo que
+	   deja al nav encima de la bandera (9998). */
 	[id="L3482832595"] {
 		position: fixed;
 		inset: 0;
@@ -86,6 +90,25 @@
 		--nav-logo-filter: invert(1);
 	}
 
+	[id="L3482832595"][data-bandera="black"],
+	[id="L3482832595"][data-bandera="black"] [data-nav] {
+		--nav-ink: rgba(0, 0, 0, 0.85);
+		--nav-ink-strong: rgb(0, 0, 0);
+		--nav-logo-filter: invert(1);
+	}
+
+	[id="L3482832595"][data-bandera="white"],
+	[id="L3482832595"][data-bandera="white"] [data-nav] {
+		--nav-ink: rgba(255, 255, 255, 0.85);
+		--nav-ink-strong: rgb(255, 255, 255);
+		--nav-logo-filter: none;
+	}
+
+	[id="L3482832595"][data-bandera] :is(.nav-lema, .nav-menu, .nav-links a),
+	[id="L3482832595"][data-bandera] .fake-logo {
+		transition: none;
+	}
+
 	.nav-lema {
 		text-align: left;
 		color: var(--nav-ink);
@@ -101,9 +124,23 @@
 		display: flex;
 		justify-content: flex-end;
 		align-items: flex-end;
-		gap: 0.03em;
+		gap: 0.28em;
 		line-height: 1;
 		white-space: nowrap;
+	}
+
+	.nav-menu {
+		display: inline-block;
+		color: var(--nav-ink-strong);
+		font-weight: 400;
+		transition: color 220ms ease;
+	}
+
+	.nav-menu::after {
+		content: "__";
+		display: inline-block;
+		letter-spacing: -0.13em;
+		margin-right: 0.15em;
 	}
 
 	.nav-links a {
@@ -111,29 +148,36 @@
 		color: var(--nav-ink-strong);
 		text-decoration: none;
 		border-bottom: 0;
-		font-weight: 400;
+		font-weight: 700;
 		transition: color 220ms ease;
 	}
 
 	.nav-links a.active,
 	.nav-links a.is-active {
-		font-weight: 700;
+		font-style: italic;
+		font-weight: 400;
 		text-decoration: none;
 	}
 
-	.nav-links a.active + a,
-	.nav-links a.is-active + a {
-		margin-left: 0.05em;
-	}
-
+	/* Dos reservas: la negrilla y la itálica regular. Ver la sección 2. */
+	.nav-links a::before,
 	.nav-links a::after {
 		content: attr(data-label);
 		display: block;
 		height: 0;
 		overflow: hidden;
 		visibility: hidden;
-		font-weight: 700;
 		pointer-events: none;
+	}
+
+	.nav-links a::before {
+		font-style: normal;
+		font-weight: 700;
+	}
+
+	.nav-links a::after {
+		font-style: italic;
+		font-weight: 400;
 	}
 
 	[data-glitch] {
@@ -212,7 +256,7 @@
 
 <div class="page" id="L3482832595"><div class="page-content">
 
-<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><span class="fake-logo"></span></div></column-unit><column-unit slot="2"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" class="active">CATALOG</a><a href="merca-2" rel="history" data-label="MERCA">MERCA</a><a href="blog-2" rel="history" data-label="BLOG">BLOG</a></div></column-unit></column-set>
+<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><span class="fake-logo"></span></div></column-unit><column-unit slot="2"><div class="nav-links"><span class="nav-menu">MENU</span><a href="about" rel="history" data-label="ABOUT">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" class="active">CATALOG</a><a href="merca-2" rel="history" data-label="MERCA">MERCA</a><a href="blog-2" rel="history" data-label="BLOG">BLOG</a></div></column-unit></column-set>
 
 </div></div>
 
@@ -222,6 +266,9 @@
 	<br>
 	<b>interruptor de página</b>
 	<button data-mode="auto">auto</button><button data-mode="white">blanco</button><button data-mode="black">negro</button>
+	<br>
+	<b>bandera</b>
+	<button data-flag="ya">respiro ya</button><button data-flag="3s">cada 3s</button><button data-flag="normal">20–40s</button><button data-flag="home">fingir home</button><button data-flag="nohome">fingir otra</button>
 	<br>
 	<span id="estado"></span>
 </div>
@@ -854,6 +901,288 @@
 })();
 </script>
 
+<!-- SCRIPT BANDERA (logo de los navs L3482832595 · N1901077103) -->
+
+<script>
+(function () {
+  // Las cuatro del sello, publicadas por Pages junto al resto del material.
+  //
+  // **La tinta va escrita al lado, y no se mide.** El script del blanco/negro
+  // (sección 4) mide con `elementsFromPoint`, y la bandera es `pointer-events:
+  // none` —tiene que serlo, o se comería los clics de la página—, así que
+  // sencillamente no la ve. Como son cuatro y no cambian, la tinta de cada una
+  // se midió una vez y se dejó escrita: negro sobre las tres claras, blanco
+  // sobre la azul y roja. Si algún día entra una bandera nueva, esto es lo que
+  // hay que decidirle.
+  var BASE = "../../media/banderas/";  // en Cargo: https://j-mamanche.github.io/tratratrax-web/media/banderas/
+  var BANDERAS = [
+    { archivo: "estrellas.svg",   tinta: "black" },  // amarillo
+    { archivo: "sur.svg",         tinta: "black" },  // verde claro
+    { archivo: "diagonal.svg",    tinta: "black" },  // gris y amarillo
+    { archivo: "de-colombia.svg", tinta: "white" }   // azul y rojo
+  ];
+
+  var NAV_SEL = '[id="L3482832595"], [id="N1901077103"]';
+
+  var Z          = 9998;   // justo debajo del nav, que va en 9999
+  var FLASH      = 1000;   // ms del destello del respiro: puesta y quieta, corte seco
+  var FLASH_DEDO = 420;    // ms del toque en teléfono: alcanza a verse antes de navegar
+  var COLA_MANO  = 800;    // ms que aguanta después de que la mano suelta el logo
+  var QUIETO_MIN = 20000;  // ms de quietud antes de un respiro (mínimo)
+  var QUIETO_MAX = 40000;  // ms de quietud antes de un respiro (máximo)
+
+  // Dónde NO corre el respiro. El home de Cargo es `home-1`; la raíz también
+  // sirve el home, así que las dos cuentan.
+  var HOME = ["", "home-1", "home", "index"];
+
+  var LOGO_SEL = '[id="L3482832595"] .nav-logo, [id="N1901077103"] .nav-logo';
+
+  var menos = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // — La capa —
+  // Se cuelga del <body> y no del nav: tiene que tapar la página, que es otro
+  // elemento. Todo el estilo va inline a propósito — es lo único que le gana
+  // siempre al CSS global de Cargo, y así este script no necesita que alguien
+  // se acuerde de pegar un bloque de CSS más.
+  var capa = document.createElement("div");
+  capa.setAttribute("aria-hidden", "true");
+  capa.setAttribute("data-ttx-bandera", "");
+  capa.style.cssText =
+    "position:fixed;inset:0;z-index:" + Z + ";opacity:0;pointer-events:none;" +
+    "visibility:hidden;contain:strict";
+
+  var imgs = [];
+  for (var i = 0; i < BANDERAS.length; i++) {
+    var img = document.createElement("img");
+    img.src = BASE + BANDERAS[i].archivo;
+    img.alt = "";
+    img.draggable = false;
+    img.style.cssText =
+      "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" +
+      "opacity:0;display:block";
+    capa.appendChild(img);
+    imgs.push(img);
+  }
+
+  var puesta = false;   // ¿hay bandera en pantalla?
+  var porMano = false;  // ¿la puso el logo? entonces no la quita ningún reloj
+  var ultima = -1;      // la anterior, para no repetirla
+  var reloj = null;     // el reloj del respiro
+  var corte = null;     // el que apaga un destello
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+
+  function tinta(valor) {
+    var navs = document.querySelectorAll(NAV_SEL);
+    for (var i = 0; i < navs.length; i++) {
+      if (valor) navs[i].setAttribute("data-bandera", valor);
+      else navs[i].removeAttribute("data-bandera");
+    }
+  }
+
+  function mostrar() {
+    var k;
+    do {
+      k = Math.floor(Math.random() * imgs.length);
+    } while (imgs.length > 1 && k === ultima);
+    ultima = k;
+
+    for (var j = 0; j < imgs.length; j++) imgs[j].style.opacity = j === k ? "1" : "0";
+    capa.style.visibility = "visible";
+    capa.style.opacity = "1";
+    // La tinta **antes** que la bandera no cambia nada —las dos ocurren en el
+    // mismo cuadro— pero el orden importa al revés: al apagar hay que quitar la
+    // bandera primero y devolverle la tinta al script que mide después, o el
+    // nav pega un parpadeo del color viejo sobre el fondo nuevo.
+    tinta(BANDERAS[k].tinta);
+    puesta = true;
+  }
+
+  function ocultar() {
+    capa.style.opacity = "0";
+    capa.style.visibility = "hidden";
+    tinta(null);
+    puesta = false;
+  }
+
+  // — El respiro —
+
+  var forzarHome = null;  // el preview lo pone a mano; en Cargo se queda en null
+
+  function enHome() {
+    if (forzarHome !== null) return forzarHome;
+    var here = location.pathname.replace(/^\/|\/$/g, "").toLowerCase();
+    for (var i = 0; i < HOME.length; i++) if (here === HOME[i]) return true;
+    return false;
+  }
+
+  function agendar() {
+    clearTimeout(reloj);
+    reloj = null;
+    // Las cuatro razones para no contar: la preferencia del sistema, el home,
+    // la pestaña de atrás, y una bandera que ya está puesta con la mano.
+    if (menos || enHome() || document.hidden || porMano) return;
+    reloj = setTimeout(respirar, rnd(QUIETO_MIN, QUIETO_MAX));
+  }
+
+  function respirar() {
+    reloj = null;
+    // Se vuelve a preguntar todo: entre que se agendó y que se cumplió el reloj
+    // pudo cambiar la página, esconderse la pestaña o entrar la mano.
+    if (menos || enHome() || document.hidden || porMano) return agendar();
+
+    mostrar();
+    clearTimeout(corte);
+    corte = setTimeout(function () {
+      corte = null;
+      if (!porMano) ocultar();
+      agendar();
+    }, FLASH);
+  }
+
+  // Cualquier señal de vida reinicia el reloj. No apaga nada: si hay bandera
+  // puesta es porque la mano está en el logo, y eso lo maneja el otro lado.
+  function reiniciar() { agendar(); }
+
+  // — El logo —
+  // Delegado en el documento y no atado al nodo: Cargo repinta el nav en cada
+  // navegación AJAX y un listener puesto sobre `.nav-logo` se iría con él. Así
+  // no hay nada que volver a enganchar y no hay estado que reparar.
+
+  function logoDe(nodo) {
+    if (!nodo || !nodo.closest) return null;
+    return nodo.closest(LOGO_SEL);
+  }
+
+  document.addEventListener("pointerover", function (e) {
+    if (e.pointerType && e.pointerType !== "mouse") return;
+    var logo = logoDe(e.target);
+    if (!logo || logoDe(e.relatedTarget) === logo) return; // movimiento adentro
+    clearTimeout(corte);
+    corte = null;
+    porMano = true;
+    clearTimeout(reloj);
+    reloj = null;
+    // Volver antes de que se cumpla la cola no sortea otra bandera.
+    if (!puesta) mostrar();
+  }, true);
+
+  document.addEventListener("pointerout", function (e) {
+    if (e.pointerType && e.pointerType !== "mouse") return;
+    var logo = logoDe(e.target);
+    if (!logo || logoDe(e.relatedTarget) === logo) return;
+    porMano = false;
+    // La cola: aguanta puesta y corta seco al final. Si la mano vuelve antes,
+    // el `pointerover` cancela esto y la deja donde estaba.
+    clearTimeout(corte);
+    corte = setTimeout(function () {
+      corte = null;
+      ocultar();
+      agendar();
+    }, COLA_MANO);
+    agendar();
+  }, true);
+
+  // Teléfono: el toque la muestra un instante y **navega al home igual**. Se
+  // acepta que se vea artefactuoso; lo que no se acepta es que el logo deje de
+  // ser el link al home por mostrar una bandera.
+  document.addEventListener("pointerdown", function (e) {
+    if (!e.pointerType || e.pointerType === "mouse") return;
+    if (!logoDe(e.target)) return;
+    mostrar();
+    clearTimeout(corte);
+    corte = setTimeout(function () {
+      corte = null;
+      ocultar();
+      agendar();
+    }, FLASH_DEDO);
+  }, true);
+
+  // — Señales de vida —
+  var VIVO = ["mousemove", "pointerdown", "wheel", "keydown", "touchstart", "scroll"];
+  for (var v = 0; v < VIVO.length; v++) {
+    window.addEventListener(VIVO[v], reiniciar, { passive: true, capture: true });
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      clearTimeout(reloj);
+      reloj = null;
+      if (!porMano) ocultar();
+    } else {
+      agendar();
+    }
+  });
+
+  window.addEventListener("popstate", reiniciar);
+  window.addEventListener("pageshow", reiniciar);
+  window.addEventListener("hashchange", reiniciar);
+
+  // — La ronda —
+  // **Aquí no hay MutationObserver, y es a propósito.** Los otros dos scripts sí
+  // lo usan porque tienen que volver a enganchar nodos que Cargo repinta; este
+  // no engancha nada (los eventos van delegados en el documento). Y si lo usara
+  // para reiniciar el reloj, el reloj no se cumpliría nunca: el lema teclea
+  // letra por letra, los widgets escriben, Cargo carga imágenes — el DOM muta
+  // todo el tiempo por razones que no son el usuario.
+  //
+  // Lo que hay que ver de la navegación AJAX es **si cambió la página**, no si
+  // cambió el DOM. Eso es mirar la URL, y se mira en la misma ronda que repara
+  // la capa.
+  var donde = location.href;
+
+  function montar() {
+    // Cargo reescribe el <body> en cada navegación: si la capa se fue con él,
+    // se vuelve a colgar. Los <img> son los mismos, así que no se vuelven a
+    // pedir ni a decodificar.
+    if (capa.parentNode !== document.body) document.body.appendChild(capa);
+
+    if (location.href !== donde) {
+      // Página nueva: el reloj arranca de cero y hay que volver a preguntar si
+      // esta es el home. Nunca un destello encima de una navegación.
+      donde = location.href;
+      if (!porMano) ocultar();
+      agendar();
+    } else if (!reloj && !porMano) {
+      // Se quedó sin reloj: pasa cuando `agendar` se salió por el home o por la
+      // pestaña escondida y esa razón ya no está.
+      agendar();
+    }
+    // Y si el reloj está corriendo, **no se toca**. Reagendarlo en cada ronda
+    // era el error de la primera versión: cada 3 s volvía a sortear 20–40 s, así
+    // que el plazo no se cumplía jamás y el respiro no existía.
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", montar);
+  } else {
+    montar();
+  }
+  window.addEventListener("load", montar);
+  setInterval(montar, 3000);   // ronda de reparación, como los otros dos scripts
+
+  // Para calibrar desde la consola o desde el preview. En Cargo no molesta a
+  // nadie: es un objeto y nada más.
+  window.TTX_BANDERA = {
+    mostrar: mostrar,
+    ocultar: ocultar,
+    respirar: respirar,
+    ritmo: function (min, max) {
+      QUIETO_MIN = min;
+      QUIETO_MAX = max == null ? min : max;
+      agendar();
+    },
+    // Fingir que se está (o no) en el home sin poder cambiar la URL: es lo que
+    // el preview necesita, porque ahí la página es un archivo suelto.
+    // `null` devuelve la decisión a `location.pathname`.
+    home: function (v) {
+      forzarHome = v;
+      agendar();
+    }
+  };
+})();
+</script>
+
 <script>
 /* Solo del preview: cambia el fondo de la página de abajo y el interruptor,
    para ver al script decidir. En Cargo esto lo hace cada página. */
@@ -883,6 +1212,14 @@
 		}
 		if (b.hasAttribute("data-mode")) {
 			content.style.setProperty("--nav-mode", b.getAttribute("data-mode"));
+		}
+		if (b.hasAttribute("data-flag")) {
+			var q = b.getAttribute("data-flag");
+			if (q === "ya") TTX_BANDERA.respirar();
+			if (q === "3s") TTX_BANDERA.ritmo(3000);
+			if (q === "normal") TTX_BANDERA.ritmo(20000, 40000);
+			if (q === "home") TTX_BANDERA.home(true);
+			if (q === "nohome") TTX_BANDERA.home(false);
 		}
 	});
 
