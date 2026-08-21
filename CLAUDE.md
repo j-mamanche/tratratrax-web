@@ -36,18 +36,25 @@ todos los stacks cuando eran muchos.
 Ahora el catálogo es un `<div>` que llenamos nosotros, con `overflow-x: auto` y
 `scroll-snap` nativos. **No volver al marquee.**
 
-## Estado del contenido (2026-07-27)
+## Estado del contenido (2026-08-19)
+
+Lo que falta del sello vive en **`PENDIENTES-SELLO.md`**, con la pregunta ya
+formulada y los datos al lado. Eso es lo que hay que mandar a preguntar; esto es
+el resumen:
 
 - 35 releases importados de Bandcamp, de 2020 a 2026.
-- Faltan los números TRA018–TRA024. Hay 14 releases sin número; siete de ellos,
-  entre 2024-03 y 2024-11, encajan exactamente en ese hueco por fecha. **Es una
-  hipótesis, no un dato** — confirmar con el sello antes de escribirlo.
+- Nueve releases sin número de catálogo. Siete, entre 2024-03 y 2024-11, encajan
+  exactamente en el hueco TRA018–TRA024 por fecha. **Es una hipótesis, no un
+  dato** — confirmar con el sello antes de escribirlo.
 - TRA028 está repetido en dos releases de Nick León (el álbum y sus remezclas).
   Viene así del HTML de Cargo. El validador lo avisa; falta que el sello decida.
+- `Ruido y Flor` trae `AMBIE—TÓN001`, con una raya donde va una `N`. Del import.
+- Ninguno de los 35 tiene `listenUrl`: son 35 de los 39 avisos del validador.
 - El blog es contenido placeholder.
-- El About ya existe (`BRIEF-ABOUT.md`), pero sus tres emblemas son **material
-  de relleno**: estampas generadas, marcadas `"relleno": true`. El validador lo
-  avisa en cada corrida. Falta el material del sello.
+- El About ya tiene el material del sello (`BRIEF-ABOUT.md`, `media/about/`),
+  incluidas las tres redes y el correo de bookings. Las cuatro banderas del nav
+  también llegaron (`media/banderas/LEEME.md`). Falta confirmar el correo
+  publicado y la grafía de `Nyksan`.
 
 ## Los widgets
 

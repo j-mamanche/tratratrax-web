@@ -33,32 +33,38 @@ npm run dev        # abre el tablero de datos en localhost:4321
 
 Se ve en **`/preview/home`**. Es el lanzamiento y nada más. En reposo no hay
 composición: hay una **cenefa** —el video ocupando solo la franja del título, de
-borde a borde, sobre negro— con el nombre del disco encima. Tomar el título con
-la mano abre esa grieta en las dos cajas del lanzamiento: la carátula y el
-video, una arriba y otro abajo. Al soltar se vuelve a cerrar, y la pasada
-siguiente abre la composición contraria.
+borde a borde, sobre negro— con el nombre del disco encima. Tomar la franja con
+la mano abre esa grieta en los dos módulos del lanzamiento: el arte y el video,
+uno arriba y otro abajo. Al soltar se vuelve a cerrar, y la pasada siguiente
+abre la composición contraria. Cada apertura sortea además dónde cae el
+**gooey**, el filtro que funde las formas del arte.
 
-Sale de `data/home.json`, con respaldo automático al release más reciente si no
-hay destacado. Qué se pega en Cargo y cómo se calibra:
+**El destacado es un release del catálogo.** `data/home.json` solo guarda la
+política —`fijo` con un id, o `auto`, que sortea entre los que cumplen— y el
+material vive en el bloque `home` de ese release. La franja dice el disco y
+quién, ofrece `BUY` y `LISTEN` con la mano encima, y su texto lleva al release
+abierto en el catálogo. Si el destacado falla, el home cae al release visible
+más reciente. Qué se pega en Cargo y cómo se calibra:
 **[cargo/snippets/home.md](cargo/snippets/home.md)**.
 
 ## El widget del about
 
-Se ve en **`/preview/about`**. Es el mismo stack, **invertido**: el intersticio
-va abajo. En reposo es negro absoluto con un solo renglón de texto —*Sonic
-hustlers since 2020 / Run by DJ Lomalinda, Nyksan and Verraco.*— y nada más: sin
-imagen, sin loop, sin destello. Pasar la mano por un nombre invoca el emblema
-kitsch de ese DJ en una posición **aleatoria**, que vive un segundo y se apaga
-sola; la grieta de abajo lo muestra aplastado de borde a borde. **El santo es el
-link:** el que lleva al Instagram es el emblema, no el nombre.
+Se ve en **`/preview/about`**. Es el mismo stack **sin visor**: una barra de
+texto arriba y el gris del chrome debajo. En reposo son las tres sílabas de
+`TRA · TRA · TRAX` abiertas a lo ancho —**la grieta**— y, contra el borde
+derecho, `A RECORD LABEL RUN BY__ DJ LOMALINDA / NYKSAN / VERRACO`. Ni imagen,
+ni loop, ni destello: quien no mueva la mano no ve nunca nada.
+
+Pasar la mano por la grieta **la cierra**, y en el espacio que sueltan las
+sílabas entra el resto de la línea: el lema, las tres redes del sello y el
+correo de bookings. Pasarla por un nombre invoca el emblema kitsch de ese DJ en
+una posición **aleatoria de toda la ventana**, que se queda quieto mientras haya
+mano y dura segundo y medio más. **El santo es el link:** el que lleva al
+Instagram es el emblema, no el nombre.
 
 Sale de `data/about.json`. El ensayo del *third space* es no verbal a propósito:
 no hay manifiesto ni citas. El acuerdo está en **[BRIEF-ABOUT.md](BRIEF-ABOUT.md)**
 y lo que se pega en Cargo en **[cargo/snippets/about.md](cargo/snippets/about.md)**.
-
-> Los tres emblemas de hoy son **relleno** —estampas generadas, marcadas
-> `RELLENO` en la imagen— para poder calibrar sin esperar al sello. Se
-> reemplazan sobreescribiendo los seis archivos de `media/about/`.
 
 ## El widget de catálogo
 
@@ -76,9 +82,6 @@ Qué se pega en Cargo y cómo se calibra sin tocar código:
 
 ## La merca
 
-Se ve, con el home corriendo detrás, en **`/preview/merca`** (`?ver=item`
-abre la ficha, `?stock=out-of-stock` la pone agotada).
-
 Es la única pantalla que **no** es un widget: la vitrina y las fichas son
 páginas de Cargo, con su `gallery-grid` y sus `column-set`, para que el
 equipo las edite sin pasar por el repo. Lo que ponemos nosotros es el CSS
@@ -90,7 +93,13 @@ propia, **cuelga de la barra de la mitad**. El widget del stack mide su banda
 y publica `--ttx-ancla`; el CSS de Cargo la lee. Mover el visor mueve la
 merca con él.
 
-Qué se pega y por qué: **[cargo/snippets/merca.md](cargo/snippets/merca.md)**.
+Qué se pega y por qué: **[cargo/snippets/merca-estado.md](cargo/snippets/merca-estado.md)**.
+
+> **No hay preview de la merca.** Hubo un `/preview/merca.astro` que importaba
+> tres snippets que nunca se escribieron (`merca.css`, `merca-grid.html`,
+> `merca-item.html`), así que la ruta daba 500 y `npm run build` fallaba ahí.
+> Se borró. Cuando los snippets existan, el preview se vuelve a escribir — el
+> archivo viejo no vale la pena rescatarlo, era andamio sin nada que sostener.
 
 ```
 src/widgets/
@@ -101,12 +110,26 @@ src/widgets/
 │   ├── datos.js        Un solo fetch de data/*.json por página
 │   ├── stack.js        Visor · banda · contenido, y la proyección
 │   ├── hscroll.js      Arrastre, rueda y flechas. El resto es nativo
-│   ├── format.js       Rol__ Valor, fechas, URLs de carátula
+│   ├── format.js       Rol__ Valor, la regla de las juntas, el home del catálogo
+│   ├── filtro.js       Los filtros SVG: la estampa del visor y el gooey
 │   └── dom.js          `elemento()`, lo único que hace falta sin framework
 ├── catalogo/           El carril y el acordeón
 ├── home/               El lanzamiento y su intercambio
-└── about/              El stack invertido y las apariciones
+└── about/              La grieta y las apariciones
 ```
+
+## El nav y la bandera
+
+El nav **no es un widget**: es una página de Cargo con su CSS y tres scripts en
+el HTML global —el lema que se hackea, el blanco/negro automático y la bandera—.
+Todo está anotado, con el porqué de cada decisión, en
+**[cargo/snippets/nav.md](cargo/snippets/nav.md)**, y se puede probar sin tocar
+el sitio abriendo `cargo/snippets/nav-preview.html` con doble clic.
+
+`MENU__ ABOUT CATALOG MERCA BLOG`, con la página actual en itálica. Pasar la
+mano por el logo tapa la página con una de las cuatro banderas del sello
+—`media/banderas/`— menos el nav, que se queda encima y legible. Y fuera del
+home, con el usuario quieto, cada 20–40 s una se asoma sola un instante.
 
 ---
 
@@ -152,13 +175,15 @@ los guarda estructurados:
 "credits": [{ "role": "Mastering", "name": "Beau Thomas at Ten Eight Seven" }]
 ```
 
-Se guardan como objetos y se renderizan como `Mastering__ Beau Thomas…`. El
-formato bonito es de **salida**, no de almacenamiento — así nadie tiene que
-parsear texto libre para cambiar un dato.
+Se guardan como objetos y se renderizan como `Mastering__ Beau Thomas…`.
 
-Los releases viejos escribieron los créditos como texto corrido. En esos casos
-todo queda en `note` y se pueden ir pasando a `credits` con calma. El tablero de
-`npm run dev` lista cuáles faltan.
+`credits` es **una lista ordenada con dos clases de entrada**: la junta
+`{ role, name }`, que se pinta con la raya del sello, y la línea suelta
+`{ texto }` —«All NRG programmed by…», la nota con asterisco— que cierra el
+bloque sin rotular nada. El orden del archivo es el orden en pantalla.
+
+`note`, donde antes vivía la línea suelta, ya no se escribe. El widget lo sigue
+leyendo por si queda algún dato viejo sin migrar.
 
 ---
 
@@ -171,7 +196,8 @@ media/       El material propio: el video del home, los emblemas del about y
              es generado y se borra
              entera en cada compilación, así que ahí no puede vivir.
 src/widgets/ Lo que corre DENTRO de Cargo: JS sin framework, CSS scopeado.
-src/pages/   El taller: tablero, previews y (pronto) el panel de edición.
+src/pages/   El taller público: tablero de datos y previews de los widgets.
+src/lib/     Lo que se usa fuera de los widgets: por ahora, leer Bandcamp.
 tools/       Importador de Bandcamp y validador.
 cargo/       Espejo versionado de lo que vive dentro de Cargo.
 ```
