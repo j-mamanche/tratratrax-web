@@ -1,5 +1,7 @@
 // De dónde salen los datos y cómo se cargan una sola vez por página.
 
+import { cumpleHome } from './format.js';
+
 /**
  * Base de los datos: la carpeta donde vive este mismo bundle.
  * Cargo solo pega `<script src=".../ttx.js">`, así que el widget deduce el
@@ -67,24 +69,67 @@ export function cargar() {
 let promesaHome = null;
 
 /**
- * `home.json` va aparte de `cargar()`: es el único que lo usa y el catálogo no
- * tiene por qué pedirlo.
+ * El destacado del home, ya resuelto: **un release de `releases.json`**, con su
+ * bloque `home` adentro.
  *
- * **Nunca rechaza.** Si el archivo no existe todavía o la red falla, resuelve
- * a `null` y el home cae a su respaldo. Un home pobre es aceptable; un home
- * roto no.
+ * `home.json` no guarda contenido, guarda la política:
+ *
+ *   { "modo": "fijo", "release": "killing-mariposas" }   ← siempre ese
+ *   { "modo": "auto" }                                   ← uno al azar
+ *
+ * Es lo que hace que el home cuelgue del catálogo: el título, los artistas y
+ * los links salen del release, no de una copia paralela que se desactualiza
+ * sola. Lo único que vive en `home.json` es cuál.
+ *
+ * **Nunca rechaza.** Si el archivo no existe todavía, si la política apunta a
+ * un release que se borró o si la red falla, resuelve a `null` y el home cae a
+ * su respaldo —el release visible más reciente—. Un home pobre es aceptable;
+ * un home roto no.
  */
 export function cargarHome() {
   if (promesaHome) return promesaHome;
 
-  promesaHome = fetch(new URL('home.json', BASE))
-    .then((r) => (r.ok ? r.json() : null))
-    .catch(() => {
-      promesaHome = null; // un fallo de red no envenena la página para siempre
-      return null;
-    });
+  promesaHome = resolverHome().catch(() => {
+    promesaHome = null; // un fallo de red no envenena la página para siempre
+    return null;
+  });
 
   return promesaHome;
+}
+
+async function resolverHome() {
+  const [politica, { releases }] = await Promise.all([
+    // Un 404 no es un fallo: es un sitio que todavía no tiene home.json y que
+    // se merece el respaldo, no una excepción.
+    fetch(new URL('home.json', BASE)).then((r) => (r.ok ? r.json() : null)),
+    cargar(),
+  ]);
+
+  return elegirDestacado(politica, releases);
+}
+
+/**
+ * Qué release manda en el home, según la política.
+ *
+ * En `fijo` se exige el arte: un destacado a dedo sin material es un home a
+ * medias, y el respaldo se ve mejor que media pantalla en negro. En `auto` se
+ * sortea entre los que cumplen (`format.js:cumpleHome`) y, si no cumple
+ * ninguno, también cae al respaldo.
+ *
+ * Sin `modo` escrito se deduce del propio archivo: si hay `release`, es fijo.
+ * Así un `home.json` viejo —o escrito a la carrera— sigue significando algo.
+ */
+function elegirDestacado(politica, releases) {
+  const modo = politica?.modo ?? (politica?.release ? 'fijo' : 'auto');
+
+  if (modo === 'fijo') {
+    const r = releases.find((x) => x.id === politica?.release);
+    return r?.home?.arte ? r : null;
+  }
+
+  const candidatos = releases.filter(cumpleHome);
+  if (!candidatos.length) return null;
+  return candidatos[Math.floor(Math.random() * candidatos.length)];
 }
 
 let promesaAbout = null;

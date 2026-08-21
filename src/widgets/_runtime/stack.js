@@ -18,6 +18,8 @@
 // y viajar con ella al hacer scroll. Como todas comparten `--ttx-banda-h`,
 // la fila de etiquetas se lee igual: una sola franja continua.
 
+import { inyectarFiltros } from './filtro.js';
+
 /**
  * Arma el esqueleto dentro de `host` y devuelve sus piezas.
  * @param {HTMLElement} host  el `[data-ttx]` que puso Cargo
@@ -27,7 +29,7 @@
  */
 export function crearStack(host, { banda = false, ancla = true } = {}) {
   host.classList.add('ttx');
-  inyectarFiltro();
+  inyectarFiltros();
 
   // El aire de alrededor va como `padding` del host y el stack vive en un
   // marco adentro. Estaba como `margin` del host y no se veía: un margen
@@ -89,7 +91,11 @@ export function crearStack(host, { banda = false, ancla = true } = {}) {
 // merca aterrizaría contra una línea que ya no existe. Ese es el caso de
 // `ancla: false`. Lo que quede escrito es lo de la última página que sí manda,
 // que es exactamente lo que la gaveta quiere.
-const RAIZ = 'ttx-ancla';
+// Con los dos guiones. `setProperty` no perdona: `'ttx-ancla'` es una propiedad
+// que no existe y el navegador la descarta sin decir nada, así que el `var(--ttx-ancla,
+// 21rem)` del CSS de la gaveta se quedaba **siempre** en el respaldo de 21rem. Se
+// veía casi bien, que es lo que lo hacía invisible.
+const RAIZ = '--ttx-ancla';
 
 function medirAncla(marco, visor, franja, contenido) {
   const medir = () => {
@@ -140,64 +146,6 @@ export function proyectar(host, datos) {
       el.textContent = valor;
     }
   }
-}
-
-// ── El filtro del visor ───────────────────────────────────────────────
-//
-// Una estampa en blanco y negro, sin un solo gris. Cuatro pasos:
-//
-//   1. un poco de blur, para que lo que quede sean formas y no grano;
-//   2. a escala de grises;
-//   3. el gris aplanado a dos valores — eso es `posterize` llevado al
-//      límite, y en SVG es literalmente un `feComponentTransfer` de tipo
-//      `discrete` con dos entradas. En inverso: lo oscuro sale blanco;
-//   4. y un blur suave al final, que le quita el filo de recorte al salto
-//      entre los dos tonos.
-//
-// Nada de esto existe como filtro de CSS: `blur()` sí, pero no hay ni
-// `posterize` ni umbral. En SVG sí, y se referencia igual —
-// `filter: url(#…)`— así que el punto de calibración sigue siendo una sola
-// variable.
-//
-// Se probó también dibujar los bordes encima con un `feConvolveMatrix`,
-// como en una serigrafía. Sobre dos tonos no aporta nada: el contorno ya
-// *es* el salto entre blanco y negro. Se sacó, y con él lo más caro del
-// filtro.
-//
-// Todo lo que vale la pena calibrar está en `tableValues`, y va al revés de
-// lo que uno esperaría porque el umbral está invertido:
-//   - dar la vuelta: `"1 0"` es el inverso, `"0 1"` el directo.
-//   - dónde corta: `"1 0"` parte por la mitad; `"1 1 0"` deja más blanco y
-//     `"1 0 0"` más negro.
-//   - cuántos tonos: `"1 .45 0"` mete un gris medio, si algún día se quiere
-//     menos brutal.
-const FILTRO = `
-<filter id="ttx-visor-fx" x="-8%" y="-8%" width="116%" height="116%"
-        color-interpolation-filters="sRGB">
-  <feGaussianBlur stdDeviation="3" result="suave"/>
-  <feColorMatrix in="suave" type="saturate" values="0" result="gris"/>
-  <feComponentTransfer in="gris" result="umbral">
-    <feFuncR type="discrete" tableValues="1 0"/>
-    <feFuncG type="discrete" tableValues="1 0"/>
-    <feFuncB type="discrete" tableValues="1 0"/>
-  </feComponentTransfer>
-  <feGaussianBlur in="umbral" stdDeviation="2"/>
-</filter>`;
-
-const NS = 'http://www.w3.org/2000/svg';
-
-/** Uno solo para todo el documento: el filtro no depende de la instancia. */
-function inyectarFiltro() {
-  if (document.getElementById('ttx-visor-fx')) return;
-
-  const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('width', '0');
-  svg.setAttribute('height', '0');
-  // Fuera del flujo y sin tamaño: es una definición, no algo que se vea.
-  svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
-  svg.innerHTML = FILTRO;
-  document.body.append(svg);
 }
 
 /**

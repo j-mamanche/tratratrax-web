@@ -41,7 +41,7 @@
 
   /* ── Efecto del visor ─────────────────────────────────────────────── */
   /* Una estampa en blanco y negro: un poco de blur, a grises, y el gris
-     aplanado a dos valores. El filtro SVG lo inyecta `stack.js`; aquí se
+     aplanado a dos valores. El filtro SVG lo inyecta `_runtime/filtro.js`; aquí se
      puede encadenar lo que sea de CSS antes o después. Ojo con `saturate`
      y compañía: sobre dos tonos no hacen nada. */
   --ttx-visor-fx: url(#ttx-visor-fx);
@@ -64,6 +64,23 @@
      fijamos tamaños, que es lo único que el chrome necesita. */
   --ttx-chrome: clamp(9px, 0.72vw, 11px);
   --ttx-cuerpo-fs: clamp(11px, 0.78vw, 13px);
+
+  /* ── Las dos separaciones ─────────────────────────────────────────────
+     Una línea compuesta tiene **dos anchos de separación**, y confundirlos
+     es lo que hacía que cada pantalla inventara el suyo:
+
+       la junta   entre grupos del mismo enunciado, después del `__`
+       el aire    entre enunciados independientes, sin `__` de por medio
+
+       A RECORD LABEL RUN BY__ DJ LOMALINDA   SONIC HUSTLERS__ SINCE 2020
+                            └junta┘        └── aire ──┘
+
+     La junta es un espacio pequeño: los dos grupos siguen siendo la misma
+     frase y el `__` ya hizo el trabajo de separarlos. El aire es lo que
+     dice que ahí empieza otra cosa. Los dos van en `em` para que escalen
+     con el cuerpo del chrome, que cambia entre escritorio y teléfono. */
+  --ttx-junta: 0.3em;
+  --ttx-aire: 1.6em;
 
   color: var(--ttx-tinta);
   /* El aire va como padding del host, no como margen: un margen inferior se
@@ -108,15 +125,63 @@
   color: inherit;
 }
 
-/* ── Los guiones bajos ────────────────────────────────────────────────
-   `Released__ February 20, 2026`. Con el tracking normal los guiones bajos
-   salen picados, uno a uno. El sitio viejo ya los cerraba con -0.13em para
-   que se leyeran como una sola línea continua; es el mismo valor. */
-[data-ttx] .ttx-guion {
+/* ── La regla de las juntas ───────────────────────────────────────────
+   `SONIC HUSTLERS__ SINCE 2020`, `Released__ February 20, 2026`. Es la misma
+   regla en las cuatro pantallas y por eso vive aquí y no en el CSS de cada
+   una. Quién lleva junta y quién lleva qué peso lo decide `format.js:grupos`;
+   esto solo lo pinta.
+
+   **El `__` no está en el DOM.** Lo imprime este `::after` sobre el `<span>`
+   del grupo, así que hereda su peso y su color sin un nodo de más — y sin que
+   el lector de pantalla lea dos guiones bajos en medio de la frase.
+
+   Con el tracking normal los guiones salen picados, uno a uno. El sitio viejo
+   ya los cerraba con -0.13em para que se leyeran como una raya continua; es el
+   mismo número que sale del CSS de Cargo de la barra de artistas, no uno
+   nuevo. El margen le devuelve al último guión lo que el tracking le quitó y
+   encima pone la junta. */
+[data-ttx] .ttx-junta::after {
+  content: '__';
   display: inline-block;
   letter-spacing: -0.13em;
-  /* Le devuelve al último guión el espacio que le quitó el tracking. */
-  margin-right: 0.15em;
+  margin-right: calc(0.15em + var(--ttx-junta));
+}
+
+/* ── Lo que todavía no se ha escrito ─────────────────────────────────
+   Lo pone y lo quita `_runtime/escribir.js` mientras teclea. Un elemento al
+   que el cursor no ha llegado no está vacío de letras: está **fuera de la
+   línea**, y por eso es `display: none` y no una opacidad. Con cualquier otra
+   cosa seguiría midiendo su `gap`, su margen y su junta, la línea nacería con
+   todos los huecos hechos y las letras caerían dentro de un sitio que ya
+   estaba reservado. Lo que se quiere es que empujen. */
+[data-ttx] [data-ttx-vacio] {
+  display: none;
+}
+
+/* Los dos pesos de la alternancia. **Lo único que separa un grupo del
+   siguiente es la junta y el peso**: ni un signo, ni un color. Un segundo tono
+   sería un tercer nivel de información en una línea que solo tiene dos.
+
+   El peso normal va escrito y no omitido: el CSS global de Cargo engorda cosas
+   por su cuenta. */
+[data-ttx] .ttx-fuerte {
+  font-weight: 700;
+}
+
+[data-ttx] .ttx-suave {
+  font-weight: 400;
+}
+
+/* Lo que solo existe para quien no ve la pantalla: el álbum que nombra un
+   `PURCHASE` suelto, lo que hace el título del home. Vive aquí y no en el CSS
+   de una pantalla porque lo usan tres. */
+[data-ttx] .ttx-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* ── El stack: visor · banda · contenido ──────────────────────────────
