@@ -63,9 +63,21 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 
          `--ttx-margen` recorta por los cuatro lados y `--ttx-nav-h` deja
          abajo el hueco de la barra de Cargo — el que el video no invade. -->
-    <div data-ttx="home" style="--ttx-margen: 10px; --ttx-nav-h: 1.6rem"></div>
+    <!-- `data-catalogo` apunta al preview del catálogo y no a `/catalog`, que
+         aquí no existe: así se puede probar el viaje entero —clic en la franja
+         → el release abierto allá— sin subir nada a Cargo.
 
-    <a class="respaldo" href="?respaldo" data-quitar>ver el respaldo →</a>
+         Para calibrar el gooey contra la referencia de Figma, sin recompilar:
+         `?ttx-threshold=20`, `?ttx-spread=12`, `?ttx-edgesoftness=2`,
+         `?ttx-sourcemix=50`, `?ttx-invertir=0`. Son los mismos nombres que los
+         deslizadores de allá; los valores viven en `_runtime/filtro.js`. -->
+    <div
+      data-ttx="home"
+      data-catalogo={`${base}preview/catalogo`}
+      style="--ttx-margen: 10px; --ttx-nav-h: 1.6rem"
+    ></div>
+
+    <a class="respaldo" href="?sin-video" data-quitar>ver sin video →</a>
 
     <div class="chrome">
       <span>2026 © Todos los izquierdos públicos</span>
@@ -74,14 +86,18 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
     </div>
 
     <!-- Antes del bundle: el widget lee el atributo al montar. Va aquí y no en
-         el frontmatter porque el sitio se compila estático y `?respaldo` solo
-         existe en el navegador. -->
+         el frontmatter porque el sitio se compila estático y `?sin-video` solo
+         existe en el navegador.
+
+         No es "el respaldo" ni un home degradado: es la versión del home para un
+         lanzamiento sin pieza audiovisual, con su cenefa, su grieta y su sorteo
+         de filtro. Ver `home.js`. -->
     <script is:inline>
-      if (location.search.includes('respaldo')) {
-        document.querySelector('[data-ttx="home"]').setAttribute('data-respaldo', '');
+      if (location.search.includes('sin-video')) {
+        document.querySelector('[data-ttx="home"]').setAttribute('data-sin-video', '');
         const a = document.querySelector('[data-quitar]');
         a.href = location.pathname;
-        a.textContent = '← ver el destacado';
+        a.textContent = '← ver con video';
       }
     </script>
 
