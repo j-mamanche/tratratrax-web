@@ -3,22 +3,23 @@
    El stack **sin visor**: banda y contenido, nada más.
 
      .ttx-marco
-      ├─ .ttx-visor      display: none  ← la grieta, que ya no está
+      ├─ .ttx-visor      display: none  ← no hay tercera banda
       ├─ .ttx-banda      grid-row 2     ← la bisagra: el único texto de la página
       └─ .ttx-contenido  grid-row 1/-1  ← el campo: las tres filas a la vez
 
-   La grieta —el mismo emblema aplastado a la fuerza de borde a borde— existió y
-   se quitó. Era la lectura literal del third space, *el hueco deforma lo que
-   pasa por él*, y en pantalla resultó una barra distorsionada compitiendo con la
-   aparición. El visor se esconde en vez de no crearse: `crearStack` es el mismo
-   runtime de las otras tres páginas y no se toca por una decisión de esta.
+   **La grieta vive adentro del texto**, no en el visor. Son las tres sílabas de
+   `TRA · TRA · TRAX` abiertas a lo ancho, y el hueco entre ellas es lo que
+   responde a la mano. La grieta vieja —el emblema aplastado de borde a borde en
+   una franja al pie— se quitó en julio y no vuelve; el visor se esconde en vez
+   de no crearse porque `crearStack` es el mismo runtime de las otras tres
+   páginas y no se toca por una decisión de esta.
 
    El campo cruza las filas, así que se superpone a la banda y el reparto lo hace
    el `z-index`: la banda encima del campo. Reasignar filas es todo lo que hace
    falta: `tokens.css:142,207,221` ya les pone `grid-row` a mano a las tres,
    precisamente para poder moverlas. El orden del DOM no cambia —lo pone
-   `crearStack` y de él sale el orden de tabulación, que aquí importa: del nombre
-   se tabula al emblema. */
+   `crearStack` y de él sale el orden de tabulación, que aquí importa: del
+   disparador se tabula a lo que abrió. */
 
 [data-ttx='about'] {
   /* El gris del chrome, el mismo de la franja de etiquetas del catálogo y del
@@ -28,9 +29,10 @@
      encabezado de esta pantalla.
 
      **El fondo no cambia nunca**: ni se tiñe ni se ilumina en ninguno de los
-     estados. En un sitio que es blanco y negro en todas las demás pantallas,
-     las apariciones son lo único cromático — y eso es lo que impide que se lean
-     como contenido. La tinta vuelve a la de la casa, negra sobre claro. */
+     estados, tampoco con la grieta abierta. En un sitio que es blanco y negro
+     en todas las demás pantallas, las apariciones son lo único cromático — y
+     eso es lo que impide que se lean como contenido. La tinta vuelve a la de la
+     casa, negra sobre claro. */
   --ttx-papel: var(--ttx-gris);
 
   /* **Un solo renglón**, del grosor de la banda del home: el intersticio es la
@@ -44,13 +46,33 @@
      abajo, vacío. */
   --ttx-about-aire: clamp(48px, 12vh, 132px);
 
-  /* La junta entre grupos. **Casi cero, y tiene que serlo**: los grupos van
-     pegados y lo único que los separa es que el peso alterna, igual que la
-     franja del home (`--ttx-home-titulo-gap`) y que el menú del nav. Los
-     espacios que se ven en la línea son los de adentro de un grupo —`SONIC
-     HUSTLERS` son dos palabras—, no juntas. Abrir esto convierte la línea en
-     una frase con espacios y se pierde el gesto entero. */
-  --ttx-about-junta: 0.03em;
+  /* La junta y el aire no se calibran aquí: son del sistema
+     (`tokens.css`, `--ttx-junta` y `--ttx-aire`) y valen lo mismo en las
+     cuatro pantallas. Esa es la gracia — el espacio después del `__` no puede
+     ser un número por página. */
+
+  /* ── La grieta ──────────────────────────────────────────────────────
+     **No hay un ancho escrito.** Lo que sobra de la barra se reparte entre dos
+     cosas que crecen —el bloque de las sílabas y el hueco que va antes del
+     sello— en esta proporción. Con 2 y 3, el hueco de antes del sello es kilo
+     y medio de cada hueco entre sílabas, que es como se ven en las capturas:
+
+       TRA──────TRA──────TRAX────────────────A RECORD LABEL RUN BY__ DJ …
+          └ 2 ┘    └ 2 ┘      └───── 3 ─────┘
+
+     Cuando la entrada se despliega deja de sobrar espacio y las dos cosas se
+     encogen solas hasta su mínimo. **Eso es la grieta cerrándose**: no hay una
+     animación del hueco, hay una sola cosa que se anima —el ancho de la
+     entrada— y esto es su consecuencia. Calibrar el reposo es mover estos dos
+     números; no hay un tercero que ajustar para el estado abierto. */
+  --ttx-about-grieta-crece: 2;
+  --ttx-about-hueco-crece: 3;
+
+  /* Lo que **nunca** se cierra del todo: con la línea abierta las sílabas se
+     juntan pero no se tocan, o `TRA TRA TRAX` se leería `TRATRATRAX` y dejaría
+     de ser un nombre partido. Es el aire de entre enunciados, que es la
+     separación que ya significa "aquí empieza otra cosa". */
+  --ttx-about-grieta-min: var(--ttx-aire);
 
   /* La banda no tiene fondo propio: transparente es, literalmente, del color
      del papel. Y es lo que deja que una aparición **pase por detrás del
@@ -60,21 +82,19 @@
      desaparece. */
   --ttx-about-banda-fondo: transparent;
 
-  /* **La zona donde cae el azar**, en porcentaje del campo y sobre el *centro*
-     del emblema. El JS no sabe nada de esto: sortea dos números de 0 a 1 y aquí
-     se estiran hasta la zona que toque.
+  /* **La zona donde cae el azar: toda la ventana.** El JS sortea dos números de
+     0 a 1 y aquí se estiran de un borde al otro.
 
-     En pantalla ancha es **la mitad derecha**. La línea de texto arranca por la
-     izquierda, así que el emblema tiene su propio lado y las dos cosas se leen a
-     la vez en vez de pelearse. En teléfono la zona se acuesta: pasa a ser **la
-     mitad de abajo**, porque ahí la línea ocupa el ancho entero y ya no hay
-     derecha que dejarle (ver el bloque de teléfono, al final).
+     La zona segura no está en estos cuatro números: sale de cómo se ancla el
+     emblema. Ver `.ttx-about-emblema`, que es donde pasa. Estos siguen aquí
+     para poder acotar la zona desde el placeholder de Cargo sin tocar el
+     widget — por ejemplo, dejarle los emblemas a la mitad de abajo en una
+     página concreta.
 
-     Que el `1` sea `100%` y no `100% - ancho` es a propósito: el emblema se
-     coloca por el centro, así que en el extremo sale con la mitad afuera y el
-     marco lo corta. Ese es el derecho a cortarse, y se pierde si esto se
-     "arregla". */
-  --ttx-about-x0: 50%;
+     (Hasta agosto de 2026 la zona era la mitad derecha en escritorio y la
+     mitad de abajo en teléfono. El sello lo reportó: los santos salían siempre
+     del mismo lado y cortados por el borde. Las dos cosas se corrigieron.) */
+  --ttx-about-x0: 0%;
   --ttx-about-x1: 100%;
   --ttx-about-y0: 0%;
   --ttx-about-y1: 100%;
@@ -99,15 +119,29 @@
   grid-template-rows: var(--ttx-about-aire) auto minmax(0, 1fr);
 }
 
+/* **Las dos en la columna 1**, y esto no es decoración: sin el `grid-column` el
+   campo se va a una columna que no existía. La colocación automática ve un
+   elemento que ocupa las filas 1 a 3 y otro que ya está en la fila 2, decide
+   que se estorban y le abre una segunda columna al segundo — así que la banda
+   se quedaba con dos tercios de la pantalla y el campo con el tercio de la
+   derecha.
+
+   Eso era la mitad del problema que el sello reportó como "los santos siempre
+   salen a la derecha": no era solo la zona del azar, es que el campo entero
+   estaba a la derecha. La otra mitad era la zona, y está arriba. Que se
+   superpongan es justamente lo que se quiere aquí, y de eso se encarga el
+   `z-index`. */
 [data-ttx='about'] .ttx-contenido {
   grid-row: 1 / -1;
+  grid-column: 1;
 }
 
 [data-ttx='about'] .ttx-banda {
   grid-row: 2;
+  grid-column: 1;
 }
 
-/* La grieta, fuera. Se esconde y no se deja de crear: el visor sale de
+/* Sin tercera banda. Se esconde y no se deja de crear: el visor sale de
    `crearStack`, que es de todas las páginas. */
 [data-ttx='about'] .ttx-visor {
   display: none;
@@ -116,16 +150,10 @@
 /* ── El campo ─────────────────────────────────────────────────────────
    **Toda la ventana.** El campo cruza las tres filas, así que las coordenadas
    se cuentan contra la pantalla entera y la zona se recorta con los cuatro
-   límites de arriba, no con el tamaño de una fila. Cambiar dónde aparecen los
-   emblemas es mover cuatro números, no rehacer la maquetación.
+   límites de arriba, no con el tamaño de una fila.
 
    Vacío en reposo, y eso es el diseño: gris y nada más. Ni una imagen, ni un
-   loop, ni un destello. Quien no mueva la mano no ve nunca nada.
-
-   `overflow: visible` no cambia nada ahora que el campo llega a los bordes,
-   pero se queda: el marco sigue teniendo `overflow: hidden`
-   (`tokens.css:136`) y de ahí sale gratis el derecho a cortarse contra el borde
-   de la pantalla. */
+   loop, ni un destello. Quien no mueva la mano no ve nunca nada. */
 [data-ttx='about'] .ttx-about-campo {
   position: relative;
   z-index: 0;
@@ -133,19 +161,29 @@
 }
 
 /* ── Las apariciones ──────────────────────────────────────────────────
-   El emblema se coloca por su **centro**. El JS le escribe al encender dos
-   números de 0 a 1 —`--ttx-about-rx` y `--ttx-about-ry`, el azar puro— y aquí
-   se estiran hasta la zona:
+   El JS le escribe al encender dos números de 0 a 1 —`--ttx-about-rx` y
+   `--ttx-about-ry`, el azar puro— y aquí pasan dos cosas con ellos a la vez:
 
-     0   → el borde de arranque de la zona
-     1   → el borde de llegada
-     0.5 → la mitad
+     left / top    los estira hasta los bordes de la zona
+     translate     corre el emblema **su propio porcentaje** hacia atrás
 
-   Separar las dos cosas es lo que permite mover la zona sin tocar el widget: en
-   pantalla ancha los emblemas caen a la derecha, en teléfono abajo, y el JS
-   sigue sorteando lo mismo. Dentro de la zona no hay retícula, ni zona segura,
-   ni memoria de posición; y como el ancla es el centro, en los extremos sale
-   medio cortado.
+   Y de ahí sale la **zona segura**, sin medir nada y sin que el JS sepa el
+   tamaño de la imagen:
+
+     0    → left: 0%    · translate: 0        → apoyado en el borde izquierdo
+     0.5  → left: 50%   · translate: -50%     → centrado
+     1    → left: 100%  · translate: -100%    → apoyado en el borde derecho
+
+   Ninguna posición sortea al emblema medio afuera, y el rectángulo donde puede
+   caer su esquina es exactamente el de la ventana encogido en el ancho y el
+   alto **reales** de esa imagen — que es distinto en cada una: hay un emblema
+   cuadrado, uno alto y uno apaisado. Un `calc()` con un tamaño escrito a mano
+   los recortaría a los tres con el número del más grande.
+
+   Adentro de la zona sigue sin haber retícula, ni memoria de posición: puede
+   quedar en una esquina ridícula y dos pueden caer encima. Lo único que se le
+   quitó al azar es el derecho a cortarse contra el borde, que el sello reportó
+   como problema.
 
    Nada de `transition` ni de `animation`: la aparición es un corte y la
    desaparición es otro. Lo único que se mueve dentro del emblema es el GIF, que
@@ -158,7 +196,10 @@
   top: calc(
     var(--ttx-about-y0) + (var(--ttx-about-y1) - var(--ttx-about-y0)) * var(--ttx-about-ry, 0.5)
   );
-  transform: translate(-50%, -50%);
+  transform: translate(
+    calc(var(--ttx-about-rx, 0.5) * -100%),
+    calc(var(--ttx-about-ry, 0.5) * -100%)
+  );
   width: var(--ttx-about-emblema-w);
   line-height: 0;
   -webkit-tap-highlight-color: transparent;
@@ -195,18 +236,11 @@
 }
 
 /* ── La bisagra: el único texto de la página ──────────────────────────
-   Una barra de un renglón, de borde a borde, con los dos bloques empujados
-   cada uno a su lado:
+   Una barra de un renglón, de borde a borde, con cuatro piezas de las que solo
+   se ven dos en reposo:
 
-     SONIC HUSTLERS SINCE 2020        TRATRATRAX IS A LABEL RUN BY DJ LOMALINDA…
-
-   El hueco del medio no es un espacio escrito: es lo que sobra de la barra
-   (`justify-content: space-between`). Al cambiar el ancho de la ventana el
-   hueco se abre y se cierra, y los dos bloques se quedan clavados en su borde
-   — la barra se lee como el chrome de la página, no como una frase centrada.
-
-   Las citas de Bhabha no se transcriben: el third space se demuestra, no se
-   explica.
+     TRA      TRA      TRAX  ·hueco·  A RECORD LABEL RUN BY__ DJ …  ⟨entrada⟩
+     └──── la grieta ──────┘          └──────── el sello ────────┘
 
    Va **encima** de las apariciones. Al revés —el emblema encima— el emblema
    taparía su propio disparador y el nombre quedaría inalcanzable justo cuando
@@ -224,12 +258,15 @@
   overflow: visible;
 }
 
+/* Sin `gap` y sin `space-between`: **todo el reparto lo hacen las dos piezas
+   que crecen**, la grieta y el hueco. Un `gap` aquí metería un espacio fijo
+   entre la entrada y el sello que en reposo no se puede quitar, y un
+   `space-between` repartiría también contra la entrada cerrada — que mide cero
+   pero sigue siendo un elemento. */
 [data-ttx='about'] .ttx-about-texto {
   display: flex;
   flex: 1;
-  justify-content: space-between;
   align-items: baseline;
-  gap: var(--ttx-about-junta);
   min-width: 0;
   font-size: var(--ttx-about-texto-fs);
   line-height: var(--ttx-about-texto-lh);
@@ -238,43 +275,181 @@
   font-weight: 400;
 }
 
-/* Cada bloque es una tira de campos con la junta de por medio. Las versalitas,
-   el tracking y el `nowrap` los pone el token de la banda (`tokens.css:207`);
-   aquí solo se arma la tira. */
+/* **La grieta.** Un `<button>` de verdad, no un `<span>` con eventos: el
+   teclado y el lector de pantalla salen gratis, y sin él las tres redes y el
+   correo que hay adentro de la entrada no se podrían alcanzar de ninguna forma
+   que no sea con la mano.
+
+   Crece —`--ttx-about-grieta-crece`— y adentro reparte con `space-between`, así
+   que la primera sílaba se queda clavada en el borde izquierdo y la última
+   marca dónde termina el nombre. El `gap` es el mínimo: es lo que queda cuando
+   la línea abierta ya no deja sobrar nada. */
+[data-ttx='about'] .ttx-about-grieta {
+  flex: var(--ttx-about-grieta-crece) 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ttx-about-grieta-min);
+  padding: 0;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: left;
+  cursor: pointer;
+  /* En teléfono la grieta se toca y se mantiene: sin esto sale la lupa, la
+     selección de texto o el menú de iOS. */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+[data-ttx='about'] .ttx-about-grieta:focus-visible {
+  outline: 1px solid var(--ttx-tinta);
+  outline-offset: 2px;
+}
+
+/* Las sílabas van todas en el mismo peso y no entran en la alternancia: no son
+   grupos de un enunciado, son un nombre partido. El que las separa es el hueco,
+   que es justamente lo que la página pone a mover. */
+[data-ttx='about'] .ttx-about-silaba {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* El hueco de antes del sello. No es un `gap`: tiene que crecer distinto que el
+   aire de entre sílabas —más, para que en reposo el sello se vaya contra el
+   borde derecho— y eso un `gap` no lo sabe hacer. Base cero: todo lo que mide
+   es lo que le tocó del reparto. */
+[data-ttx='about'] .ttx-about-hueco {
+  flex: var(--ttx-about-hueco-crece) 0 0;
+  min-width: 0;
+}
+
+/* Cada bloque es una tira de grupos de un mismo enunciado. **Sin `gap`**: la
+   separación la pone la junta de cada grupo (`tokens.css`, `.ttx-junta`), que
+   va pegada al `__` y por eso viaja con él cuando la línea envuelve. Las
+   versalitas, el tracking y el `nowrap` los pone el token de la banda; aquí
+   solo se arma la tira. */
 [data-ttx='about'] .ttx-about-bloque {
   display: flex;
   align-items: baseline;
-  gap: var(--ttx-about-junta);
+  flex: 0 0 auto;
 }
 
-/* **Lo único que separa un grupo del siguiente es el peso.** Ni un signo, ni un
-   espacio, ni un color: todo el renglón va en la misma tinta negra. Un segundo
-   tono sería un tercer nivel de información en una línea que solo tiene dos, y
-   la haría parecer una frase con partes secundarias — que es exactamente lo que
-   no es. Los grupos alternan y ya, como la franja del home
-   (`KILLING MARIPOSAS KELMAN DURÁN`) y el menú del nav.
+/* ── La entrada: lo que cabe en la grieta ─────────────────────────────
+   El lema, las tres redes y el correo. En reposo mide **cero** y con la mano en
+   la grieta mide lo que mida su contenido.
 
-   Los nombres entran en la misma alternancia y no se distinguen de `TRATRATRAX`
-   o de `2020`. Es a propósito: el nombre no anuncia que se pueda tocar, y el
-   link ni siquiera es él sino el santo que invoca. Un link que hay que cazar no
-   se señala. */
-[data-ttx='about'] .ttx-about-fuerte {
-  font-weight: 700;
+   El truco es la columna de `0fr` a `1fr`. Es la única forma de animar "de cero
+   a lo que mida" sin escribir un ancho a mano: un `max-width` fijo se queda
+   corto o le sobra —y le sobraría distinto en cada ventana—, y `width: auto` no
+   se interpola. El hijo lleva `overflow: hidden` y `min-width: 0`, que es lo
+   que le da permiso al `0fr` de valer cero de verdad.
+
+   Y es **lo único que se anima en toda la página**. Las sílabas se cierran
+   porque esto se abre, no porque alguien les mueva el hueco: el `flex` de
+   arriba reparte lo que sobra en cada cuadro. Una sola cosa en movimiento, y
+   nada que pueda quedar desincronizado con nada. */
+[data-ttx='about'] .ttx-about-entrada {
+  display: grid;
+  grid-template-columns: 0fr;
+  flex: 0 0 auto;
+  transition: grid-template-columns var(--ttx-dur) var(--ttx-ease);
 }
 
-[data-ttx='about'] .ttx-about-suave {
-  font-weight: 400;
+[data-ttx='about'][data-abierto] .ttx-about-entrada {
+  grid-template-columns: 1fr;
 }
+
+/* ── El eco y lo que se escribe ───────────────────────────────────────
+   Dos copias de la misma línea, una encima de la otra en la misma celda de un
+   grid de una sola celda. La de abajo —el eco— está completa y es invisible, y
+   es la que le dice a la celda cuánto mide. La de arriba es la de verdad y nace
+   vacía: `escribir.js` le va soltando las letras.
+
+   Es lo que permite que **el hueco se abra de una y el texto llegue después**.
+   Sin el eco, el ancho de la entrada sería el de lo tecleado hasta ese
+   instante, y las sílabas se irían cerrando letra por letra durante los cuatro
+   segundos que tarda la línea entera. La animación que hay es de medio segundo
+   y es la que se queda.
+
+   Y es también lo que estabiliza el teléfono, donde la línea envuelve: el
+   reparto en renglones lo fija el eco de una vez, así que las palabras ya no se
+   reacomodan entre ellas con cada letra que entra.
+
+   El fundido que había aquí se fue. Era lo que hacía aparecer el texto —los dos
+   se pisarían, y de todos modos la escritura *es* la aparición ahora. */
+[data-ttx='about'] .ttx-about-entrada-in {
+  display: grid;
+  grid-template-areas: 'linea';
+  min-width: 0;
+  overflow: hidden;
+}
+
+[data-ttx='about'] :is(.ttx-about-eco, .ttx-about-vivo) {
+  grid-area: linea;
+  display: flex;
+  align-items: baseline;
+  gap: var(--ttx-aire);
+  min-width: 0;
+  /* El aire de la izquierda es lo que separa `VERRACO` de `SONIC HUSTLERS`.
+     Como `padding` de las dos copias y no como margen del primer enunciado, que
+     es como estaba: el primer enunciado de la copia que se escribe pasa por
+     `display: none` mientras no le llegue su primera letra, y con él se iba el
+     margen — la línea escrita arrancaba un aire más a la izquierda que el eco y
+     se veía saltar al llegar la primera letra. El `padding` es de la copia, que
+     está siempre. Y no de la caja de afuera, que es la que se recorta: con
+     `box-sizing: border-box` su ancho no puede bajar del padding, y cerrada
+     seguiría midiendo un aire de más. */
+  padding-left: var(--ttx-aire);
+}
+
+/* Invisible pero midiendo, que es justo lo que `visibility` hace y ninguna otra
+   cosa hace: `opacity: 0` dejaría los links atrapando clics y `display: none`
+   no mediría nada. El `inert` y el `aria-hidden` van en el HTML: son cuatro
+   links repetidos y no pueden existir dos veces para el teclado ni para el
+   lector de pantalla. */
+[data-ttx='about'] .ttx-about-eco {
+  visibility: hidden;
+}
+
+/* Una red o el correo: un enunciado de un solo grupo, así que va liviano y sin
+   junta. Sin subrayado y en la misma tinta que todo lo demás — aquí tampoco se
+   señala nada. */
+[data-ttx='about'] .ttx-about-enlace {
+  flex: 0 0 auto;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+[data-ttx='about'] .ttx-about-enlace:focus-visible {
+  outline: 1px solid var(--ttx-tinta);
+  outline-offset: 2px;
+}
+
+/* Los pesos y el `__` los pone el sistema: `.ttx-fuerte`, `.ttx-suave` y
+   `.ttx-junta` viven en `tokens.css` y se los cuelga `format.js:grupos`. Aquí
+   no hay una copia local.
+
+   Lo que sí es de aquí: **todo el renglón va en la misma tinta negra**. Ni un
+   signo, ni un color de más. Un segundo tono sería un tercer nivel de
+   información en una línea que solo tiene dos, y la haría parecer una frase con
+   partes secundarias — que es exactamente lo que no es.
+
+   Los nombres no se distinguen del resto de su grupo. Es a propósito: el nombre
+   no anuncia que se pueda tocar, y el link ni siquiera es él sino el santo que
+   invoca. Un link que hay que cazar no se señala. */
 
 [data-ttx='about'] .ttx-about-nombre {
   padding: 0;
+  font-weight: inherit;
   letter-spacing: inherit;
   text-transform: inherit;
   vertical-align: baseline;
   cursor: pointer;
   /* En teléfono el nombre se mantiene pulsado: sin esto sale la lupa, la
-     selección de texto o el menú de iOS. El lema de al lado sigue siendo texto
-     normal y se puede seleccionar. */
+     selección de texto o el menú de iOS. El resto de la línea sigue siendo
+     texto normal y se puede seleccionar. */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   user-select: none;
@@ -286,32 +461,92 @@
   outline-offset: 2px;
 }
 
+/* ── Cuando la línea no cabe ──────────────────────────────────────────
+   Un renglón único es una regla de pantalla ancha, no del texto. Abierta, la
+   línea son unos ciento cincuenta caracteres en versalitas; por debajo de
+   ~1090px ya no caben, y forzarlos sería o tipografía de seis píxeles o media
+   frase cortada contra el borde — y ahí adentro están los nombres, que son los
+   disparadores, y los tres links del sello.
+
+   Así que la barra envuelve: se parte por las juntas y por el aire, que es
+   exactamente para lo que están, y crece a dos o tres renglones.
+
+   **La grieta se queda con su propio renglón**, entero y de borde a borde. Es
+   la única forma de que se siga leyendo como un hueco que se abre y no como
+   tres sílabas apretadas contra el resto de la frase — y de paso resuelve el
+   problema del reparto: envuelto, el `flex` ya no puede cerrar el hueco solo,
+   porque lo que sobra en el primer renglón no sabe nada de lo que entró en el
+   segundo. Aquí el hueco **sí** se anima a mano, y es el único sitio del widget
+   donde eso pasa.
+
+   El hueco de antes del sello no tiene sentido con la línea envuelta y se va. */
+@media (max-width: 68rem) {
+  [data-ttx='about'] {
+    /* Lo que se abren las sílabas en reposo, en porcentaje del renglón: con
+       dos huecos de esto y el nombre en el medio, `TRA TRA TRAX` ocupa el
+       ancho entero sin llegar a tocarlo. */
+    --ttx-about-grieta-tel: 26%;
+  }
+
+  [data-ttx='about'] .ttx-about-texto {
+    flex-wrap: wrap;
+    row-gap: 0.35em;
+  }
+
+  /* Su propio renglón, y el hueco escrito en vez de repartido. */
+  [data-ttx='about'] .ttx-about-grieta {
+    flex: 0 0 100%;
+    justify-content: flex-start;
+    column-gap: var(--ttx-about-grieta-tel);
+    transition: column-gap var(--ttx-dur) var(--ttx-ease);
+  }
+
+  [data-ttx='about'][data-abierto] .ttx-about-grieta {
+    column-gap: var(--ttx-about-grieta-min);
+  }
+
+  [data-ttx='about'] .ttx-about-hueco {
+    display: none;
+  }
+
+  /* Que pueda bajarse a su renglón y encogerse hasta el ancho de la barra en
+     vez de desbordarla. Abierta mide su contenido, que es más que la pantalla:
+     sin esto se sale por la derecha. */
+  [data-ttx='about'] .ttx-about-entrada {
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Adentro también envuelve, por el aire de entre enunciados. Las dos copias
+     igual: si envolvieran distinto, el eco dejaría de medir lo que mide la
+     línea que se escribe y todo el truco se cae. */
+  [data-ttx='about'] :is(.ttx-about-eco, .ttx-about-vivo) {
+    flex-wrap: wrap;
+    row-gap: 0.35em;
+  }
+
+  /* **Cerrada no envuelve.** La entrada cerrada mide cero de ancho, y un
+     contenido que envuelve dentro de cero de ancho se parte en un renglón por
+     enunciado: cuatro o cinco renglones invisibles que no se ven pero sí miden,
+     y que dejaban la barra **más alta cerrada que abierta**. En una línea que
+     se abre con la mano, eso se lee como que algo está al revés.
+
+     Sin envolver, lo que no se ve mide un renglón y el recorte se lo come. Y la
+     barra crece al abrirse, que es lo que uno espera. */
+  [data-ttx='about']:not([data-abierto]) :is(.ttx-about-eco, .ttx-about-vivo) {
+    flex-wrap: nowrap;
+  }
+}
+
 /* ── Teléfono ─────────────────────────────────────────────────────────
-   La línea no cabe. Son ochenta y pico de caracteres en versalitas y una
-   pantalla de 390 puntos: forzarla a un renglón sería o tipografía de seis
-   píxeles o la mitad de los nombres cortada contra el borde — y los nombres son
-   los disparadores, sin ellos la página no hace nada.
-
-   Así que aquí, y solo aquí, la barra envuelve: se parte por las juntas, que es
-   exactamente para lo que están, y crece a dos o tres renglones. El renglón
-   único es una regla de pantalla ancha, no del texto.
-
-   El tamaño sube al del catálogo en teléfono (`catalogo.css:246`): 9px de
-   chrome ahí es ilegible, y encima hay que atinarle con el dedo. */
+   Lo de arriba ya envolvió la línea; aquí solo cambia el cuerpo. El tamaño sube
+   al del catálogo en teléfono (`catalogo.css:246`): 9px de chrome ahí es
+   ilegible, y encima hay que atinarle con el dedo. */
 @media (max-width: 46rem) {
   [data-ttx='about'] {
     --ttx-chrome: 11px;
     --ttx-inset: 0.75rem;
-
-    /* **La zona se acuesta.** En pantalla ancha el emblema tiene la mitad
-       derecha porque la línea de texto arranca por la izquierda; aquí la línea
-       ocupa el ancho entero y envuelve, así que no hay derecha que dejarle. Lo
-       que sí sobra es lo de abajo — la mitad inferior, que en un teléfono es
-       además donde está la mano. */
-    --ttx-about-x0: 0%;
-    --ttx-about-x1: 100%;
-    --ttx-about-y0: 50%;
-    --ttx-about-y1: 100%;
   }
 
   [data-ttx='about'] .ttx-banda {
@@ -319,17 +554,22 @@
     padding-bottom: 0.4rem;
   }
 
-  /* El bloque envuelve por las juntas, que es exactamente para lo que están: se
-     parte entre grupos y nunca dentro de uno. */
-  [data-ttx='about'] .ttx-about-texto,
+  /* El bloque envuelve por las juntas: se parte entre grupos y nunca dentro de
+     uno. */
   [data-ttx='about'] .ttx-about-bloque {
     flex-wrap: wrap;
     row-gap: 0.35em;
+    /* Y que pueda encogerse hasta el ancho de la barra, que es la mitad de
+       envolver. Con el `flex: 0 0 auto` de pantalla ancha el bloque se queda
+       en su ancho máximo pase lo que pase: envolvía adentro pero seguía
+       midiendo lo de una sola línea, así que `VERRACO` se salía por la derecha
+       de la pantalla. */
+    flex-shrink: 1;
+    min-width: 0;
   }
 
-  /* Sin el empujón a los dos bordes: envuelto, `space-between` dejaría huecos
-     de cualquier ancho en medio de la frase. */
-  [data-ttx='about'] .ttx-about-texto {
-    justify-content: flex-start;
+  /* Envuelto, el aire de la izquierda dejaría la segunda línea sangrada. */
+  [data-ttx='about'] :is(.ttx-about-eco, .ttx-about-vivo) {
+    padding-left: 0;
   }
 }

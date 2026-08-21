@@ -1,6 +1,16 @@
 {
-  "lema": "*Sonic hustlers*since*2020*",
-  "sello": "*TraTraTrax*is a label run by*",
+  "silabas": ["Tra", "Tra", "Trax"],
+  "sello": "*A record label run by*",
+  "lema": "*Sonic hustlers*since 2020*",
+  "redes": [
+    { "nombre": "Instagram", "url": "https://www.instagram.com/tratratrax" },
+    { "nombre": "YouTube", "url": "https://www.youtube.com/@tratratrax" },
+    { "nombre": "Bandcamp", "url": "https://tratratrax.bandcamp.com/" }
+  ],
+  "bookings": {
+    "texto": "Bookings: carin@outer-agency.com",
+    "email": "carin@outer-agency.com"
+  },
   "djs": [
     {
       "nombre": "DJ Lomalinda",

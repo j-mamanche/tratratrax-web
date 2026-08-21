@@ -2,32 +2,50 @@ import { registrar } from '../_runtime/mount.js';
 import { cargarAbout, urlMedia } from '../_runtime/datos.js';
 import { crearStack, precargar } from '../_runtime/stack.js';
 import { elemento } from '../_runtime/dom.js';
+import { maquina, NAV } from '../_runtime/escribir.js';
+import { partir, grupos } from '../_runtime/format.js';
 import './about.css';
 
-// El About: un solo renglón de texto y un gesto que se sostiene con la mano.
+// El About: un solo renglón de texto y dos gestos que se sostienen con la mano.
 // El ensayo es **no verbal** — el third space se demuestra, no se explica.
 //
-//   REPOSO                        MANO EN UN NOMBRE (escritorio)
-//   ┌────────────────────────┐    ┌────────────────────────┐
-//   │                        │    │              ✝◉✝       │
-//   │ SONIC HUSTLERS… TRATRA…│    │ SONIC HUSTLERS… TRA✝◉✝│  ← la bisagra
-//   │                        │    │                        │
-//   │     gris y nada más    │    │  gris          ✝◉✝     │  ← el campo
-//   │                        │    │                        │
-//   └────────────────────────┘    └────────────────────────┘
-//                                 └── la mitad derecha ────┘
+//   REPOSO
+//   ┌──────────────────────────────────────────────────────────────────┐
+//   │ TRA      TRA      TRAX          A RECORD LABEL RUN BY__ DJ LOMA… │
+//   │        └ la grieta ┘                                             │
+//   │                        gris y nada más                           │
+//   └──────────────────────────────────────────────────────────────────┘
+//
+//   LA MANO EN LA GRIETA
+//   ┌──────────────────────────────────────────────────────────────────┐
+//   │ TRA TRA TRAX  A RECORD LABEL RUN BY__ DJ LOMA…  SONIC HUSTLERS__ │
+//   │ SINCE 2020  INSTAGRAM  YOUTUBE  BANDCAMP  BOOKINGS: CARIN@…      │
+//   └──────────────────────────────────────────────────────────────────┘
+//
+// **La grieta es el hueco dentro del nombre del sello.** No es una banda, no es
+// un emblema deformado y no es una cuarta fila: son las tres sílabas de
+// `TRA · TRA · TRAX` abiertas a lo ancho de la pantalla, y el aire que queda
+// entre ellas es lo que se cierra con la mano. Lo que **escucha** la mano es
+// otra cosa —la banda entera, que no se mueve; ver `disparos`— y esa distinción
+// es lo único no obvio de este widget. Pasar por ahí **cierra la grieta**
+// —las sílabas se juntan hacia la izquierda— y en el espacio que sueltan entra
+// el resto de la línea: el lema, las tres redes y la línea de bookings.
+//
+// Esa es la lectura del third space que sí funciona en pantalla: el hueco no
+// deforma lo que pasa por él, **el hueco es donde cabe lo que no estaba
+// dicho**. La versión anterior —el emblema aplastado de borde a borde— se
+// quitó en julio y no vuelve; esta es otra cosa y vive dentro del texto.
 //
 // **No hay tercera banda.** El About usa el stack sin visor: banda y contenido,
-// nada más. La grieta —el emblema aplastado de borde a borde— existió y se
-// quitó: deformar el material era una idea sobre el third space, y la página
-// funciona mejor sin ella. `about.css` esconde el visor que `crearStack` crea
-// igual.
+// nada más. `about.css` esconde el visor que `crearStack` crea igual.
 //
-// El campo **es toda la ventana**, pero el azar no cae en toda la ventana: la
-// zona la recorta el CSS —la mitad derecha en pantalla ancha, la mitad de abajo
-// en teléfono—, así que la línea de texto casi nunca se ve invadida y el
-// emblema tiene un sitio propio en la composición. El JS solo sortea dos
-// números de 0 a 1.
+// El campo de las apariciones **es toda la ventana**, y ahora con **zona
+// segura**: el azar sigue siendo puro, pero ningún emblema sale medio comido
+// por el borde. El JS solo sortea dos números de 0 a 1; el recorte lo hace el
+// CSS con el tamaño real del emblema. (Antes la zona era la mitad derecha y el
+// corte contra el borde se defendía como intencional. El sello lo reportó como
+// problema en las capturas del 19 de agosto de 2026: siempre a la derecha, y
+// cortados en teléfono. Se corrigieron las dos cosas.)
 //
 // Lo que hay que entender antes de tocar nada:
 //
@@ -40,31 +58,33 @@ import './about.css';
 //     la mano siga puesta no salta a otro sitio, y cuando la mano se va todavía
 //     dura `VIDA` más, quieta, para que se alcance con el ratón. Sostener no
 //     produce una ráfaga; produce una imagen que espera.
+//   - **La grieta cuenta el mismo reloj**, con su propio número (`LINGER`):
+//     mientras haya mano no hay reloj, y volver antes de que se cumpla cancela
+//     la cola. Es la misma disciplina, no una copia — las dos salen de
+//     `crearGesto`.
 //   - **Hay un solo emblema por DJ y nunca se va del DOM**, solo se apaga
 //     (`about.css`, la regla de `[data-apagado]`). Un
 //     GIF que se quita y se vuelve a poner reinicia su animación y el santo
 //     saldría siempre en el mismo cuadro; dejándolo puesto, el loop sigue
 //     corriendo por debajo y cada aparición lo agarra donde vaya.
-//   - **El azar es puro dentro de la zona.** Lo único que se decidió es en qué
-//     mitad de la pantalla pasa esto; adentro no hay retícula, no hay zona
-//     segura y no hay memoria de posición. Puede salir medio cortado por el
-//     borde —el `overflow: hidden` del marco lo corta gratis—, puede quedar en
-//     una esquina ridícula, dos pueden caer encima. Todos son resultados
-//     legales: es el pop-up de los noventa, el kitsch entrando por el
-//     comportamiento. Lo que sí es fijo es que **el sitio se sortea al aparecer,
-//     nunca mientras se ve**.
+//   - **El azar es puro dentro de la zona.** No hay retícula y no hay memoria de
+//     posición: puede quedar en una esquina ridícula y dos pueden caer encima.
+//     Lo único que se le quitó es el derecho a cortarse contra el borde. Lo que
+//     sí es fijo es que **el sitio se sortea al aparecer, nunca mientras se
+//     ve**.
 //   - **El santo es el link**, no el nombre. El nombre solo invoca; clic en el
 //     emblema lleva al Instagram de ese DJ. Un link que hay que cazar.
 //
 // Opciones que acepta el placeholder de Cargo:
 //   <div data-ttx="about"></div>
-//   <div data-ttx="about" data-vida="2000"></div>   ← ms que dura la cola
+//   <div data-ttx="about" data-vida="2000"></div>     ← ms de cola del emblema
+//   <div data-ttx="about" data-grieta="2500"></div>   ← ms de cola de la grieta
+//   <div data-ttx="about" data-letra="40"></div>      ← ms por letra de la entrada
 
 /**
- * **La cola**: lo que la aparición se queda después de que la mano se fue.
- * Antes era lo que vivía desde que nació, y era otra cosa — el reloj corría
- * contra el gesto y una mano quieta veía saltar el santo. Ahora el reloj
- * arranca cuando el gesto termina: mientras haya mano no hay reloj.
+ * **La cola del emblema**: lo que la aparición se queda después de que la mano
+ * se fue. El reloj arranca cuando el gesto termina: mientras haya mano no hay
+ * reloj.
  *
  * Segundo y medio es lo que alcanza para soltar el nombre y llegar al emblema
  * con el ratón —que es cómo se caza el link— sin que la imagen se instale.
@@ -72,6 +92,40 @@ import './about.css';
  * home.
  */
 const VIDA = 1500;
+
+/**
+ * **La cola de la grieta.** El mismo número, y a propósito: la línea abierta
+ * trae tres links y un correo, y hay que poder salirse de la grieta y llegar a
+ * ellos sin que se cierre en la cara. Se calibra con `data-grieta`.
+ */
+const LINGER = 1500;
+
+/**
+ * **Lo que tarda el hueco en hacerse**, y por lo tanto lo que espera la primera
+ * letra antes de salir. Es `--ttx-dur` (0,5s) por el `0.4` con el que la entrada
+ * ya retrasaba su aparición en `about.css`: primero se hace el sitio y después
+ * llega el texto, nunca al revés — que se vería como una línea empujando a la
+ * otra.
+ *
+ * Está escrito aquí porque el JS no puede leer un `calc()` de un token; si
+ * `--ttx-dur` se mueve, esto se mueve.
+ */
+const ESPERA = 200;
+
+/**
+ * **Y lo que tarda en cerrarse**, que es el techo del borrado entero.
+ *
+ * Escribir puede tomarse su tiempo —es lo que hay que leer— pero borrar no: el
+ * hueco se cierra en `--ttx-dur` y lo que quede escrito se vería recortándose
+ * contra el borde mientras se encoge. Así que el borrado corre a los 30ms por
+ * letra del nav mientras quepa, y se acelera cuando no. Con la línea entera del
+ * sello no cabe ni de lejos, así que en la práctica se va de un tirón: la salida
+ * es el hueco cerrándose, no un desescribirse.
+ */
+const CIERRE = 500;
+
+/** Lo que separa un nombre del siguiente. No es una junta: es parte del texto. */
+const BARRA = ' / ';
 
 registrar('about', async (host) => {
   const about = await cargarAbout();
@@ -100,9 +154,66 @@ registrar('about', async (host) => {
   precargar(djs.map((dj) => (menos.matches ? dj.emblema : dj.quieto)));
 
   const estados = djs.map((dj) => crearEstado(dj, { campo, vida, menos }));
-  banda.append(crearTexto(about, estados));
+  const { texto, grieta, extra, vivo } = crearTexto(about, estados);
+  banda.append(texto);
 
-  const soltarDisparos = disparos(host, estados);
+  // La máquina de escribir de la entrada. Los números son los del lema del nav
+  // —es el mismo gesto y tiene que sonar igual— con una sola excepción, el
+  // borrado: ver `escribir.js` y `--ttx-dur`.
+  const letras = maquina(vivo, {
+    paso: Number(host.dataset.letra) || NAV.paso,
+    espera: ESPERA,
+    techoBorrado: CIERRE,
+  });
+
+  const abrir = crearGesto({
+    vida: Number(host.dataset.grieta) || LINGER,
+    encender(fuente) {
+      host.setAttribute('data-abierto', '');
+      grieta.setAttribute('aria-expanded', 'true');
+      extra.removeAttribute('inert');
+      letras.abrir(fuente === 'tecla' || menos.matches);
+    },
+    apagar(fuente) {
+      host.removeAttribute('data-abierto');
+      grieta.setAttribute('aria-expanded', 'false');
+      extra.setAttribute('inert', '');
+      letras.cerrar(fuente === 'tecla' || menos.matches);
+    },
+  });
+
+  const soltarDisparos = disparos(host, [
+    // **La bisagra es la banda entera**, no el botón de las sílabas.
+    //
+    // Con el botón, la línea se cerraba sola y de dos maneras. Una: al abrirse,
+    // las sílabas se corren hacia la izquierda —eso *es* la grieta cerrándose—
+    // y el botón se salía de debajo del cursor quieto, que disparaba
+    // `pointerleave`, que cerraba, que devolvía las sílabas debajo del cursor,
+    // que volvía a abrir. Un ciclo, con la mano quieta. Y dos: irse hacia los
+    // nombres de los DJs o hacia los links era salirse del botón, así que lo
+    // que se abría no se podía tocar.
+    //
+    // Las dos salen del mismo error —hacer bisagra de algo que se mueve— y por
+    // eso el arreglo es uno solo: la que escucha es una caja que no se mueve
+    // nunca y que contiene todo lo que hay que poder alcanzar. El botón sigue
+    // existiendo para el teclado y el lector de pantalla, que es para lo que
+    // estaba.
+    //
+    // Va **trabada en tacto**: en teléfono un toque la abre y se queda abierta
+    // hasta que se toque en otra parte. Es la excepción a la regla de "soltar el
+    // dedo suelta el gesto", y la razón es que lo que aparece son links de
+    // verdad —las tres redes y el correo—; con la cola de siempre habría que
+    // atinarles en segundo y medio.
+    {
+      el: banda,
+      foco: grieta,
+      gesto: abrir,
+      dentro: (n) => Boolean(n) && banda.contains(n),
+      trabar: true,
+    },
+    ...estados.map((est) => ({ el: est.boton, gesto: est.gesto, dentro: est.tieneFoco })),
+  ]);
+
   // La preferencia se puede cambiar con la página abierta: ahí hay que
   // cambiarle el archivo al emblema, que ya no se vuelve a crear nunca.
   const soltarMenos = escuchar(menos, () => {
@@ -113,6 +224,8 @@ registrar('about', async (host) => {
     destruir() {
       soltarDisparos();
       soltarMenos();
+      abrir.cerrar();
+      letras.soltar();
       for (const est of estados) est.soltar();
     },
   };
@@ -150,191 +263,305 @@ function normalizar(dj) {
 // ── El texto ────────────────────────────────────────────────────────────
 
 /**
- * El único texto de la página, en **un solo renglón** de punta a punta:
+ * El único texto de la página, en **un solo renglón** de punta a punta, y en
+ * cuatro piezas de las que solo se ven dos en reposo:
  *
- *   SONIC HUSTLERS SINCE 2020        TRATRATRAX IS A LABEL RUN BY DJ LOMALINDA…
- *   └──────── el lema ───────┘       └──────────────── el sello ─────────────┘
+ *   TRA    TRA    TRAX  ·hueco·  A RECORD LABEL RUN BY__ DJ …  ⟨lo que entra⟩
+ *   └─── la grieta ───┘          └────────── el sello ───────┘ └─ la entrada ─┘
  *
- * Dos bloques y el hueco entre ellos, que no es un espacio escrito sino lo que
- * sobra de la barra: el CSS los empuja a los dos bordes.
+ * **La grieta no lleva medidas escritas.** Las sílabas se abren porque el
+ * `flex` reparte lo que sobra de la barra entre ellas y el hueco que va antes
+ * del sello (`about.css`, `--ttx-about-grieta-crece` y `--ttx-about-hueco-crece`).
+ * Cuando la entrada se despliega deja de sobrar, y las sílabas se cierran
+ * solas: no hay una animación del `gap`, hay una sola cosa que se anima —el
+ * ancho de la entrada— y la grieta es su consecuencia. Por eso no hay nada que
+ * medir desde el JS y nada que se descuadre al cambiar el ancho de la ventana.
  *
- * **Adentro de un bloque los grupos van pegados, sin espacio**, y lo único que
- * los separa es que el peso alterna: fuerte, liviano, fuerte, liviano. Los
- * espacios que sí existen son los de adentro de un grupo —`SONIC HUSTLERS` son
- * dos palabras— porque ahí son parte del texto. Por eso el copy llega marcado
- * con asteriscos:
+ * **La alternancia arranca en liviano y se reinicia en cada enunciado.** Así
+ * están las capturas del sello:
  *
- *   *SONIC HUSTLERS*SINCE*2020*
- *   ─────fuerte──── liviano fuerte
+ *   A RECORD LABEL RUN BY__ DJ LOMALINDA / NYKSAN / VERRACO
+ *   ░░░░░░░░░░░░░░░░░░░░░░  ▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉
+ *   SONIC HUSTLERS__ SINCE 2020
+ *   ░░░░░░░░░░░░░░░  ▉▉▉▉▉▉▉▉▉▉
  *
- * Cada asterisco es una junta y **no se imprime**; no es un espacio, es el
- * punto donde cambia el peso.
+ * y por eso son dos llamadas a `grupos`, no una: cada enunciado empieza su
+ * propia cuenta. Lo que separa un enunciado del otro es **el aire**, sin `__`
+ * de por medio — las dos separaciones son distintas y viven en `tokens.css`
+ * (`--ttx-junta` y `--ttx-aire`).
  *
- * **Los tres nombres siguen la misma alternancia**, y por eso se pegan al final
- * del segundo bloque en vez de ir en una lista aparte: `DJ LOMALINDA` fuerte,
- * `NYKSAN` liviano, `VERRACO` fuerte. La cuenta no se reinicia — sigue desde el
- * último campo de la frase, que es lo que hace que los nombres se lean como más
- * campos de la misma línea y no como una enumeración pegada al final.
+ * **Los tres nombres son un solo grupo**, separados por `/` y en el peso fuerte
+ * que les toca por cerrar el enunciado. Antes iban repartidos en la alternancia
+ * —un nombre fuerte, otro liviano— y las capturas lo corrigen: se leen como una
+ * lista, no como más campos de la frase. Cada uno sigue siendo un `<button>` de
+ * verdad, así que el teclado sale gratis; lo que cambió es que el peso ya no es
+ * de cada nombre sino del grupo que los contiene.
  *
  * Nada de comas ni de "and". La línea se **compone** desde `about.json` para
  * que los nombres y sus disparadores tengan una sola fuente — agregar un cuarto
  * DJ es agregarlo al JSON, no editar una frase en un sitio y una lista en otro.
- *
- * Cada nombre es un `<button>` de verdad —el teclado sale gratis, como el
- * título del home—, no un `<span>` con eventos.
  */
 function crearTexto(about, estados) {
-  const lema = partir(about.lema);
-  const sello = partir(about.sello);
+  // Enunciado 1: la frase del sello y los tres nombres, que son su último
+  // grupo. Van en la misma llamada porque el peso de los nombres sale de la
+  // alternancia de la frase, no de una regla aparte.
+  const frase = partir(about.sello);
+  const sello = grupos([...frase, estados.map((est) => est.nombre).join(BARRA)]);
+  const nombres = sello[sello.length - 1];
 
-  // La alternancia del segundo bloque no se reinicia en los nombres: sigue
-  // contando desde donde la dejó la frase.
-  for (const [i, est] of estados.entries()) est.vestir(liviano(sello.length + i));
+  const grieta = elemento(
+    'button',
+    {
+      class: 'ttx-about-grieta',
+      type: 'button',
+      'aria-expanded': 'false',
+      // Lo que hace, dicho para quien no lo puede pasar con la mano. El nombre
+      // del sello ya está en las sílabas de adentro.
+      'aria-label': `${(about.silabas ?? []).join('')} — opens the rest of the line`,
+    },
+    ...(about.silabas ?? []).map((s) => elemento('span', { class: 'ttx-about-silaba' }, s)),
+  );
 
-  return elemento(
+  // Lo que entra en la grieta, que se construye **dos veces**. Ver el eco más
+  // abajo: uno se escribe y el otro le sostiene el sitio.
+  const dentro = () => [
+    // Enunciado 2: el lema. Cuenta propia, arranca en liviano.
+    elemento('span', { class: 'ttx-about-bloque' }, ...grupos(partir(about.lema)).map(crearCampo)),
+    // Enunciados 3, 4 y 5: las tres redes del sello. Una cada uno —por eso
+    // ninguna lleva junta y todas van livianas—, separadas por el aire.
+    ...(about.redes ?? [])
+      .filter((r) => r?.nombre && r?.url)
+      .map((r) => crearEnlace(r.nombre, r.url)),
+    // Y el correo, que es un grupo solo: los dos puntos y el espacio son
+    // parte del texto, no una junta. Es la única línea del sitio con un signo
+    // adentro y así llegó de las capturas.
+    about.bookings?.texto &&
+      crearEnlace(about.bookings.texto, `mailto:${about.bookings.email || about.bookings.texto}`, {
+        fuera: false,
+      }),
+  ];
+
+  // **El eco**: la misma línea, completa, invisible y fuera del alcance. Es lo
+  // que le reserva el ancho a la que se escribe.
+  //
+  // Sin él, el ancho de la entrada sería el del texto tecleado hasta ahora, y
+  // entonces la grieta se cerraría al ritmo de la escritura —cuatro segundos de
+  // sílabas arrastrándose— en vez de cerrarse de una, que es la animación que
+  // ya estaba y que es la que se queda. Con el eco, lo que se anima sigue siendo
+  // una sola cosa, el hueco, y el texto se escribe **dentro** de un sitio que ya
+  // está hecho. Eso es lo que arregla de paso el desorden de teléfono: la línea
+  // envuelta no se vuelve a repartir con cada letra, porque su reparto lo fijó
+  // el eco.
+  //
+  // `inert` propio y no heredado: la entrada se lo quita al abrirse y el eco
+  // tiene que seguir siendo intocable — son cuatro links repetidos.
+  const vivo = elemento('span', { class: 'ttx-about-vivo' }, ...dentro());
+
+  const extra = elemento(
+    'span',
+    // Nace cerrado y **fuera del alcance**: adentro hay cuatro links y sin el
+    // `inert` se podría tabular a ellos con la línea cerrada, que es tabular al
+    // vacío. Es la misma regla del emblema apagado.
+    { class: 'ttx-about-entrada', inert: '' },
+    elemento(
+      'span',
+      { class: 'ttx-about-entrada-in' },
+      elemento(
+        'span',
+        { class: 'ttx-about-eco', 'aria-hidden': 'true', inert: '' },
+        ...dentro(),
+      ),
+      vivo,
+    ),
+  );
+
+  const texto = elemento(
     'p',
     { class: 'ttx-about-texto' },
-    lema.length > 0 && elemento('span', { class: 'ttx-about-bloque' }, ...lema.map(crearCampo)),
+    grieta,
+    // El hueco entre la grieta y el sello. Es un elemento y no un `gap` porque
+    // tiene que **crecer distinto** que el aire de entre sílabas: en reposo el
+    // sello se va contra el borde derecho y este hueco es el que se lleva la
+    // diferencia.
+    elemento('span', { class: 'ttx-about-hueco', 'aria-hidden': 'true' }),
     elemento(
       'span',
       { class: 'ttx-about-bloque' },
-      ...sello.map(crearCampo),
-      ...estados.map((est) => est.boton),
+      ...sello.slice(0, -1).map(crearCampo),
+      crearNombres(nombres, estados),
     ),
+    extra,
+  );
+
+  return { texto, grieta, extra, vivo };
+}
+
+/** Un grupo ya resuelto por `format.js:grupos`: su texto y sus dos clases. */
+function crearCampo({ texto, clase }) {
+  return elemento('span', { class: clase }, texto);
+}
+
+/**
+ * El grupo de los nombres: un solo `<span>` con el peso del grupo y los tres
+ * `<button>` adentro, separados por la barra. El peso lo hereda cada botón del
+ * span que los envuelve, así que ninguno lo lleva escrito.
+ */
+function crearNombres({ clase }, estados) {
+  const span = elemento('span', { class: clase });
+  for (const [i, est] of estados.entries()) {
+    if (i) span.append(BARRA);
+    span.append(est.boton);
+  }
+  return span;
+}
+
+/**
+ * Un enunciado que es un link y nada más: una red o el correo. Liviano porque
+ * es el grupo 0 de su propio enunciado, y sin junta porque también es el
+ * último.
+ */
+function crearEnlace(texto, href, { fuera = true } = {}) {
+  return elemento(
+    'a',
+    {
+      class: 'ttx-about-enlace ttx-suave',
+      href,
+      target: fuera && '_blank',
+      rel: fuera && 'noopener',
+    },
+    texto,
   );
 }
 
-/**
- * El asterisco es **la junta**, y así llega el copy escrito:
- *
- *   "*Sonic hustlers*since*2020*"  →  ["Sonic hustlers", "since", "2020"]
- *
- * No se imprime nunca; solo dice dónde termina un grupo y empieza el otro. Los
- * grupos alternan peso empezando por el fuerte, que es lo único que los separa:
- * entre uno y otro no va ni un espacio.
- *
- * Se guarda así en `data/about.json`, con los asteriscos, porque es la única
- * forma de que el sello escriba la línea entera —texto y ritmo— en un solo
- * sitio. Una frase sin asteriscos es un grupo fuerte y ya: no se rompe nada.
- */
-function partir(frase) {
-  if (!frase) return [];
-  return String(frase)
-    .split('*')
-    .map((t) => t.trim())
-    .filter(Boolean);
-}
-
-/** Los impares van livianos: el primer grupo de cada bloque siempre es fuerte. */
-const liviano = (i) => i % 2 === 1;
-
-function crearCampo(texto, i) {
-  return elemento('span', { class: peso(liviano(i)) }, texto);
-}
-
-const peso = (esLiviano) => (esLiviano ? 'ttx-about-suave' : 'ttx-about-fuerte');
-
-// ── Las apariciones ─────────────────────────────────────────────────────
+// ── Los gestos ──────────────────────────────────────────────────────────
 
 /**
- * El estado de un DJ. No hay estado global: no hay cola, no hay uno-a-la-vez,
- * no hay nada que coordinar entre los tres. Cada uno sabe si su disparador
- * está activo y si su emblema está encendido, y eso es todo.
+ * El reloj de un gesto que se sostiene con la mano. Lo usan los dos gestos de
+ * la página —el emblema de un DJ y la grieta— y por eso vive aparte: la
+ * disciplina es la misma y no puede haber dos versiones de ella.
  *
- * **Las fuentes se cuentan, no se pisan.** El mismo nombre puede estar activo
- * por el ratón y por el teclado a la vez (foco puesto y el puntero encima), y
- * soltar una no puede apagar la otra. Es el `mano` del home, con nombre.
+ * **Las fuentes se cuentan, no se pisan.** El mismo disparador puede estar
+ * activo por el ratón y por el teclado a la vez (foco puesto y el puntero
+ * encima), y soltar una no puede apagar la otra. Es el `mano` del home, con
+ * nombre.
  *
- * El ciclo entero son tres reglas:
+ * Tres reglas:
  *
- *   1. Se enciende cuando llega la primera fuente, en un sitio sorteado **en
- *      ese instante**.
- *   2. Mientras haya una fuente puesta no hay reloj: la imagen no se mueve, no
- *      se recicla y no se apaga por su cuenta.
- *   3. Cuando se va la última fuente arranca la cola de `vida` ms, quieta en el
- *      mismo sitio. Volver antes de que se cumpla **cancela la cola y no
- *      resortea**: no hay forma de hacer que el santo brinque con la mano
- *      encima.
- *
- * El emblema no se crea ni se destruye nunca —eso lo hace `crearEmblema`, una
- * sola vez— porque quitar un GIF del DOM le reinicia la animación.
+ *   1. Se enciende cuando llega la primera fuente.
+ *   2. Mientras haya una fuente puesta **no hay reloj**: no se recicla, no se
+ *      resortea y no se apaga por su cuenta.
+ *   3. Cuando se va la última fuente arranca la cola de `vida` ms. Volver antes
+ *      de que se cumpla **cancela la cola sin volver a encender**: `encender`
+ *      no se llama dos veces seguidas, así que el emblema no brinca a otro
+ *      sitio con la mano encima.
  */
-function crearEstado(dj, { campo, vida, menos }) {
+function crearGesto({ vida, encender, apagar }) {
   const fuentes = new Set();
-  const el = crearEmblema(dj, menos.matches);
-  const boton = crearBoton(dj);
-  campo.append(el);
-
-  let encendido = false;
+  let vivo = false;
   let timer = null;
 
-  const fuente = () => (menos.matches ? dj.quieto : dj.emblema);
-
-  const encender = () => {
+  const parar = () => {
     clearTimeout(timer);
     timer = null;
-    if (encendido) return;
-    // El sorteo ocurre aquí y solo aquí: apagado el emblema, nadie lo ve
-    // moverse. Con el emblema encendido esta función ya se salió arriba.
-    //
-    // Salen dos números de 0 a 1, no dos porcentajes. **La zona la pone el
-    // CSS** —la derecha en pantalla ancha, abajo en teléfono— y esto es
-    // solamente el azar: dónde cae dentro de la zona que le toque. Poner el
-    // recorte aquí obligaría al JS a saber de anchos de pantalla, que es la
-    // única cosa que este widget nunca ha tenido que saber.
-    el.style.setProperty('--ttx-about-rx', Math.random().toFixed(4));
-    el.style.setProperty('--ttx-about-ry', Math.random().toFixed(4));
-    el.removeAttribute('data-apagado');
-    el.removeAttribute('inert');
-    encendido = true;
-  };
-
-  const apagar = () => {
-    clearTimeout(timer);
-    timer = null;
-    if (!encendido) return;
-    el.setAttribute('data-apagado', '');
-    el.setAttribute('inert', '');
-    encendido = false;
   };
 
   return {
-    boton,
-
-    /**
-     * El peso que le toca al nombre en la alternancia de la línea. Lo decide
-     * `crearTexto`, que es el único que sabe cuántos campos vinieron antes.
-     */
-    vestir(esLiviano) {
-      boton.classList.add(peso(esLiviano));
-    },
-
-    /** ¿Tiene el foco de teclado como fuente? Lo pregunta `disparos`. */
-    conTecla: () => fuentes.has('tecla'),
-    /** ¿El foco está dentro de su emblema encendido? El caso de tabular hasta el santo. */
-    tieneFoco: (nodo) => Boolean(encendido && nodo && el.contains(nodo)),
-
     activar(f) {
       fuentes.add(f);
-      encender();
+      parar();
+      if (vivo) return;
+      vivo = true;
+      // Quién lo encendió va con el aviso: es lo único que le permite a la
+      // grieta escribir letra por letra con la mano y de un golpe con el
+      // teclado. A quien tabula no se le puede hacer esperar cuatro segundos a
+      // que salga el link que va a buscar.
+      encender(f);
     },
 
     desactivar(f) {
       if (!fuentes.delete(f)) return;
       // Queda otra mano puesta: no empieza a contar nada.
-      if (fuentes.size || !encendido) return;
-      clearTimeout(timer);
-      timer = setTimeout(apagar, vida);
+      if (fuentes.size || !vivo) return;
+      parar();
+      timer = setTimeout(() => {
+        timer = null;
+        vivo = false;
+        apagar(f);
+      }, vida);
     },
+
+    /** ¿Está activo por esta fuente? Lo pregunta `disparos` para el teclado. */
+    tiene: (f) => fuentes.has(f),
+    /** ¿Está encendido ahora mismo? */
+    vivo: () => vivo,
+
+    /** Cierre inmediato, sin cola: el desmontaje del widget. */
+    cerrar() {
+      fuentes.clear();
+      parar();
+      if (!vivo) return;
+      vivo = false;
+      // Como si lo cerrara el teclado: sin animación. Lo que viene después de
+      // esto es que el widget desaparece.
+      apagar('tecla');
+    },
+  };
+}
+
+// ── Las apariciones ─────────────────────────────────────────────────────
+
+/**
+ * El estado de un DJ. No hay estado global: no hay cola, no hay uno-a-la-vez,
+ * no hay nada que coordinar entre los tres. Cada uno tiene su `crearGesto` y
+ * eso es todo.
+ *
+ * El emblema no se crea ni se destruye nunca —eso lo hace `crearEmblema`, una
+ * sola vez— porque quitar un GIF del DOM le reinicia la animación.
+ */
+function crearEstado(dj, { campo, vida, menos }) {
+  const el = crearEmblema(dj, menos.matches);
+  const boton = crearBoton(dj);
+  campo.append(el);
+
+  const gesto = crearGesto({
+    vida,
+    encender() {
+      // El sorteo ocurre aquí y solo aquí: apagado el emblema, nadie lo ve
+      // moverse. Con el emblema encendido `crearGesto` ya no vuelve a llamar.
+      //
+      // Salen dos números de 0 a 1, no dos porcentajes. **La zona y la zona
+      // segura las pone el CSS** —toda la ventana, encogida en medio emblema
+      // por cada lado— y esto es solamente el azar: dónde cae dentro de ella.
+      // Poner el recorte aquí obligaría al JS a saber de anchos de pantalla y
+      // del tamaño del emblema, que es lo único que este widget nunca ha
+      // tenido que saber.
+      el.style.setProperty('--ttx-about-rx', Math.random().toFixed(4));
+      el.style.setProperty('--ttx-about-ry', Math.random().toFixed(4));
+      el.removeAttribute('data-apagado');
+      el.removeAttribute('inert');
+    },
+    apagar() {
+      el.setAttribute('data-apagado', '');
+      el.setAttribute('inert', '');
+    },
+  });
+
+  return {
+    boton,
+    gesto,
+    nombre: dj.nombre,
+
+    /** ¿El foco está dentro de su emblema encendido? El caso de tabular hasta el santo. */
+    tieneFoco: (nodo) => Boolean(gesto.vivo() && nodo && el.contains(nodo)),
 
     /** Cambió `prefers-reduced-motion` con la página abierta. */
     revisarMovimiento() {
-      const url = fuente();
+      const url = menos.matches ? dj.quieto : dj.emblema;
       const img = el.querySelector('img');
       if (img && img.src !== url) img.src = url;
     },
 
-    soltar: apagar,
+    soltar: gesto.cerrar,
   };
 }
 
@@ -372,12 +599,12 @@ function crearBoton(dj) {
  * alcanzable —ni con el ratón ni con Tab—, o habría tres links invisibles
  * repartidos por la pantalla.
  *
- * La posición es el centro, en porcentaje del campo, en dos variables que el
- * CSS traduce a `left`/`top` con un `translate(-50%,-50%)`. Que sea el centro
- * es lo que le da el **derecho a cortarse**: un emblema en el 2% de la
- * izquierda sale con la mitad afuera y el marco lo corta. Que vaya en
- * porcentaje evita medir el campo desde el JS y de paso el emblema no se
- * descoloca si la ventana cambia de tamaño mientras se ve. Las escribe
+ * La posición son dos números de 0 a 1 que el CSS traduce a `left`/`top` **y a
+ * un `translate` del mismo porcentaje**: con 0 el emblema se apoya en el borde
+ * de arranque, con 1 en el de llegada y con 0.5 queda centrado. Ese es todo el
+ * truco de la zona segura, y es lo que permite que el CSS la calcule con el
+ * tamaño real del emblema —que es distinto en cada uno: hay uno cuadrado, uno
+ * alto y uno apaisado— sin que el JS tenga que medir nada. Las escribe
  * `crearEstado` al encender; aquí solo nace en el centro, donde nadie lo ve.
  */
 function crearEmblema(dj, quieto) {
@@ -413,52 +640,88 @@ function crearEmblema(dj, quieto) {
  * `pointerleave`, y atender los cinco eventos sin distinguir haría dos
  * apariciones por toque.
  *
+ * **La pieza trabada es la excepción en tacto.** La grieta no se suelta al
+ * levantar el dedo: se queda abierta hasta que se toque fuera de ella y fuera
+ * de lo que abrió. Es lo que hace que en teléfono se pueda tocar `INSTAGRAM` o
+ * el correo, que son links de verdad. Los emblemas no la usan: ahí el link es
+ * el santo y cazarlo *es* el gesto.
+ *
  * **El teclado se suelta distinto**, y es la única complicación de este widget.
- * Tabular desde el nombre lleva justamente al emblema —que está después en el
- * DOM— así que si el `blur` del nombre lo borrara, no habría nada que alcanzar:
- * el foco se iría al vacío en el mismo fotograma en que lo va a buscar. Por eso
- * no se mira el evento sino **dónde aterrizó el foco**, un cuadro después: si
- * sigue dentro del nombre o dentro de su emblema, el disparador sigue activo.
+ * Tabular desde el disparador lleva justamente a lo que abrió —el emblema o la
+ * entrada, que están después en el DOM— así que si el `blur` lo cerrara, no
+ * habría nada que alcanzar: el foco se iría al vacío en el mismo fotograma en
+ * que lo va a buscar. Por eso no se mira el evento sino **dónde aterrizó el
+ * foco**, un cuadro después: si sigue dentro del disparador o dentro de lo que
+ * abrió, el gesto sigue activo.
  */
-function disparos(host, estados) {
+function disparos(host, piezas) {
   const ac = new AbortController();
   const { signal } = ac;
   const raton = (e) => e.pointerType === 'mouse';
 
-  for (const est of estados) {
-    const b = est.boton;
-    const on = (tipo, fn) => b.addEventListener(tipo, fn, { signal });
+  for (const p of piezas) {
+    const on = (tipo, fn) => p.el.addEventListener(tipo, fn, { signal });
 
-    on('pointerenter', (e) => raton(e) && est.activar('raton'));
-    on('pointerleave', (e) => raton(e) && est.desactivar('raton'));
+    on('pointerenter', (e) => raton(e) && p.gesto.activar('raton'));
+    on('pointerleave', (e) => raton(e) && p.gesto.desactivar('raton'));
 
     on('pointerdown', (e) => {
       if (raton(e)) return;
-      // Con la captura, soltar el dedo fuera del nombre sigue avisando aquí;
-      // sin ella un deslizamiento hacia afuera dejaba la ráfaga corriendo para
-      // siempre.
-      try {
-        b.setPointerCapture(e.pointerId);
-      } catch {
-        /* el navegador no la da: `pointercancel` sigue cubriendo el caso */
+      // Con la captura, soltar el dedo fuera del disparador sigue avisando
+      // aquí; sin ella un deslizamiento hacia afuera dejaba el gesto corriendo
+      // para siempre. La pieza trabada no la pide: no escucha el `pointerup`.
+      if (!p.trabar) {
+        try {
+          p.el.setPointerCapture(e.pointerId);
+        } catch {
+          /* el navegador no la da: `pointercancel` sigue cubriendo el caso */
+        }
       }
-      est.activar('tacto');
+      p.gesto.activar('tacto');
     });
-    on('pointerup', (e) => !raton(e) && est.desactivar('tacto'));
-    on('pointercancel', (e) => !raton(e) && est.desactivar('tacto'));
 
+    if (!p.trabar) {
+      on('pointerup', (e) => !raton(e) && p.gesto.desactivar('tacto'));
+      on('pointercancel', (e) => !raton(e) && p.gesto.desactivar('tacto'));
+    }
+
+    // **La mano y el foco no siempre escuchan al mismo elemento.** En la grieta
+    // la mano escucha la banda entera —una caja que no se mueve— pero el foco
+    // solo puede estar en algo que se pueda tabular, que es el botón de las
+    // sílabas. `foco` es ese, cuando son distintos.
+    //
     // Solo el foco de teclado. Un clic del ratón también da foco, y ahí el
     // `pointerleave` ya se encarga: sin este filtro, hacer clic en un nombre
     // dejaría su emblema clavado en pantalla hasta que el foco se fuera.
-    on('focus', () => tecla(b) && est.activar('tecla'));
+    const focal = p.foco ?? p.el;
+    focal.addEventListener('focus', () => tecla(focal) && p.gesto.activar('tecla'), { signal });
+  }
+
+  // El destrabe. Va en el documento y **en captura**, que es lo que lo hace
+  // correcto: el mismo toque que abre la grieta pasa por aquí antes de llegar
+  // al botón, y en ese momento el `contains` ya dice que sí — así que no se
+  // cierra a sí misma.
+  const trabadas = piezas.filter((p) => p.trabar);
+  if (trabadas.length) {
+    document.addEventListener(
+      'pointerdown',
+      (e) => {
+        if (raton(e)) return;
+        for (const p of trabadas) {
+          if (p.el.contains(e.target) || p.dentro(e.target)) continue;
+          p.gesto.desactivar('tacto');
+        }
+      },
+      { signal, capture: true },
+    );
   }
 
   const revisarFoco = () => {
     const foco = document.activeElement;
-    for (const est of estados) {
-      if (!est.conTecla()) continue;
-      if (foco === est.boton || est.tieneFoco(foco)) continue;
-      est.desactivar('tecla');
+    for (const p of piezas) {
+      if (!p.gesto.tiene('tecla')) continue;
+      if (foco === (p.foco ?? p.el) || p.dentro(foco)) continue;
+      p.gesto.desactivar('tecla');
     }
   };
 

@@ -2,9 +2,8 @@
 // El widget del About aislado, con los datos reales y el mismo bundle que se
 // carga en Cargo. Lo que se ve aquí es lo que se ve allá.
 //
-// El chrome de abajo es una imitación del de Cargo — la barra contra la que se
-// apoya la grieta. Está solo para juzgar las proporciones; no es parte del
-// widget.
+// El chrome de abajo es una imitación del de Cargo. Está solo para juzgar las
+// proporciones y para ver que el widget deja su hueco; no es parte del widget.
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
@@ -19,9 +18,9 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
         margin: 0;
         height: 100%;
         /* No es el color de nada: está para que se vea dónde termina el recorte
-           de los cuatro lados y hasta dónde llega la grieta. Ahora que el papel
-           del About es el gris del chrome (`#e5e5e5`), este tiene que ser
-           bastante más oscuro o el borde del widget se pierde. */
+           de los cuatro lados. Como el papel del About es el gris del chrome
+           (`#e5e5e5`), este tiene que ser bastante más oscuro o el borde del
+           widget se pierde. */
         background: #b0aaa1;
         color: #000;
         font-family: ui-sans-serif, system-ui, sans-serif;
@@ -51,7 +50,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
          `style` inline le gana a cualquier CSS, incluido el global de Cargo.
 
          `--ttx-margen` recorta por los cuatro lados y `--ttx-nav-h` deja abajo
-         el hueco de la barra de Cargo — debajo de la grieta. -->
+         el hueco de la barra de Cargo. -->
     <div data-ttx="about" style="--ttx-margen: 10px; --ttx-nav-h: 1.6rem"></div>
 
     <div class="chrome">

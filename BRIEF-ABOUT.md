@@ -14,6 +14,20 @@ aparición que se queda quieta y **la grieta, que se quitó**. Lo que decía est
 documento antes sobre el fondo negro, los dos renglones, el reciclaje y el
 aplastado **ya no aplica** — está reescrito donde tocaba, no anotado.
 
+**Revisado otra vez el 2026-08-19**, con siete capturas del sello delante.
+Cuatro cosas cambiaron y están reescritas abajo, no anotadas:
+
+1. **Vuelve una grieta, y es otra.** No la banda aplastada del pie: el hueco
+   dentro del nombre del sello, `TRA · TRA · TRAX` abierto a lo ancho. La mano
+   lo cierra y ahí entra el resto de la línea. Ver §3.4.
+2. **La alternancia arranca en liviano** y **se reinicia en cada enunciado**.
+   Los tres nombres dejan de ir intercalados: son un solo grupo separado por
+   `/`. Ver §3.2 bis.
+3. **Entre grupos sí va algo**: la junta, `__` y un espacio pequeño. Es la regla
+   nueva del sitio entero (`format.js:grupos`), no una decisión de esta página.
+4. **La zona vuelve a ser toda la ventana**, ahora con zona segura: ningún
+   emblema sale cortado por el borde. Ver §3.2 ter.
+
 ---
 
 ## 1. Contexto — por qué esta página
@@ -93,17 +107,17 @@ es un eco buscado, no un choque.
 ### 3.2 El stack se queda en dos: banda y campo
 
 ```
-ESCRITORIO                        TELÉFONO
-┌────────────────────────────┐    ┌──────────────────┐
-│                  ✝◉✝       │    │SONIC HUSTLERS…   │  ← la línea
-│SONIC HUSTLERS…  TRATRAT…   │    │TRATRATRAX IS A…  │    envuelve
-│                            │    │                  │
-│  gris          ✝◉✝         │    │      gris        │
-│                            │    ├─ ─ ─ ─ ─ ─ ─ ─ ─ ┤
-│                    ✝◉✝     │    │   ✝◉✝     ✝◉✝    │  ← la zona:
-└────────────────────────────┘    │        ✝◉✝       │    la mitad
-      barra de Cargo              └──────────────────┘    de abajo
-└─── la zona: la mitad derecha ──┘      barra de Cargo
+ESCRITORIO                            TELÉFONO
+┌────────────────────────────────┐    ┌──────────────────┐
+│ ✝◉✝                            │    │TRA   TRA   TRAX  │  ← la grieta,
+│TRA   TRA   TRAX   A RECORD LA… │    │A RECORD LABEL R… │    su renglón
+│                       ✝◉✝      │    │                  │
+│  gris                          │    │   ✝◉✝     ✝◉✝    │
+│         ✝◉✝                    │    │        gris      │
+│                          ✝◉✝   │    │  ✝◉✝             │
+└────────────────────────────────┘    └──────────────────┘
+      barra de Cargo                    barra de Cargo
+└─── la zona: toda la ventana ──┘   └── la zona: igual ──┘
 ```
 
 **No hay tercera banda.** El About usa `crearStack(host, { banda: true })` y
@@ -115,11 +129,12 @@ no reescribir.
 `--ttx-about-aire` —`clamp(48px, 12vh, 132px)`— y todo lo que sobra queda
 debajo, vacío. La página es una hoja de chrome con una sola línea alta.
 
-**El campo es toda la ventana, la zona no.** `.ttx-contenido` cruza las tres
-filas (`grid-row: 1 / -1`), así que las coordenadas se cuentan contra la
-pantalla entera; encima de eso, cuatro variables recortan **dónde** cae el azar.
-En pantalla ancha, la mitad derecha; en teléfono, la mitad de abajo. El reparto
-de capas lo hace el `z-index`: campo `0`, banda `1`.
+**El campo es toda la ventana, y la zona también.** `.ttx-contenido` cruza las
+tres filas (`grid-row: 1 / -1`) y se queda en la columna 1 (`grid-column: 1`,
+que no es opcional — ver §5.2), así que las coordenadas se cuentan contra la
+pantalla entera. Las cuatro variables de la zona siguen ahí para poder acotarla
+desde el placeholder, pero por defecto no recortan nada. El reparto de capas lo
+hace el `z-index`: campo `0`, banda `1`.
 
 La bisagra es **una barra de un solo renglón, del grosor de la del home**
 (`--ttx-banda-h: 1.9rem`). El intersticio es la misma barra de chrome en las
@@ -133,78 +148,98 @@ regla de pantalla ancha, no del texto.
 El copy se escribe con **asteriscos en las juntas**, y así se guarda:
 
 ```
-*SONIC HUSTLERS*SINCE*2020*      *TRATRATRAX*IS A LABEL RUN BY*DJ LOMALINDA*NYKSAN*VERRACO*
+*A record label run by*          *Sonic hustlers*since 2020*
 ```
 
 y se lee así:
 
 ```
-SONIC HUSTLERSSINCE2020          TRATRATRAXIS A LABEL RUN BYDJ LOMALINDANYKSANVERRACO
-━━━━━━━━━━━━━━╌╌╌╌╌━━━━          ━━━━━━━━━━╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌━━━━━━━━━━━━╌╌╌╌╌╌━━━━━━━
-   fuerte     liviano fuerte        fuerte      liviano       fuerte    liviano fuerte
+A RECORD LABEL RUN BY__ DJ LOMALINDA / NYKSAN / VERRACO
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      liviano                       fuerte
+
+SONIC HUSTLERS__ SINCE 2020
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌   ━━━━━━━━━━
+    liviano        fuerte
 ```
 
-Tres reglas, y ninguna es negociable porque son *la* forma en que escribe la
-casa:
+Cuatro reglas, y ninguna es negociable porque son *la* forma en que escribe la
+casa — y ya no son solo de esta página: viven en `format.js:grupos` y valen
+igual en el home y en los créditos del catálogo.
 
-1. **Entre grupos no va nada.** Ni coma, ni "and", ni punto, ni espacio. El
-   asterisco marca la junta y **no se imprime**: no es un espacio, es el punto
-   donde cambia el peso.
+1. **Entre grupos va la junta**: `__` y un espacio pequeño. El asterisco marca
+   dónde termina un grupo y **no se imprime**; lo que se imprime es el `__`, y
+   lo pone el CSS. El último grupo del enunciado no la lleva.
 2. **Los espacios que sí se ven son los de adentro de un grupo.** `SONIC
-   HUSTLERS` son dos palabras y llevan su espacio; `IS A LABEL RUN BY` son cinco.
-   Ahí el espacio es parte del texto, no una separación de campos.
-3. **El peso alterna, empezando por el fuerte**, y es lo único que separa. Es la
-   franja del home (`KILLING MARIPOSAS KELMAN DURÁN 091826`) y el menú del nav.
+   HUSTLERS` son dos palabras y llevan su espacio. Ahí el espacio es parte del
+   texto, no una separación de campos.
+3. **El peso alterna, empezando por el liviano**, y **se reinicia en cada
+   enunciado**. Los dos enunciados de la página arrancan en peso normal.
+4. **Entre enunciados va el aire**, un espacio ancho y sin `__`. Son dos
+   separaciones distintas y confundirlas es lo que hacía que cada pantalla
+   inventara la suya.
 
-**Los tres nombres van intercalados en esa misma alternancia** —`DJ LOMALINDA`
-fuerte, `NYKSAN` liviano, `VERRACO` fuerte—, y la cuenta no se reinicia al
-llegar a ellos: sigue desde el último grupo de la frase. Eso es lo que hace que
-se lean como más campos de la misma línea y no como una lista pegada al final.
+**Los tres nombres son un solo grupo**, separados por `/`, en el peso fuerte que
+les toca por cerrar su enunciado. Hasta agosto iban intercalados en la
+alternancia —un nombre fuerte, otro liviano—; las capturas lo corrigieron: se
+leen como una lista, no como más campos de la frase. Cada uno sigue siendo un
+`<button>`, así que el teclado sale gratis.
 
-Que un nombre no se distinga de `TRATRATRAX` o de `2020` es a propósito: el
-nombre no anuncia que se pueda tocar, y el link ni siquiera es él sino el santo
-que invoca.
+Que un nombre no se distinga del resto de su grupo es a propósito: el nombre no
+anuncia que se pueda tocar, y el link ni siquiera es él sino el santo que
+invoca.
 
 Y **una sola tinta**: todo el renglón en negro. Un segundo tono metería un
 tercer nivel de información en una línea que solo tiene dos, y la haría parecer
 una frase con partes secundarias — que es exactamente lo que no es.
 
-Los dos bloques van clavados cada uno a su borde y el hueco del medio no es un
-espacio escrito: es lo que sobra de la barra.
+**Lo que se ve en reposo y lo que entra con la grieta.** En reposo solo están
+las sílabas y `A RECORD LABEL RUN BY__ …`, empujado contra el borde derecho por
+el hueco. El lema, las tres redes del sello y el correo de bookings **entran al
+cerrarse la grieta** — ver §3.4.
 
 ### 3.2 ter La zona
 
-El azar era sobre la ventana entera y se recortó. **Las dos cosas de la página
-—la línea y el emblema— se leen mejor cada una en su sitio** que peleándose el
-mismo: la línea arranca por la izquierda, así que el emblema se queda con la
-derecha.
+**Toda la ventana, con zona segura.** El azar era sobre la ventana entera, se
+recortó a la mitad derecha en julio —la línea arranca por la izquierda, así que
+el emblema se quedaba con la derecha— y en agosto el sello reportó las dos
+consecuencias: los santos salían siempre del mismo lado y encima cortados por el
+borde en teléfono.
 
-En teléfono la línea ocupa el ancho entero y envuelve, así que no hay derecha
-que dejarle: ahí la zona se acuesta y pasa a ser la mitad de abajo, que además
-es donde está la mano.
+Se corrigieron las dos. Y había una tercera, que nadie había mirado: **el campo
+mismo medía un tercio de la pantalla**. El grid del marco le abría una segunda
+columna al campo porque se cruzaba con la banda, así que la "mitad derecha" era
+la mitad derecha de un tercio. Un `grid-column: 1` lo resolvió.
 
-Adentro de la zona **no cambió nada**: sin retícula, sin zona segura, sin
-memoria de posición, y con derecho a salir medio cortado contra el borde. El
-límite es `100%` y no `100% menos el ancho del emblema` justamente por eso — el
-ancla es el centro.
+Adentro de la zona **no cambió nada más**: sin retícula, sin memoria de posición,
+y dos emblemas pueden caer encima. Lo único que se le quitó al azar es el
+derecho a cortarse contra el borde.
 
-En el JS esto no se nota: `crearEstado` sortea dos números de 0 a 1 y el CSS los
-estira hasta la zona que toque. El widget nunca ha sabido de anchos de pantalla
-y esto no lo obliga a aprender.
+La zona segura no está escrita en ningún número. El emblema se ancla con un
+`translate` de su propio porcentaje —con `0` se apoya en el borde izquierdo, con
+`1` en el derecho, con `0.5` queda centrado—, así que el recorte usa el **tamaño
+real de cada imagen**: hay una cuadrada, una alta y una apaisada, y un `calc()`
+con un número escrito a mano las habría recortado a las tres con la medida de la
+más grande.
+
+En el JS esto no se nota: `crearEstado` sortea dos números de 0 a 1 y el CSS hace
+el resto. El widget nunca ha sabido de anchos de pantalla y esto no lo obliga a
+aprender.
 
 ### 3.3 La mecánica
 
 - **Reposo:** el gris del chrome y la línea de texto. Ni una imagen, ni un loop,
   ni un destello. **Sin destello de ocio**, ni en teléfono. Quien no mueva
   la mano no ve nunca nada.
+- **Hover sobre la grieta:** se cierra y entra el resto de la línea. Ver §3.4.
 - **Hover sobre un nombre:** aparece el emblema de *ese* DJ en una **posición
-  aleatoria dentro de la zona** — la mitad derecha en escritorio, la de abajo en
-  teléfono.
-- **Azar puro, con derecho a cortarse.** Adentro de la zona no hay retícula, ni
-  zona segura, ni memoria de posición. Puede salir medio cortado por el borde,
-  puede quedar en una esquina ridícula, dos pueden caer encima. Todos son
-  resultados legales. Es el pop-up de los noventa: el kitsch entrando por el
-  comportamiento.
+  aleatoria de toda la ventana**.
+- **Azar puro, pero sin cortarse.** Adentro de la zona no hay retícula ni memoria
+  de posición: puede quedar en una esquina ridícula y dos pueden caer encima.
+  Esos siguen siendo resultados legales — es el pop-up de los noventa, el kitsch
+  entrando por el comportamiento. Lo que sí se le quitó es el corte contra el
+  borde, que el sello reportó como problema: hay zona segura, y sale del anclaje
+  del emblema, no de un número escrito.
 - **Tamaño fijo.** El azar hace una sola cosa y por eso se lee.
 - **La posición se sortea al aparecer y no se toca más.** Con la mano puesta el
   emblema no salta, no se recicla y no se apaga: no hay reloj mientras haya
@@ -228,21 +263,50 @@ y esto no lo obliga a aprender.
   clic en el Divino Niño lleva al Instagram de Nyksan. Un link que hay que
   cazar, donde le da la gana.
 
-### 3.4 La grieta: se quitó
+### 3.4 La grieta: volvió, y es otra
 
-Existió: **el mismo emblema comprimido a la fuerza en su altura, de borde a
-borde** en una franja al pie de la página, `object-fit: fill` y ya. La lectura
-literal del third space — *el hueco deforma lo que pasa por él*.
+**La grieta es el hueco dentro del nombre del sello.** `TRA · TRA · TRAX`
+separado a lo ancho de la pantalla, y el aire entre las sílabas es lo que
+responde a la mano.
 
-Se quitó el 2026-07-30. La idea era buena escrita y en pantalla resultaba una
-barra distorsionada compitiendo con la aparición: dos cosas cromáticas peleando
-en una página que tiene una sola. **El third space se demuestra en el
-comportamiento —el santo que aparece y no se deja atrapar—, no hacía falta
-además ilustrarlo.**
+```
+REPOSO   TRA      TRA      TRAX                 A RECORD LABEL RUN BY__ DJ LOMALINDA / NYKSAN / VERRACO
 
-El visor se esconde por CSS (`display: none`) en vez de no crearse: `crearStack`
-es el runtime de las cuatro páginas y no se toca por una decisión de esta. En el
-JS se fue `crearGrieta` entera y con ella el `--ttx-visor-img` del host.
+MANO     TRA TRA TRAX  A RECORD LABEL RUN BY__ DJ …  SONIC HUSTLERS__ SINCE 2020  INSTAGRAM  YOUTUBE  BANDCAMP  BOOKINGS: CARIN@OUTER-AGENCY.COM
+```
+
+- **Pasar la mano la cierra**: las tres sílabas se juntan hacia la izquierda.
+- **En el espacio que sueltan entra el resto de la línea.** No aparece un panel
+  ni se abre un menú: se termina de escribir una frase, en el mismo renglón, la
+  misma tinta y el mismo cuerpo.
+- **Al salir, la línea se queda abierta 1,5 s** y después la grieta se vuelve a
+  abrir. Mismo reloj y misma regla que los emblemas: mientras haya mano no hay
+  reloj, y volver antes de que se cumpla cancela la cola.
+- **En teléfono se traba**: un toque la abre y se queda abierta hasta que se
+  toque en otra parte. Es la excepción a la regla de "soltar el dedo suelta el
+  gesto", y la razón es que ahí adentro hay cuatro links de verdad.
+
+**Lo único que se anima es el ancho de lo que entra.** Las sílabas se cierran
+porque eso se abre: el `flex` reparte en cada cuadro lo que sobra de la barra. No
+hay una animación del hueco que pueda quedar desincronizada, ni un ancho escrito
+a mano que se quede corto en otra ventana. La única excepción es cuando la línea
+envuelve —por debajo de ~1090px—, porque ahí lo que sobra en el primer renglón ya
+no sabe nada de lo que entró en el segundo.
+
+**La grieta vieja no vuelve.** Aquella era el mismo emblema comprimido a la
+fuerza en su altura, de borde a borde en una franja al pie: la lectura literal
+del third space, *el hueco deforma lo que pasa por él*. Se quitó el 2026-07-30
+porque en pantalla eran dos cosas cromáticas peleándose una página que tiene una
+sola.
+
+Esta es otra lectura y no compite con nada: **el hueco no deforma lo que pasa por
+él, el hueco es donde cabe lo que no estaba dicho**. Y de paso resuelve algo que
+la página tenía a medias — el sello tenía tres redes y un correo que no estaban
+en ninguna parte, y meterlos en la línea de reposo la habría vuelto un pie de
+página.
+
+El visor se sigue escondiendo por CSS (`display: none`): `crearStack` es el
+runtime de las cuatro páginas y no se toca por una decisión de esta.
 
 ### 3.5 El color y el material
 
@@ -280,9 +344,10 @@ JS se fue `crearGrieta` entera y con ella el `--ttx-visor-img` del host.
   por `pointerType` de `home.js:339-382`. La línea envuelve a dos o tres
   renglones —ochenta y pico de caracteres en versalitas no caben en 390 puntos,
   y forzarlos sería tipografía de seis píxeles o la mitad de los nombres cortada
-  contra el borde, y los nombres son los disparadores— y **la zona se acuesta**:
-  la mitad de abajo en vez de la mitad derecha. Envuelto se parte por las
-  juntas, nunca dentro de un grupo.
+  contra el borde, y los nombres son los disparadores— y **la grieta se queda con
+  su propio renglón**, entero y de borde a borde. Envuelto se parte por las
+  juntas y por el aire, nunca dentro de un grupo. La zona no cambia: es toda la
+  ventana aquí también.
 - **Teclado: el emblema no se apaga mientras el nombre esté enfocado.** El foco
   es una fuente como la mano, y mientras esté puesta no hay reloj; al irse
   corre la misma cola. Del nombre se tabula al santo, que está después en el
@@ -299,21 +364,25 @@ JS se fue `crearGrieta` entera y con ella el `--ttx-visor-img` del host.
 ## 4. Cerrado — no volver a abrir
 
 - El ensayo es **no verbal**. Sin manifiesto, sin citas transcritas.
-- El copy es una sola línea, en dos bloques y con las juntas marcadas:
-  `*SONIC HUSTLERS*SINCE*2020*` a la izquierda,
-  `*TRATRATRAX*IS A LABEL RUN BY*DJ LOMALINDA*NYKSAN*VERRACO*` a la derecha.
-- **Entre grupos no va nada** —ni coma, ni espacio—; los espacios que se ven son
-  los de adentro de un grupo. **Lo único que separa es el peso**, alternando, y
-  los tres nombres van intercalados en esa misma alternancia.
+- El copy es una sola línea y se escribe con las juntas marcadas:
+  `*A record label run by*` y `*Sonic hustlers*since 2020*`. Las sílabas del
+  nombre van aparte, en `silabas`.
+- **Entre grupos va la junta**: `__` y un espacio pequeño. Entre enunciados va el
+  aire, sin `__`. Los espacios que se ven dentro de un grupo son del texto. **El
+  peso alterna arrancando en liviano y se reinicia en cada enunciado.**
+- **Los tres nombres son un solo grupo**, separados por `/`. No van intercalados
+  en la alternancia.
 - **Una sola tinta.** Negro, y ya.
-- **No hay grieta.** El About es banda y campo; el visor se esconde.
+- **La grieta es el hueco del nombre del sello**, no una banda. El About sigue
+  siendo banda y campo; el visor se esconde.
 - La barra de texto es **de un renglón, del grosor de la del home**, y va
   **arriba**, no a media pantalla.
 - **El papel es el gris del chrome `#e5e5e5`**, tinta negra, y la banda no se
   pinta aparte.
 - Un **emblema kitsch** por DJ, no un retrato. En GIF, a su color, tamaño fijo.
-- **Azar puro dentro de la zona**: la mitad derecha en escritorio, la mitad de
-  abajo en teléfono. Adentro no hay retícula, y el borde corta.
+- **Azar puro dentro de la zona, que es toda la ventana**, con zona segura.
+  Adentro no hay retícula ni memoria de posición; lo único que se le quitó al
+  azar es el corte contra el borde.
 - **La aparición no se mueve**, y dura segundo y medio después de la mano.
 - **El GIF nunca se reinicia**: el emblema no sale del DOM, solo se apaga.
 - **Reposo: gris y quietud.** Sin destello de ocio, sin loop, sin luz.
@@ -331,8 +400,16 @@ los nombres y sus disparadores tengan una sola fuente:
 
 ```json
 {
-  "lema": "*Sonic hustlers*since*2020*",
-  "sello": "*TraTraTrax*is a label run by*",
+  "silabas": ["Tra", "Tra", "Trax"],
+  "sello": "*A record label run by*",
+  "lema": "*Sonic hustlers*since 2020*",
+  "redes": [
+    { "nombre": "Instagram", "url": "https://www.instagram.com/tratratrax" },
+    { "nombre": "YouTube",   "url": "https://www.youtube.com/@tratratrax" },
+    { "nombre": "Bandcamp",  "url": "https://tratratrax.bandcamp.com/" }
+  ],
+  "bookings": { "texto": "Bookings: carin@outer-agency.com",
+                "email": "carin@outer-agency.com" },
   "djs": [
     { "nombre": "DJ Lomalinda", "instagram": "https://www.instagram.com/djlomalinda/",
       "emblema": "media/about/lomalinda.gif", "quieto": "media/about/lomalinda.png" },
@@ -343,18 +420,26 @@ los nombres y sus disparadores tengan una sola fuente:
 ```
 
 Las frases llevan **los asteriscos de las juntas** y el widget las parte por
-ahí; los nombres se pegan al final del segundo bloque, en el orden del array, y
-**siguen la alternancia de peso desde donde la dejó la frase** — no la
-reinician. Guardar la marca en el dato es lo que permite escribir la línea
-entera —texto y ritmo— en un solo sitio; una frase sin asteriscos es un grupo
-fuerte y ya.
+ahí; los tres nombres se pegan al final del enunciado del sello como **un solo
+grupo** separado por `/`, en el orden del array. Guardar la marca en el dato es
+lo que permite escribir la línea entera —texto y ritmo— en un solo sitio; una
+frase sin asteriscos es un grupo liviano y ya.
+
+**`silabas` es la grieta** y no es decorativo: sin ella no hay nombre partido y
+sin nombre partido no hay hueco que abrir, así que tres cuartos del texto se
+quedan sin forma de aparecer. El validador lo trata como error.
+
+**Los dos Instagram no son el mismo.** `redes` es el del sello y se lee en la
+línea; `djs[].instagram` es el de cada DJ y es a donde lleva su santo.
 
 Los GIF van en `media/about/`, **nunca en `public/`** (`CLAUDE.md:25-28`);
 `tools/build-widgets.mjs` ya copia `media/` a `public/`.
 
 Esquema en `tools/validate.mjs`, que ya maneja archivos de datos opcionales
 condicionalmente: exigir los tres DJs con `nombre`, `instagram`, `emblema` y
-`quieto`, y avisar si falta `lema` o `sello`. El `quieto` quedó
+`quieto`, exigir `silabas` y las URLs de `redes`, y avisar si falta `lema`,
+`sello`, `redes` o `bookings`. Del correo revisa además que el `email` aparezca
+dentro del `texto`: si no, se lee una dirección y se escribe a otra. El `quieto` quedó
 como **error** y no como aviso: sin PNG no hay forma de respetar
 `prefers-reduced-motion`. Que sean exactamente tres es aviso, no error — el
 brief cerró tres nombres, pero la línea se compone sola y el día que sean otros
@@ -381,10 +466,16 @@ el dato manda.
 
 ```css
 .ttx-marco     { grid-template-rows: var(--ttx-about-aire) auto minmax(0,1fr); }
-.ttx-contenido { grid-row: 1 / -1; }  /* el campo: las tres filas a la vez */
-.ttx-banda     { grid-row: 2; }       /* la bisagra: la línea de texto */
-.ttx-visor     { display: none; }     /* la grieta, que ya no está */
+.ttx-contenido { grid-row: 1 / -1; grid-column: 1; }  /* el campo: las tres filas */
+.ttx-banda     { grid-row: 2;      grid-column: 1; }  /* la línea de texto */
+.ttx-visor     { display: none; }                     /* no hay tercera banda */
 ```
+
+**El `grid-column` no es de adorno.** Sin él, la colocación automática ve que el
+campo (filas 1 a 3) se cruza con la banda (fila 2) y le abre una **segunda
+columna**: la banda se queda con dos tercios de la pantalla y el campo con el
+tercio de la derecha. Eso era la mitad del problema de "los santos siempre salen
+a la derecha".
 
 Tres filas para dos cosas: el aire de arriba, la banda y lo que sobra. El campo
 las cruza todas, así que se superpone a la banda y el reparto lo hace el
@@ -490,18 +581,21 @@ Lo que **hay que mirar con la mano y en un teléfono de verdad**:
    rápido (los tres a la vez, en tres sitios, apagándose en orden). Dejar la mano
    quieta encima de uno **un rato largo**: el emblema no se mueve ni se apaga.
    Soltar: se queda segundo y medio y se puede alcanzar con el ratón. Confirmar
-   que la posición cambia entre apariciones y que alguna sale cortada por el
-   borde.
-5. **La zona:** en escritorio, insistir hasta convencerse de que **nunca** cae
-   nada en la mitad izquierda, y de que sí cae contra el borde derecho, arriba
-   del todo y abajo del todo. En teléfono, lo mismo con la mitad de abajo.
+   que la posición cambia entre apariciones.
+5. **La zona:** insistir hasta convencerse de que cae en los cuatro cuadrantes,
+   y de que **ninguno** sale medio comido por el borde — ni el cuadrado, ni el
+   alto, ni el apaisado. En teléfono, lo mismo.
 6. **El GIF no se reinicia:** encender y apagar el mismo nombre varias veces
    seguidas; cada aparición tiene que agarrar la animación en otro punto, nunca
    en el primer cuadro.
-7. **La línea:** ningún espacio entre grupos y ninguno perdido dentro de un
-   grupo. `SONIC HUSTLERS` con su espacio, `SONIC HUSTLERSSINCE2020` sin
-   ninguno; `DJ LOMALINDA` fuerte, `NYKSAN` liviano, `VERRACO` fuerte; todo en
-   negro.
+7. **La línea:** la junta entre grupos y el aire entre enunciados, sin
+   confundirlos, y ningún `__` colgando al final de un enunciado. `SONIC
+   HUSTLERS` con su espacio; `A RECORD LABEL RUN BY` liviano y los tres nombres
+   fuertes, juntos y separados por `/`; todo en negro.
+8. **La grieta:** entrar y salir; cronometrar el segundo y medio; volver antes
+   de que se cumpla y ver que no se cierra. Con teclado, Tab la abre y el
+   siguiente Tab entra a los nombres y después a las tres redes. En teléfono,
+   tocar la abre y se queda; tocar afuera la cierra.
 8. **El link:** clic en un santo abre el Instagram correcto en pestaña nueva.
    Con el emblema apagado, clic en ese sitio no hace nada.
 9. **Teclado:** Tab hasta un nombre → el emblema sale y **no** se va; Tab otra
