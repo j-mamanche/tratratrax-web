@@ -68,10 +68,9 @@
   --ttx-about-grieta-crece: 2;
   --ttx-about-hueco-crece: 3;
 
-  /* Lo que **nunca** se cierra del todo: con la línea abierta las sílabas se
-     juntan pero no se tocan, o `TRA TRA TRAX` se leería `TRATRATRAX` y dejaría
-     de ser un nombre partido. Es el aire de entre enunciados, que es la
-     separación que ya significa "aquí empieza otra cosa". */
+  /* En reposo las sílabas conservan aire: la grieta declara que el nombre está
+     partido. Al pasar la mano, ese aire baja a cero para recomponer
+     `TRATRATRAX` como una sola palabra. */
   --ttx-about-grieta-min: var(--ttx-aire);
 
   /* La banda no tiene fondo propio: transparente es, literalmente, del color
@@ -290,6 +289,9 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--ttx-about-grieta-min);
+  transition:
+    flex-grow var(--ttx-dur) var(--ttx-ease),
+    gap var(--ttx-dur) var(--ttx-ease);
   padding: 0;
   letter-spacing: inherit;
   text-transform: inherit;
@@ -301,6 +303,16 @@
   -webkit-touch-callout: none;
   user-select: none;
   touch-action: manipulation;
+}
+
+/* La línea abierta recompone el nombre del sello: sin aire entre las tres
+   sílabas, `TRA` + `TRA` + `TRAX` se lee como `TRATRATRAX`. */
+[data-ttx='about'][data-abierto] .ttx-about-grieta {
+  gap: 0;
+  /* Al mismo ritmo que se abre la entrada, la grieta deja de reclamar espacio.
+     Así `space-between` va cerrando la distancia cuadro a cuadro, hasta que no
+     queda ancho libre ni separación entre las sílabas. */
+  flex-grow: 0;
 }
 
 [data-ttx='about'] .ttx-about-grieta:focus-visible {
@@ -502,7 +514,7 @@
   }
 
   [data-ttx='about'][data-abierto] .ttx-about-grieta {
-    column-gap: var(--ttx-about-grieta-min);
+    column-gap: 0;
   }
 
   [data-ttx='about'] .ttx-about-hueco {

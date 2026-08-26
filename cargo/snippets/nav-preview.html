@@ -37,14 +37,19 @@
 		background: #101010;
 	}
 
-	/* En Cargo esto lo pone el CSS de la página del nav (sección 2 de nav.md):
-	   `position: relative; z-index: 9999`. Acá va `fixed` porque hay que emular
-	   la superposición de páginas de Cargo. El 9999 es el mismo, y es lo que
-	   deja al nav encima de la bandera (9998). */
+	/* En Cargo esto lo pone el CSS de la página del nav (sección 2 de nav.md).
+	   Acá va `fixed` con `inset` porque hay que emular la superposición de
+	   páginas de Cargo; allá el `fixed` lo pone Cargo solo.
+
+	   El `!important` es el mismo de la sección 2 y hay que dejarlo puesto: el
+	   nav de abajo lleva `style="z-index: 399"` escrito a mano para emular lo
+	   que Cargo le escribe a toda página fijada. Sin `!important` el nav se
+	   queda en 399 y la bandera (9998) lo tapa entero — que es exactamente el
+	   error que este archivo no veía cuando el 9999 iba suelto. */
 	[id="L3482832595"] {
 		position: fixed;
 		inset: 0;
-		z-index: 9999;
+		z-index: 9999 !important;
 	}
 
 	[id="L3482832595"] .page-content {
@@ -254,7 +259,9 @@
 
 <div class="page" id="fondo"><div class="page-content"><div class="mitad"></div></div></div>
 
-<div class="page" id="L3482832595"><div class="page-content">
+<!-- El z-index en línea NO se pega en Cargo: lo escribe Cargo solo. Está acá
+     para que el preview mienta igual que el sitio. -->
+<div class="page" id="L3482832595" style="z-index: 399;"><div class="page-content">
 
 <column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><span class="fake-logo"></span></div></column-unit><column-unit slot="2"><div class="nav-links"><span class="nav-menu">MENU</span><a href="about" rel="history" data-label="ABOUT">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" class="active">CATALOG</a><a href="merca-2" rel="history" data-label="MERCA">MERCA</a><a href="blog-2" rel="history" data-label="BLOG">BLOG</a></div></column-unit></column-set>
 
@@ -268,7 +275,7 @@
 	<button data-mode="auto">auto</button><button data-mode="white">blanco</button><button data-mode="black">negro</button>
 	<br>
 	<b>bandera</b>
-	<button data-flag="ya">respiro ya</button><button data-flag="3s">cada 3s</button><button data-flag="normal">20–40s</button><button data-flag="home">fingir home</button><button data-flag="nohome">fingir otra</button>
+	<button data-flag="ya">respiro ya</button><button data-flag="3s">cada 3s</button><button data-flag="normal">20–40s</button>
 	<br>
 	<span id="estado"></span>
 </div>
@@ -939,6 +946,14 @@
   // de la pantalla**: ahí las cuatro son del mismo color a cualquier ancho, y
   // por eso la tabla sigue valiendo con el nuevo reparto. Si algún día entra
   // una bandera nueva, esto es lo que hay que decidirle.
+  // **El `?v=` no es adorno.** Los cuatro archivos cambiaron de contenido sin
+  // cambiar de nombre —dejaron de traer su propio fondo— y Pages los sirve con
+  // `cache-control: max-age=600`. Sin el sufijo, un navegador que ya los tenía
+  // sigue pintando la versión vieja: el fondo del SVG encima del fondo del CSS,
+  // dos juegos de franjas y la palabra a media altura. Es el mismo truco del
+  // `ttx.js?v=4` del HTML global. **Al reemplazar un SVG hay que subir el
+  // número**, o el cambio no le llega a quien ya visitó el sitio.
+  var VER = "?v=2";
   var BASE = "../../media/banderas/";  // en Cargo: https://j-mamanche.github.io/tratratrax-web/media/banderas/
   var BANDERAS = [
     {
@@ -978,15 +993,11 @@
   var NAV_SEL = '[id="L3482832595"], [id="N1901077103"]';
 
   var Z          = 9998;   // justo debajo del nav, que va en 9999
-  var FLASH      = 1000;   // ms del destello del respiro: puesta y quieta, corte seco
+  var FLASH      = 1500;   // ms del destello del respiro: puesta y quieta, corte seco
   var FLASH_DEDO = 420;    // ms del toque en teléfono: alcanza a verse antes de navegar
   var COLA_MANO  = 800;    // ms que aguanta después de que la mano suelta el logo
   var QUIETO_MIN = 20000;  // ms de quietud antes de un respiro (mínimo)
   var QUIETO_MAX = 40000;  // ms de quietud antes de un respiro (máximo)
-
-  // Dónde NO corre el respiro. El home de Cargo es `home-1`; la raíz también
-  // sirve el home, así que las dos cuentan.
-  var HOME = ["", "home-1", "home", "index"];
 
   var LOGO_SEL = '[id="L3482832595"] .nav-logo, [id="N1901077103"] .nav-logo';
 
@@ -1027,7 +1038,7 @@
       "position:absolute;inset:0;opacity:0;background:" + BANDERAS[i].fondo;
 
     var img = document.createElement("img");
-    img.src = BASE + BANDERAS[i].archivo;
+    img.src = BASE + BANDERAS[i].archivo + VER;
     img.alt = "";
     img.draggable = false;
     // `pointer-events: none` otra vez, aunque la capa entera ya lo tenga: es
@@ -1093,21 +1104,20 @@
 
   // — El respiro —
 
-  var forzarHome = null;  // el preview lo pone a mano; en Cargo se queda en null
-
-  function enHome() {
-    if (forzarHome !== null) return forzarHome;
+  function enAbout() {
+    // El preview vive como archivo suelto, no bajo la ruta /about: ahí lo
+    // tratamos como About para poder seguir calibrando el gesto manual.
+    if (location.protocol === "file:") return true;
     var here = location.pathname.replace(/^\/|\/$/g, "").toLowerCase();
-    for (var i = 0; i < HOME.length; i++) if (here === HOME[i]) return true;
-    return false;
+    return here === "about";
   }
 
   function agendar() {
     clearTimeout(reloj);
     reloj = null;
-    // Las cuatro razones para no contar: la preferencia del sistema, el home,
-    // la pestaña de atrás, y una bandera que ya está puesta con la mano.
-    if (menos || enHome() || document.hidden || porMano) return;
+    // El respiro sigue corriendo en todo el sitio; solo lo paran la preferencia
+    // del sistema, la pestaña escondida o una bandera puesta por la mano.
+    if (menos || document.hidden || porMano) return;
     reloj = setTimeout(respirar, rnd(QUIETO_MIN, QUIETO_MAX));
   }
 
@@ -1115,7 +1125,7 @@
     reloj = null;
     // Se vuelve a preguntar todo: entre que se agendó y que se cumplió el reloj
     // pudo cambiar la página, esconderse la pestaña o entrar la mano.
-    if (menos || enHome() || document.hidden || porMano) return agendar();
+    if (menos || document.hidden || porMano) return agendar();
 
     mostrar();
     clearTimeout(corte);
@@ -1142,6 +1152,7 @@
 
   document.addEventListener("pointerover", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
+    if (!enAbout()) return;
     var logo = logoDe(e.target);
     if (!logo || logoDe(e.relatedTarget) === logo) return; // movimiento adentro
     clearTimeout(corte);
@@ -1155,6 +1166,7 @@
 
   document.addEventListener("pointerout", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
+    if (!enAbout()) return;
     var logo = logoDe(e.target);
     if (!logo || logoDe(e.relatedTarget) === logo) return;
     porMano = false;
@@ -1174,6 +1186,7 @@
   // ser el link al home por mostrar una bandera.
   document.addEventListener("pointerdown", function (e) {
     if (!e.pointerType || e.pointerType === "mouse") return;
+    if (!enAbout()) return;
     if (!logoDe(e.target)) return;
     mostrar();
     clearTimeout(corte);
@@ -1227,14 +1240,16 @@
     }
 
     if (location.href !== donde) {
-      // Página nueva: el reloj arranca de cero y hay que volver a preguntar si
-      // esta es el home. Nunca un destello encima de una navegación.
+      // Página nueva: el reloj arranca de cero y nunca arrastra una bandera
+      // manual desde About a una página donde el logo no la invoca.
       donde = location.href;
-      if (!porMano) ocultar();
+      porMano = false;
+      clearTimeout(corte);
+      corte = null;
+      ocultar();
       agendar();
     } else if (!reloj && !porMano) {
-      // Se quedó sin reloj: pasa cuando `agendar` se salió por el home o por la
-      // pestaña escondida y esa razón ya no está.
+      // Se quedó sin reloj: pasa si la pestaña volvió a estar visible.
       agendar();
     }
     // Y si el reloj está corriendo, **no se toca**. Reagendarlo en cada ronda
@@ -1261,13 +1276,6 @@
       QUIETO_MAX = max == null ? min : max;
       agendar();
     },
-    // Fingir que se está (o no) en el home sin poder cambiar la URL: es lo que
-    // el preview necesita, porque ahí la página es un archivo suelto.
-    // `null` devuelve la decisión a `location.pathname`.
-    home: function (v) {
-      forzarHome = v;
-      agendar();
-    }
   };
 })();
 </script>
@@ -1307,8 +1315,6 @@
 			if (q === "ya") TTX_BANDERA.respirar();
 			if (q === "3s") TTX_BANDERA.ritmo(3000);
 			if (q === "normal") TTX_BANDERA.ritmo(20000, 40000);
-			if (q === "home") TTX_BANDERA.home(true);
-			if (q === "nohome") TTX_BANDERA.home(false);
 		}
 	});
 

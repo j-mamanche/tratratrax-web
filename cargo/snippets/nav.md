@@ -13,7 +13,9 @@ Antes de pegar en vivo: `cargo/snippets/nav-preview.html` es el mismo nav en un
 archivo suelto. Se abre con doble clic y sirve para calibrar tiempos sin tocar
 el sitio. Arriba a la izquierda tiene un panel —que no existe en Cargo— para
 cambiarle el fondo a la página de abajo y accionar el interruptor, y ver al nav
-decidir en vivo.
+decidir en vivo. El nav de ahí lleva `style="z-index: 399"` escrito a mano —eso
+sí no se pega en Cargo, lo escribe Cargo solo— para que el preview mienta igual
+que el sitio y la trampa del apilamiento se vea antes y no después.
 
 ---
 
@@ -22,7 +24,7 @@ decidir en vivo.
 Reemplaza el `<column-set>` entero:
 
 ```html
-<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="zoomable" hash="Y3055296379683564288776637724874" limit-by="width" scale="15%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><span class="nav-menu">MENU</span><a href="about" rel="history" data-label="ABOUT">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG">CATALOG</a><a href="merca-2" rel="history" data-label="MERCA">MERCA</a><a href="blog-2" rel="history" data-label="BLOG">BLOG</a></div></column-unit></column-set>
+<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="zoomable" hash="Y3055296379683564288776637724874" limit-by="width" scale="15%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><span class="nav-menu">MENU</span><a href="about" rel="history" data-label="ABOUT">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG">CATALOG</a><a href="merca" rel="history" data-label="MERCA">MERCA</a><a href="blog" rel="history" data-label="BLOG">BLOG</a></div></column-unit></column-set>
 ```
 
 Seis cosas que no son cosméticas:
@@ -33,8 +35,11 @@ Seis cosas que no son cosméticas:
   blanco para siempre.
 - **`ABOUT CATALOG MERCA BLOG` ahora son links de verdad.** En lo que estaba
   pegado era un `<span>` de texto plano: se veía como menú pero no navegaba, y
-  sin `<a>` no hay página activa que marcar. Los slugs son los reales del sitio
-  (`about` · `catalog` · `merca-2` · `blog-2`).
+  sin `<a>` no hay página activa que marcar. Los slugs reales del sitio son
+  `about` · `catalog` · `merca` · `blog`, **sin `-2`**: los que llevaban sufijo
+  (`merca-2`, `blog-2`) son de páginas que se renombraron después y hoy dan 404.
+  El de MERCA ya está corregido en Cargo; **el de BLOG no** — en el sitio en
+  vivo, hoy, BLOG lleva a `/blog-2` y no carga nada. Hay que cambiarlo allá.
 - **No hay espacios ni `&nbsp;` entre los `<a>`.** La separación la pone el
   `gap` del CSS, que se mide exacto. Si dejas un salto de línea entre los links,
   vuelve a colarse un espacio de texto encima del `gap`.
@@ -80,15 +85,25 @@ lista. `MENU__` y el lema no cambian: siguen en regular.
 }
 
 /* — EL NAV, ENCIMA DE TODO —
-   El nav viejo (B3241791059) traía esto y se había perdido. Vuelve porque la
-   bandera de la sección 7 se cuelga del <body> con z-index 9998 y necesita que
-   el nav esté por encima: en las cuatro capturas del sello la barra de abajo
-   sigue visible y legible sobre la bandera. Si esto se quita, la bandera se
-   come el nav. */
+   La bandera de la sección 7 se cuelga del <body> con z-index 9998 y el nav
+   tiene que quedar por encima: en las cuatro capturas del sello la barra de
+   abajo sigue visible y legible sobre la bandera.
 
-[id="L3482832595"] {
-	position: relative;
-	z-index: 9999;
+   **El `!important` es la regla, no la excepción evitable.** Cargo le escribe
+   `z-index: 399` **en el atributo style** a toda página fijada, y un estilo en
+   línea le gana a cualquier regla de la hoja por específica que sea. Sin
+   `!important` esta declaración no llega nunca: el nav se queda en 399 y la
+   bandera lo tapa entero, en escritorio y en móvil. Es lo que pasaba y se
+   verificó en el sitio en vivo — el nav se veía bien hasta que la bandera
+   entraba, y entonces desaparecía completo.
+
+   `position` ya no se toca. Cargo deja la página en `fixed` desde `.page.fixed`
+   —dos clases, que pesan más que este selector de atributo—, así que el
+   `position: relative` que había acá nunca se aplicó: era una declaración
+   muerta que además hacía creer que el apilamiento estaba resuelto. */
+
+[id="L3482832595"].page {
+	z-index: 9999 !important;
 }
 
 [id="L3482832595"] .page-content {
@@ -1056,15 +1071,129 @@ las dos en el documento, una encima de la otra.
 `.nav-links` y el `<span data-glitch>`. Si allá se llaman distinto, hay que
 agregar esas clases a `PARTS` en el script de la sección 4 — es lo que se mide.
 
-**El CSS va en el CSS de esa página**, con su id. Basta con el bloque de color;
-la maquetación del móvil es la que ya tenga:
+**Tres cosas cambian respecto al escritorio**, y solo tres: la maquetación (dos
+filas en vez de tres columnas), el logo (es un link al home, no un zoom) y el
+menú (sin `MENU__`, que no cabe). Todo lo demás —los dos juegos de tinta, la
+bandera, los pesos, las reservas de ancho— es lo mismo con otro id.
+
+### El HTML
+
+```html
+<column-set gutter="1" mobile-stack="false"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="linked" disable-zoom="true" hash="Y3055296379683564288776637724874" href="home" limit-by="width" rel="history" scale="40%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><a data-label="ABOUT" href="about" rel="history">ABOUT</a><a data-label="CATALOG" href="catalog" rel="history">CATALOG</a><a data-label="MERCA" href="merca" rel="history">MERCA</a><a data-label="BLOG" href="blog" rel="history">BLOG</a></div></column-unit></column-set>
+```
+
+- **`mobile-stack="false"` no es opcional.** Es lo que le dice a Cargo que no
+  apile las tres columnas por su cuenta; si Cargo apila, el `flex-wrap` del CSS
+  no llega a mandar y las dos filas no se arman.
+- **El logo es un link, no un zoom.** `class="linked"` con `href="home"` y
+  `disable-zoom="true"`, y a `scale="40%"` en vez del 15% del escritorio, que va
+  `zoomable`. **Sigue invocando bandera**: `LOGO_SEL` (sección 7) cuelga de
+  `.nav-logo` —el div de afuera— y no del `media-item`, así que el toque muestra
+  la bandera y navega al home en el mismo gesto. Es exactamente lo que describe
+  `FLASH_DEDO`: se ve un instante y la página cambia debajo.
+- **Sin `MENU__`.** Es lo único del sistema nuevo que no pasó al móvil, y no por
+  gusto: no cabe. Está medido más abajo.
+- **El `<span data-glitch>` va limpio.** Si copias el nav del inspector te traes
+  `class="glitch is-resting"` y los dos `<span>` de adentro (`.glitch-text` y
+  `.glitch-caret`): eso lo escribe el script de la sección 3 en cada carga, no se
+  escribe a mano. Pegarlo de vuelta no rompe nada —el script vacía el nodo y lo
+  vuelve a armar— pero deja basura en el editor de Cargo.
+
+### El CSS
 
 ```css
+/* ============================================================
+   CARGO — NAV MÓVIL  [id="N1901077103"]
+   El mismo sistema del nav de escritorio (sección 2) con otra
+   maquetación. Todo scopeado al id, como allá.
+   ============================================================ */
+
+[id="N1901077103"].page {
+	min-height: var(--viewport-height);
+}
+
+/* — EL NAV, ENCIMA DE LA BANDERA —
+   Lo mismo que en la sección 2 y por la misma razón. El `!important` no es
+   decorativo: Cargo le escribe `z-index: 399` **en el atributo style** a toda
+   página fijada, y un estilo en línea le gana a cualquier regla de la hoja.
+   Sin él esta declaración no llega nunca, el nav se queda en 399 y la bandera
+   (9998) lo tapa entero — medido en vivo, no deducido.
+
+   `position` no se pone: Cargo ya deja la página en `fixed` desde `.page.fixed`,
+   que pesa más que un selector de atributo. Un `position: relative` acá sería
+   una declaración muerta. */
+
+[id="N1901077103"].page {
+	z-index: 9999 !important;
+}
+
+[id="N1901077103"] .page-content {
+	align-items: flex-end;
+	padding: 1rem;
+}
+
+[id="N1901077103"] .page-layout {
+	align-items: flex-end;
+}
+
+/* — MÓVIL: DOS FILAS —
+   Fila 1: el logo, de borde a borde.
+   Fila 2: el lema a la izquierda, el menú a la derecha.
+   Requiere mobile-stack="false" en el column-set: si Cargo apila por su
+   cuenta, el flex-wrap de acá no llega a mandar. */
+
+[id="N1901077103"] column-set {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: space-between;
+	row-gap: 0.75rem;
+}
+
+[id="N1901077103"] column-set > column-unit {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	flex: 0 1 auto;
+	width: auto;
+	max-width: none;
+}
+
+/* Fila 1 — el logo se lleva la línea entera y la corta: lo que sigue baja. */
+[id="N1901077103"] column-set > column-unit[slot="1"] {
+	order: 0;
+	flex: 0 0 100%;
+	width: 100%;
+}
+
+/* Fila 2 — el lema es el que cede ancho; el menú no se comprime nunca. */
+[id="N1901077103"] column-set > column-unit[slot="0"] {
+	order: 1;
+	min-width: 0;
+}
+
+[id="N1901077103"] column-set > column-unit[slot="2"] {
+	order: 2;
+	flex-shrink: 0;
+}
+
+/* Solo el logo necesita estirarse para que el text-align: center signifique
+   algo; los otros dos se miden por su contenido. */
+[id="N1901077103"] column-set > column-unit[slot="1"] > * {
+	width: 100%;
+}
+
+/* — BLANCO O NEGRO —
+   El script de la sección 4 escribe data-nav="white" | "black" en el nav, y
+   también en cada pieza cuando la página parte el fondo en dos. Acá viven los
+   dos juegos de color y nada más: ningún otro sitio pinta el nav. */
+
 [id="N1901077103"],
 [id="N1901077103"] [data-nav="white"] {
-	--nav-ink: rgba(255, 255, 255, 0.85);
-	--nav-ink-strong: rgb(255, 255, 255);
-	--nav-logo-filter: none;
+	--nav-ink: rgba(255, 255, 255, 0.85);  /* lema */
+	--nav-ink-strong: rgb(255, 255, 255);  /* menú */
+	--nav-logo-filter: none;               /* el logo ya viene blanco */
 }
 
 [id="N1901077103"][data-nav="black"],
@@ -1074,14 +1203,176 @@ la maquetación del móvil es la que ya tenga:
 	--nav-logo-filter: invert(1);
 }
 
-[id="N1901077103"] .nav-lema { color: var(--nav-ink); transition: color 220ms ease; }
-[id="N1901077103"] .nav-links a { color: var(--nav-ink-strong); transition: color 220ms ease; }
+/* — LA BANDERA MANDA —
+   El mismo bloque de la sección 2, con el mismo porqué: la tinta que trae
+   escrita la bandera gana sobre lo medido, y tiene que ganar también sobre lo
+   que el medidor le escribió a cada pieza —un selector de dos partes—, así que
+   este es de tres. Y sin transición: la bandera corta seco y la tinta tiene que
+   cortar con ella. */
 
+[id="N1901077103"][data-bandera="black"],
+[id="N1901077103"][data-bandera="black"] [data-nav] {
+	--nav-ink: rgba(0, 0, 0, 0.85);
+	--nav-ink-strong: rgb(0, 0, 0);
+	--nav-logo-filter: invert(1);
+}
+
+[id="N1901077103"][data-bandera="white"],
+[id="N1901077103"][data-bandera="white"] [data-nav] {
+	--nav-ink: rgba(255, 255, 255, 0.85);
+	--nav-ink-strong: rgb(255, 255, 255);
+	--nav-logo-filter: none;
+}
+
+/* Sin `.nav-menu` en la lista: en móvil no hay rótulo. */
+[id="N1901077103"][data-bandera] :is(.nav-lema, .nav-links a),
+[id="N1901077103"][data-bandera] media-item::part(media) {
+	transition: none;
+}
+
+[id="N1901077103"] .nav-lema {
+	text-align: left;
+	color: var(--nav-ink);
+	transition: color 220ms ease;
+}
+
+[id="N1901077103"] .nav-logo {
+	text-align: center;
+	line-height: 0; /* mata el descender del inline y lo apoya de verdad */
+}
+
+/* El logo es un PNG blanco: para el modo negro se invierte. Si algún día el
+   archivo cambia a negro, hay que intercambiar los dos valores del filtro. */
 [id="N1901077103"] media-item::part(media) {
 	filter: var(--nav-logo-filter);
 	transition: filter 220ms ease;
 }
+
+/* — MENÚ DERECHO — */
+
+[id="N1901077103"] .nav-links {
+	display: flex;
+	justify-content: flex-end;
+	align-items: flex-end;
+	/* Un espacio normal de esta fuente mide ~0.28em, y eso es lo que va entre
+	   los links, igual que en el escritorio: se leen como frase y no como cuatro
+	   botones. Antes acá era 0.03em —casi tocándose—, que venía de cuando el
+	   menú era un bloque de texto. */
+	gap: 0.28em;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+/* **Las páginas a las que se puede ir van en negrilla; la que se está viendo,
+   no.** Es al revés de lo que uno haría, y es la idea: lo que pesa es lo que
+   queda por hacer. La activa se retira —regular y en itálica— porque ya no es
+   un destino, es dónde uno está. */
+[id="N1901077103"] .nav-links a {
+	display: inline-block;
+	color: var(--nav-ink-strong);
+	text-decoration: none;
+	border-bottom: 0;
+	font-weight: 700;
+	transition: color 220ms ease;
+}
+
+/* Página activa: **itálica regular**, nunca subrayado. Cargo pone .active solo;
+   .is-active es el respaldo que pone el script si Cargo no marcó nada. En el
+   home no se marca ninguna: el home no está en la lista. */
+[id="N1901077103"] .nav-links a.active,
+[id="N1901077103"] .nav-links a.is-active {
+	font-style: italic;
+	font-weight: 400;
+	text-decoration: none;
+}
+
+/* Reserva de ancho, para que marcar la página activa no empuje a los otros
+   links. **Son dos y no una**: cada link puede estar en negrilla o en itálica
+   regular, y las dos miden distinto, así que cada uno reserva las dos y se
+   queda con la mayor. Bloques invisibles de altura cero: no se ven, no se
+   seleccionan, no se leen. */
+[id="N1901077103"] .nav-links a::before,
+[id="N1901077103"] .nav-links a::after {
+	content: attr(data-label);
+	display: block;
+	height: 0;
+	overflow: hidden;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+[id="N1901077103"] .nav-links a::before {
+	font-style: normal;
+	font-weight: 700;
+}
+
+[id="N1901077103"] .nav-links a::after {
+	font-style: italic;
+	font-weight: 400;
+}
+
+/* — LEMA QUE SE HACKEA — */
+
+[id="N1901077103"] [data-glitch] {
+	display: inline-block;
+	white-space: nowrap;
+}
+
+/* En reposo el cursor no está. Aparece fijo mientras teclea, parpadea tres
+   veces al terminar y se apaga: el `both` deja el último cuadro (opacidad 0)
+   puesto, así que no hace falta un timer en JS para esconderlo. */
+[id="N1901077103"] .glitch-caret::after {
+	content: "▌";
+	opacity: 0;
+}
+
+[id="N1901077103"] [data-glitch].is-typing .glitch-caret::after {
+	opacity: 1;
+}
+
+[id="N1901077103"] [data-glitch].is-resting .glitch-caret::after {
+	animation: ttx-caret 0.5s steps(1) 3 both;
+}
+
+/* Los mismos cuadros de la sección 2. Los `@keyframes` son globales y las dos
+   definiciones son idénticas, así que sobra una — pero cada página de Cargo
+   tiene que poder pararse sola, y si algún día se cambian los tiempos hay que
+   cambiarlos en las dos. */
+@keyframes ttx-caret {
+	0%, 49% { opacity: 1; }
+	50%, 100% { opacity: 0; }
+}
 ```
+
+### Por qué en móvil no hay `MENU__`
+
+No cabe. Medido en el sitio en vivo, con la frase más larga del lema
+(`TODOS LOS IZQUIERDOS PÚBLICOS`) y con `MENU__` más el espacio normal entre
+links, la fila 2 se pasa **2 px** en los cuatro anchos que se probaron:
+
+```
+        lema  +  menú  =  total     caben
+430 px   216  +  197   =   413   >   411
+390 px   196  +  179   =   375   >   373
+360 px   181  +  165   =   346   >   344
+320 px   161  +  147   =   308   >   306
+```
+
+Los 2 px no son casualidad ni se arreglan con un teléfono más ancho: Cargo
+escala la fuente del nav con el viewport, así que la proporción es la misma en
+todos y siempre faltan los mismos 2 px. Sin el rótulo el menú mide 140 px a 390
+y sobran 37: el espacio normal entre los cuatro links —que es lo que los hace
+leerse como frase— sí entra cómodo, y es lo que quedó.
+
+**Si el rótulo se vuelve innegociable**, la única combinación que cabe es
+`MENU__` con el gap apretado de antes: el `.nav-menu` con su `::after` copiado
+de la sección 2 y `gap: 0.03em` en `.nav-links` (170 px a 390, sobran 7). El
+rótulo se lee y los cuatro links vuelven a ser un bloque. No hay una tercera.
+
+Con esa medida se cayó también el parche que había acá: un `margin-left: 0.05em`
+en el link que seguía al activo, que compensaba el aire que se come la negrilla
+cuando el `gap` es de 0.03em. Con el espacio normal y las dos reservas de ancho
+ya no hace falta.
 
 **El interruptor no se duplica.** `--nav-mode` lo pone la página de contenido,
 no el nav, así que el mismo valor manda sobre las dos instancias.
@@ -1092,10 +1383,6 @@ Dos cosas menores del móvil:
   cada uno con su ciclo y su frase. No se ve —solo una está en pantalla— y no
   cuesta nada, pero si molesta, se le quita el `data-glitch` al que no se use.
 - `markActive` (la página activa en itálica) también recorre las dos.
-- **El `MENU__` y los dos pesos van también en el HTML y el CSS del móvil**, si
-  allá se quiere el mismo rótulo. El bloque de color de arriba es lo mínimo; el
-  `.nav-menu` con su `::after`, la negrilla de los links y las dos reservas de
-  ancho (`::before` y `::after`) se copian de la sección 2 cambiando el id.
 
 ---
 
@@ -1104,10 +1391,11 @@ Dos cosas menores del móvil:
 Va debajo de los otros dos, en el mismo HTML global. Es independiente de los
 dos: si borras cualquiera, los demás siguen funcionando.
 
-**Qué hace.** Pasar la mano por el logo tapa la página entera con una de las
-cuatro banderas del sello, al azar, **menos el nav** — en las cuatro capturas la
-barra de abajo sigue visible y legible encima de la bandera. Y cada tanto, con
-el usuario quieto y fuera del home, una se asoma sola un instante: el **respiro**.
+**Qué hace.** En About, pasar la mano por el logo tapa la página entera con una
+de las cuatro banderas del sello, al azar, **menos el nav** — en las cuatro
+capturas la barra de abajo sigue visible y legible encima de la bandera. En las
+demás páginas el logo no la invoca. Y cada tanto, con el usuario quieto, una se
+asoma sola un instante en cualquier página: el **respiro**.
 
 ```
 ┌──────────────────────────────┐    ┌──────────────────────────────┐
@@ -1130,11 +1418,15 @@ el usuario quieto y fuera del home, una se asoma sola un instante: el **respiro*
 2. **El nav nunca se tapa.** La bandera va en `z-index: 9998` y el nav en
    `9999` (sección 2). Si alguien le quita el `z-index` al nav, la bandera se lo
    come — y el logo, que es lo que la invoca, deja de verse.
-3. **El respiro solo corre fuera del home y con el usuario quieto.** Cualquier
+   **Y el `9999` del nav solo cuenta si lleva `!important`**: Cargo le escribe
+   `z-index: 399` en el atributo style a las páginas fijadas, y sin `!important`
+   la regla de la hoja pierde contra el estilo en línea. Escrito así se ve
+   inofensivo y no lo es: es la diferencia entre el nav encima de la bandera y
+   el nav debajo. `nav-preview.html` emula ese estilo en línea justamente para
+   que la trampa se vea antes de pegar en Cargo.
+3. **El respiro corre en todo el sitio, solo con el usuario quieto.** Cualquier
    movimiento —ratón, scroll, tecla, dedo, cambio de página— reinicia el reloj.
-   En el home no corre nunca: allá ya hay un lanzamiento que mirar y una
-   composición que se abre con la mano; una bandera encima sería una tercera
-   cosa peleando. **Si hay duda, no se dispara.**
+   Es independiente del gesto manual: limitar el hover a About no lo limita.
 4. **Las cuatro imágenes se crean una vez y no se van del DOM.** Se apagan con
    `opacity`, nunca con `display` ni cambiándole el `src` a una sola. Es la
    lección de los emblemas del About: el navegador no puede tener que decidir
@@ -1162,51 +1454,16 @@ lo pidió el usuario con la mano.
 
 <script>
 (function () {
-  // Las cuatro del sello, publicadas por Pages junto al resto del material.
-  //
-  // **Cada bandera son dos piezas: un campo y un cuadrado.**
-  //
-  //   fondo   — el color, pintado sobre la pantalla entera por CSS.
-  //   archivo — el dibujo (las estrellas, la palabra, los letreros), en un SVG
-  //             cuadrado que se planta en la mitad midiendo `LADO`.
-  //
-  // Antes era una sola pieza: el SVG de 1440×1024 entero, a sangre con
-  // `object-fit: cover`. En una pantalla de teléfono eso recortaba por el lado
-  // largo y de `TRATRRRRRATRAX` se veían cinco letras. Partido en dos, el
-  // dibujo siempre cabe —el cuadrado mide el lado corto de la ventana— y lo que
-  // se estira es únicamente el color, que es lo que se puede estirar sin que
-  // nadie lo note.
-  //
-  // **Cada región tiene una sola geometría.** El campo no está también dentro
-  // del SVG: si estuviera, el borde del cuadrado sería una costura entre dos
-  // dibujos que tienen que coincidir al píxel, y no coincidirían. Por eso los
-  // SVG de `media/banderas/` no traen fondo — el original completo, de 1440,
-  // está guardado al lado en `originales/`.
-  //
-  // Los números de los `calc` salen del arte y están explicados en el LEEME de
-  // esa carpeta. `0.08681` es el grosor de una franja de `sur`; `LADO / 6`, el
-  // medio ancho de la barra roja de `de colombia`.
-  //
-  // **La tinta va escrita al lado, y no se mide.** El script del blanco/negro
-  // (sección 4) mide con `elementsFromPoint`, y la bandera es `pointer-events:
-  // none` —tiene que serlo, o se comería los clics de la página—, así que
-  // sencillamente no la ve. Como son cuatro y no cambian, la tinta de cada una
-  // se midió una vez y se dejó escrita: negro sobre las tres claras, blanco
-  // sobre la azul y roja. El nav va abajo, así que lo que se midió es **el pie
-  // de la pantalla**: ahí las cuatro son del mismo color a cualquier ancho, y
-  // por eso la tabla sigue valiendo con el nuevo reparto. Si algún día entra
-  // una bandera nueva, esto es lo que hay que decidirle.
+  // Cada bandera combina un fondo a pantalla completa y un SVG cuadrado centrado.
+  // Sube VER cuando cambies los SVG para invalidar la caché de Pages.
+  var VER = "?v=2";
   var BASE = "https://j-mamanche.github.io/tratratrax-web/media/banderas/";
   var BANDERAS = [
     {
-      // amarillo de pared a pared; el racimo en la mitad.
       archivo: "estrellas.svg", tinta: "black",
       fondo: "#ffff01"
     },
     {
-      // Las dos franjas van pegadas al borde de arriba y **no** al cuadrado:
-      // flotando a media pantalla parecerían una bandera pequeña puesta encima
-      // de otra cosa. Cruzan la ventana entera y solo su grosor sigue al lado.
       archivo: "sur.svg", tinta: "black",
       fondo: "linear-gradient(to bottom," +
              "red 0 calc(0.08681 * var(--ttx-lado))," +
@@ -1214,16 +1471,10 @@ lo pidió el usuario con la mano.
              "#b4ff9c calc(0.17362 * var(--ttx-lado)) 100%)"
     },
     {
-      // El diagonal del cuadrado es el de sus esquinas: 45 grados. Prolongado
-      // hasta los bordes es exactamente la línea de 45 grados que pasa por el
-      // centro de la ventana, y eso es lo que hace un `135deg` con un corte
-      // seco al 50%. Por eso el corte y el cuadrado nunca se pelean.
       archivo: "diagonal.svg", tinta: "black",
       fondo: "linear-gradient(135deg,#ffff01 0 50%,#d9d9d9 50% 100%)"
     },
     {
-      // Las tres barras son verticales: estirarlas es prolongarlas de arriba
-      // abajo, y la roja se queda en el tercio del medio del cuadrado.
       archivo: "de-colombia.svg", tinta: "white",
       fondo: "linear-gradient(to right," +
              "#0015ff 0 calc(50% - var(--ttx-lado) / 6)," +
@@ -1234,36 +1485,18 @@ lo pidió el usuario con la mano.
 
   var NAV_SEL = '[id="L3482832595"], [id="N1901077103"]';
 
-  var Z          = 9998;   // justo debajo del nav, que va en 9999
-  // El destello del respiro. Era de 160ms y pasaba tan rápido que no se leía
-  // como una bandera sino como un error de la pantalla: uno alcanzaba a ver que
-  // algo pasó y no qué. Un segundo entero, puesta y quieta, se siente sin
-  // llegar a instalarse — sigue siendo un destello y no un turno. Los cortes de
-  // entrada y de salida siguen siendo secos: el fundido es lo que la haría
-  // parecer un efecto.
-  var FLASH      = 1000;
-  var FLASH_DEDO = 420;    // ms del toque en teléfono: alcanza a verse antes de navegar
-  // Lo que aguanta puesta después de que la mano suelta el logo. Sin esto se
-  // iba en el mismo cuadro en que el ratón cruzaba el borde, y salir del logo
-  // se sentía como si se hubiera roto algo. La cola le da tiempo a la salida de
-  // ser una salida. Al final corta seco, como todo lo demás aquí.
+  var Z = 9998;
+  var FLASH      = 1500;
+  var FLASH_DEDO = 420;
   var COLA_MANO  = 800;
-  var QUIETO_MIN = 20000;  // ms de quietud antes de un respiro (mínimo)
-  var QUIETO_MAX = 40000;  // ms de quietud antes de un respiro (máximo)
-
-  // Dónde NO corre el respiro. El home de Cargo es `home-1`; la raíz también
-  // sirve el home, así que las dos cuentan.
-  var HOME = ["", "home-1", "home", "index"];
+  var QUIETO_MIN = 20000;
+  var QUIETO_MAX = 40000;
 
   var LOGO_SEL = '[id="L3482832595"] .nav-logo, [id="N1901077103"] .nav-logo';
 
   var menos = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // — La capa —
-  // Se cuelga del <body> y no del nav: tiene que tapar la página, que es otro
-  // elemento. Todo el estilo va inline a propósito — es lo único que le gana
-  // siempre al CSS global de Cargo, y así este script no necesita que alguien
-  // se acuerde de pegar un bloque de CSS más.
+  // La capa va en body para cubrir la página sin cubrir el nav.
   var capa = document.createElement("div");
   capa.setAttribute("aria-hidden", "true");
   capa.setAttribute("data-ttx-bandera", "");
@@ -1271,17 +1504,7 @@ lo pidió el usuario con la mano.
     "position:fixed;inset:0;z-index:" + Z + ";opacity:0;pointer-events:none;" +
     "visibility:hidden;contain:strict";
 
-  // **El lado del cuadrado**, que es lo único que hay que saber para armar
-  // cualquiera de las cuatro: el lado corto de la ventana. En desktop lo manda
-  // el alto y el color se va hacia los lados; en teléfono lo manda el ancho y
-  // el color se va hacia arriba y hacia abajo.
-  //
-  // Se calcula en JS y no con `min(100vw, 100vh)` por dos razones. Una: `100vw`
-  // cuenta la barra de scroll y la capa no la tiene, así que el cuadrado
-  // quedaría unos píxeles corrido del campo. Y dos: en iOS `100vh` es la
-  // ventana grande, la de antes de que se recoja la barra de direcciones,
-  // mientras que la capa —`fixed`, `inset: 0`— mide la de verdad; midiendo la
-  // capa las dos piezas no se pueden desalinear nunca.
+  // Mide la capa real para evitar desfases con scrollbars e iOS.
   function medir() {
     capa.style.setProperty(
       "--ttx-lado", Math.min(capa.clientWidth, capa.clientHeight) + "px");
@@ -1294,13 +1517,9 @@ lo pidió el usuario con la mano.
       "position:absolute;inset:0;opacity:0;background:" + BANDERAS[i].fondo;
 
     var img = document.createElement("img");
-    img.src = BASE + BANDERAS[i].archivo;
+    img.src = BASE + BANDERAS[i].archivo + VER;
     img.alt = "";
     img.draggable = false;
-    // `pointer-events: none` otra vez, aunque la capa entera ya lo tenga: es
-    // barato y deja escrito que el dibujo tampoco se toca. Lo de al lado es
-    // para el dedo y para el ratón que arrastra — una bandera no se arranca de
-    // la pantalla ni saca el menú de guardar imagen.
     img.style.cssText =
       "position:absolute;left:50%;top:50%;display:block;" +
       "width:var(--ttx-lado);height:var(--ttx-lado);" +
@@ -1312,16 +1531,14 @@ lo pidió el usuario con la mano.
     capas.push(una);
   }
 
-  // Medir se mide **después de colgar la capa**, en `montar`: un nodo suelto
-  // no tiene caja y `clientWidth` daría cero, que dejaría el cuadrado en nada.
   window.addEventListener("resize", medir, { passive: true });
   window.addEventListener("orientationchange", medir, { passive: true });
 
-  var puesta = false;   // ¿hay bandera en pantalla?
-  var porMano = false;  // ¿la puso el logo? entonces no la quita ningún reloj
-  var ultima = -1;      // la anterior, para no repetirla
-  var reloj = null;     // el reloj del respiro
-  var corte = null;     // el que apaga un destello
+  var puesta = false;
+  var porMano = false;
+  var ultima = -1;
+  var reloj = null;
+  var corte = null;
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
 
@@ -1343,10 +1560,6 @@ lo pidió el usuario con la mano.
     for (var j = 0; j < capas.length; j++) capas[j].style.opacity = j === k ? "1" : "0";
     capa.style.visibility = "visible";
     capa.style.opacity = "1";
-    // La tinta **antes** que la bandera no cambia nada —las dos ocurren en el
-    // mismo cuadro— pero el orden importa al revés: al apagar hay que quitar la
-    // bandera primero y devolverle la tinta al script que mide después, o el
-    // nav pega un parpadeo del color viejo sobre el fondo nuevo.
     tinta(BANDERAS[k].tinta);
     puesta = true;
   }
@@ -1358,31 +1571,21 @@ lo pidió el usuario con la mano.
     puesta = false;
   }
 
-  // — El respiro —
-
-  var forzarHome = null;  // el preview lo pone a mano; en Cargo se queda en null
-
-  function enHome() {
-    if (forzarHome !== null) return forzarHome;
+  function enAbout() {
     var here = location.pathname.replace(/^\/|\/$/g, "").toLowerCase();
-    for (var i = 0; i < HOME.length; i++) if (here === HOME[i]) return true;
-    return false;
+    return here === "about";
   }
 
   function agendar() {
     clearTimeout(reloj);
     reloj = null;
-    // Las cuatro razones para no contar: la preferencia del sistema, el home,
-    // la pestaña de atrás, y una bandera que ya está puesta con la mano.
-    if (menos || enHome() || document.hidden || porMano) return;
+    if (menos || document.hidden || porMano) return;
     reloj = setTimeout(respirar, rnd(QUIETO_MIN, QUIETO_MAX));
   }
 
   function respirar() {
     reloj = null;
-    // Se vuelve a preguntar todo: entre que se agendó y que se cumplió el reloj
-    // pudo cambiar la página, esconderse la pestaña o entrar la mano.
-    if (menos || enHome() || document.hidden || porMano) return agendar();
+    if (menos || document.hidden || porMano) return agendar();
 
     mostrar();
     clearTimeout(corte);
@@ -1393,14 +1596,9 @@ lo pidió el usuario con la mano.
     }, FLASH);
   }
 
-  // Cualquier señal de vida reinicia el reloj. No apaga nada: si hay bandera
-  // puesta es porque la mano está en el logo, y eso lo maneja el otro lado.
   function reiniciar() { agendar(); }
 
-  // — El logo —
-  // Delegado en el documento y no atado al nodo: Cargo repinta el nav en cada
-  // navegación AJAX y un listener puesto sobre `.nav-logo` se iría con él. Así
-  // no hay nada que volver a enganchar y no hay estado que reparar.
+  // Delegado porque Cargo reemplaza el nav durante la navegación AJAX.
 
   function logoDe(nodo) {
     if (!nodo || !nodo.closest) return null;
@@ -1409,28 +1607,23 @@ lo pidió el usuario con la mano.
 
   document.addEventListener("pointerover", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
+    if (!enAbout()) return;
     var logo = logoDe(e.target);
-    if (!logo || logoDe(e.relatedTarget) === logo) return; // movimiento adentro
+    if (!logo || logoDe(e.relatedTarget) === logo) return;
     clearTimeout(corte);
     corte = null;
     porMano = true;
     clearTimeout(reloj);
     reloj = null;
-    // Volver antes de que se cumpla la cola **no sortea otra bandera**: la que
-    // está puesta sigue puesta. Sorteando se vería cambiar en la cara de quien
-    // apenas rozó el borde y volvió, que es un movimiento que nadie hizo a
-    // propósito.
     if (!puesta) mostrar();
   }, true);
 
   document.addEventListener("pointerout", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
+    if (!enAbout()) return;
     var logo = logoDe(e.target);
     if (!logo || logoDe(e.relatedTarget) === logo) return;
     porMano = false;
-    // La cola: aguanta puesta y corta seco al final. `porMano` ya está en falso
-    // —la mano se fue— así que si vuelve, el `pointerover` de arriba cancela
-    // esto y la deja donde estaba.
     clearTimeout(corte);
     corte = setTimeout(function () {
       corte = null;
@@ -1440,11 +1633,9 @@ lo pidió el usuario con la mano.
     agendar();
   }, true);
 
-  // Teléfono: el toque la muestra un instante y **navega al home igual**. Se
-  // acepta que se vea artefactuoso; lo que no se acepta es que el logo deje de
-  // ser el link al home por mostrar una bandera.
   document.addEventListener("pointerdown", function (e) {
     if (!e.pointerType || e.pointerType === "mouse") return;
+    if (!enAbout()) return;
     if (!logoDe(e.target)) return;
     mostrar();
     clearTimeout(corte);
@@ -1455,7 +1646,6 @@ lo pidió el usuario con la mano.
     }, FLASH_DEDO);
   }, true);
 
-  // — Señales de vida —
   var VIVO = ["mousemove", "pointerdown", "wheel", "keydown", "touchstart", "scroll"];
   for (var v = 0; v < VIVO.length; v++) {
     window.addEventListener(VIVO[v], reiniciar, { passive: true, capture: true });
@@ -1475,42 +1665,24 @@ lo pidió el usuario con la mano.
   window.addEventListener("pageshow", reiniciar);
   window.addEventListener("hashchange", reiniciar);
 
-  // — La ronda —
-  // **Aquí no hay MutationObserver, y es a propósito.** Los otros dos scripts sí
-  // lo usan porque tienen que volver a enganchar nodos que Cargo repinta; este
-  // no engancha nada (los eventos van delegados en el documento). Y si lo usara
-  // para reiniciar el reloj, el reloj no se cumpliría nunca: el lema teclea
-  // letra por letra, los widgets escriben, Cargo carga imágenes — el DOM muta
-  // todo el tiempo por razones que no son el usuario.
-  //
-  // Lo que hay que ver de la navegación AJAX es **si cambió la página**, no si
-  // cambió el DOM. Eso es mirar la URL, y se mira en la misma ronda que repara
-  // la capa.
   var donde = location.href;
 
   function montar() {
-    // Cargo reescribe el <body> en cada navegación: si la capa se fue con él,
-    // se vuelve a colgar. Los <img> son los mismos, así que no se vuelven a
-    // pedir ni a decodificar.
     if (capa.parentNode !== document.body) {
       document.body.appendChild(capa);
-      medir();  // recién ahora tiene caja que medir
+      medir();
     }
 
     if (location.href !== donde) {
-      // Página nueva: el reloj arranca de cero y hay que volver a preguntar si
-      // esta es el home. Nunca un destello encima de una navegación.
       donde = location.href;
-      if (!porMano) ocultar();
+      porMano = false;
+      clearTimeout(corte);
+      corte = null;
+      ocultar();
       agendar();
     } else if (!reloj && !porMano) {
-      // Se quedó sin reloj: pasa cuando `agendar` se salió por el home o por la
-      // pestaña escondida y esa razón ya no está.
       agendar();
     }
-    // Y si el reloj está corriendo, **no se toca**. Reagendarlo en cada ronda
-    // era el error de la primera versión: cada 3 s volvía a sortear 20–40 s, así
-    // que el plazo no se cumplía jamás y el respiro no existía.
   }
 
   if (document.readyState === "loading") {
@@ -1519,10 +1691,8 @@ lo pidió el usuario con la mano.
     montar();
   }
   window.addEventListener("load", montar);
-  setInterval(montar, 3000);   // ronda de reparación, como los otros dos scripts
+  setInterval(montar, 3000);
 
-  // Para calibrar desde la consola o desde el preview. En Cargo no molesta a
-  // nadie: es un objeto y nada más.
   window.TTX_BANDERA = {
     mostrar: mostrar,
     ocultar: ocultar,
@@ -1530,13 +1700,6 @@ lo pidió el usuario con la mano.
     ritmo: function (min, max) {
       QUIETO_MIN = min;
       QUIETO_MAX = max == null ? min : max;
-      agendar();
-    },
-    // Fingir que se está (o no) en el home sin poder cambiar la URL: es lo que
-    // el preview necesita, porque ahí la página es un archivo suelto.
-    // `null` devuelve la decisión a `location.pathname`.
-    home: function (v) {
-      forzarHome = v;
       agendar();
     }
   };
@@ -1551,8 +1714,6 @@ Con `nav-preview.html` abierto, en la consola:
 ```js
 TTX_BANDERA.ritmo(3000);          // respiro cada 3s: se ve en una sentada
 TTX_BANDERA.respirar();           // uno ya
-TTX_BANDERA.home(true);           // fingir que esto es el home: no debe disparar
-TTX_BANDERA.home(null);           // devolverle la decisión a la URL
 TTX_BANDERA.ritmo(20000, 40000);  // volver a lo de verdad
 ```
 
