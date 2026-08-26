@@ -427,10 +427,7 @@
    AJUSTES MOBILE PANEL ABIERTO
 ========================= */
 
-/* ⚠️ Esta media query NUNCA se cierra: las reglas que siguen (incluido
-   el bloque @media (hover:hover) anidado) quedan atrapadas dentro de
-   max-width:768px. Efecto real: el hover scale(0.97) del trigger y
-   .release-marquee-wrapper{width:100%} solo aplican en móvil. */
+/* Ajustes específicos para el panel abierto en móvil. */
 @media (max-width: 768px) {
 	[id="E1964764012"] .release-panel {
 		min-width: 0;
@@ -487,4 +484,17 @@
     transform: scale(0.97);
   }
 }
-/* ⚠️ falta la llave de cierre de la @media (max-width: 768px) de arriba */
+}
+
+/* ===== REVELADO COORDINADO DE CARÁTULAS ===== */
+[id="E1964764012"][data-ttx-media-state="loading"] .release-marquee-wrapper,
+[id="E1964764012"][data-ttx-media-state="loading"] .release-strip {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+[id="E1964764012"] .release-marquee-wrapper,
+[id="E1964764012"] .release-strip {
+	transition: opacity 0.2s ease;
+}

@@ -357,6 +357,10 @@ function buildFreshMarquee(filteredCards) {
           requestAnimationFrame(function () {
             wrapper.style.opacity = '1';
 
+            if (window.TTXMediaReveal) {
+              window.TTXMediaReveal.refreshCatalog(root);
+            }
+
             setTimeout(function () {
               wrapper.style.transition = '';
               isTransitioning = false;
@@ -462,6 +466,113 @@ initRender();
   window.addEventListener('hashchange', handleNavigation);
   window.addEventListener('popstate', handleNavigation);
 
+})();
+</script>
+
+<!-- REVELADO COORDINADO DE MEDIOS -->
+<script>
+(function () {
+  var CATALOG_ID = 'E1964764012';
+  var MERCH_ID = 'C0789380032';
+  var INITIAL_SETTLE_MS = 280;
+  var MEDIA_TIMEOUT_MS = 3800;
+  var pendingTimers = new WeakMap();
+  var renderVersions = new WeakMap();
+
+  function imageIsReady(image) {
+    return image.complete && image.naturalWidth > 0;
+  }
+
+  function isNearViewport(image) {
+    var rect = image.getBoundingClientRect();
+    return rect.top < window.innerHeight * 1.5 && rect.bottom > -100;
+  }
+
+  function waitForImage(image) {
+    if (imageIsReady(image)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      function done() {
+        image.removeEventListener('load', done);
+        image.removeEventListener('error', done);
+        resolve();
+      }
+      image.addEventListener('load', done, { once: true });
+      image.addEventListener('error', done, { once: true });
+    });
+  }
+
+  function collectInitialImages(root, type) {
+    var images = Array.prototype.slice.call(root.querySelectorAll('img'));
+    if (type !== 'merch') return images;
+    var visible = images.filter(isNearViewport);
+    return visible.length ? visible : images.slice(0, 8);
+  }
+
+  function waitForCargoToSettle(root, type) {
+    return new Promise(function (resolve) {
+      var previousCount = -1;
+      var stableSince = Date.now();
+      var deadline = Date.now() + 1400;
+      function check() {
+        if (!root.isConnected) return resolve([]);
+        var images = collectInitialImages(root, type);
+        if (images.length !== previousCount) {
+          previousCount = images.length;
+          stableSince = Date.now();
+        }
+        if ((images.length && Date.now() - stableSince >= INITIAL_SETTLE_MS) || Date.now() >= deadline) {
+          resolve(images);
+          return;
+        }
+        window.setTimeout(check, 60);
+      }
+      check();
+    });
+  }
+
+  function reveal(root) {
+    if (root.isConnected) root.setAttribute('data-ttx-media-state', 'ready');
+  }
+
+  function prepare(root, type) {
+    if (!root || !root.isConnected) return;
+    var oldTimer = pendingTimers.get(root);
+    if (oldTimer) window.clearTimeout(oldTimer);
+    var version = (renderVersions.get(root) || 0) + 1;
+    renderVersions.set(root, version);
+    root.setAttribute('data-ttx-media-state', 'loading');
+    var failsafe = window.setTimeout(function () {
+      if (renderVersions.get(root) === version) reveal(root);
+    }, MEDIA_TIMEOUT_MS);
+    pendingTimers.set(root, failsafe);
+    waitForCargoToSettle(root, type).then(function (images) {
+      return Promise.all(images.map(waitForImage));
+    }).then(function () {
+      if (renderVersions.get(root) !== version) return;
+      window.clearTimeout(failsafe);
+      reveal(root);
+    });
+  }
+
+  function findRoot(id) { return document.getElementById(id); }
+  function refreshCatalog(root) { prepare(root || findRoot(CATALOG_ID), 'catalog'); }
+  function refreshMerch(root) { prepare(root || findRoot(MERCH_ID), 'merch'); }
+  window.TTXMediaReveal = { refreshCatalog: refreshCatalog, refreshMerch: refreshMerch };
+
+  function mount() {
+    refreshCatalog();
+    refreshMerch();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
+  else mount();
+
+  var observer = new MutationObserver(function () {
+    var catalog = findRoot(CATALOG_ID);
+    var merch = findRoot(MERCH_ID);
+    if (catalog && !catalog.hasAttribute('data-ttx-media-state')) refreshCatalog(catalog);
+    if (merch && !merch.hasAttribute('data-ttx-media-state')) refreshMerch(merch);
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 })();
 </script>
 

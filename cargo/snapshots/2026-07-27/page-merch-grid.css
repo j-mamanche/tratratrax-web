@@ -62,3 +62,14 @@ gallery-grid .tag-separator {
 [id="X2106740497"].page {
 	min-height: var(--viewport-height);
 }
+
+/* ===== REVELADO COORDINADO DEL GRID ===== */
+[id="X2106740497"][data-ttx-media-state="loading"] gallery-grid {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+[id="X2106740497"] gallery-grid {
+	transition: opacity 0.2s ease;
+}
