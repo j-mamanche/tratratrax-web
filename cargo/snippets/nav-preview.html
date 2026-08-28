@@ -373,6 +373,9 @@
     el.classList.remove("is-typing");
     el.classList.add("is-resting"); // parpadea al cargar y se apaga
 
+    ctl.track = document.createElement("span");
+    ctl.track.className = "glitch-track";
+
     ctl.out = document.createElement("span");
     ctl.out.className = "glitch-text";
     ctl.out.textContent = ctl.phrase;
@@ -381,8 +384,22 @@
     caret.className = "glitch-caret";
     caret.setAttribute("aria-hidden", "true");
 
-    el.appendChild(ctl.out);
-    el.appendChild(caret);
+    ctl.track.appendChild(ctl.out);
+    ctl.track.appendChild(caret);
+    el.appendChild(ctl.track);
+
+    function followCaret() {
+      var mobile = el.closest('[id="N1901077103"]');
+      if (!mobile || !document.contains(mobile) || reduce) {
+        ctl.track.style.transform = "";
+        return;
+      }
+
+      var overflow = Math.ceil(ctl.track.scrollWidth - el.clientWidth);
+      ctl.track.style.transform = overflow > 0
+        ? "translateX(" + (-overflow) + "px)"
+        : "";
+    }
 
     // Un solo timer por lema: espera, borrado y tecleo se turnan.
     function later(fn, ms) {
@@ -435,6 +452,7 @@
       }
 
       ctl.idle = false;
+      ctl.track.style.transform = "";
       el.classList.remove("is-resting");
       el.classList.add("is-typing");
 
@@ -452,6 +470,7 @@
         }
 
         ctl.out.textContent = from.slice(0, erased);
+        followCaret();
         later(erase, rnd(DEL_MS - DEL_JIT, DEL_MS + DEL_JIT));
       }
 
@@ -464,6 +483,7 @@
         }
 
         ctl.out.textContent = withTrail(to, typed, TRAIL);
+        followCaret();
         later(type, rnd(TYPE_MS - TYPE_JIT, TYPE_MS + TYPE_JIT));
       }
 
@@ -471,6 +491,7 @@
       function settle(trail) {
         if (trail <= 0) {
           ctl.out.textContent = to;
+          followCaret();
           el.classList.remove("is-typing");
           el.classList.add("is-resting"); // dispara los parpadeos finales
           ctl.idle = true;
@@ -479,6 +500,7 @@
         }
 
         ctl.out.textContent = withTrail(to, to.length, trail);
+        followCaret();
         later(function () { settle(trail - 1); }, rnd(TYPE_MS - TYPE_JIT, TYPE_MS + TYPE_JIT));
       }
 
@@ -491,6 +513,7 @@
     ctl.resume = function () {
       if (ctl.idle && ctl.out.textContent !== ctl.phrase) {
         ctl.out.textContent = ctl.phrase;
+        followCaret();
       }
       if (ctl.stopped) {
         ctl.stopped = false;
@@ -993,11 +1016,17 @@
   var NAV_SEL = '[id="L3482832595"], [id="N1901077103"]';
 
   var Z          = 9998;   // justo debajo del nav, que va en 9999
-  var FLASH      = 1500;   // ms del destello del respiro: puesta y quieta, corte seco
   var FLASH_DEDO = 420;    // ms del toque en teléfono: alcanza a verse antes de navegar
   var COLA_MANO  = 800;    // ms que aguanta después de que la mano suelta el logo
-  var QUIETO_MIN = 20000;  // ms de quietud antes de un respiro (mínimo)
-  var QUIETO_MAX = 40000;  // ms de quietud antes de un respiro (máximo)
+  // La quietud se vuelve presencia, no ráfaga: cada aparición tarda menos y
+  // dura más. La última no corta hasta que alguien vuelva a dar una señal.
+  var RESPIROS = [
+    { espera: [20000, 40000], duracion: 1500 },
+    { espera: [14000, 22000], duracion: 2600 },
+    { espera: [10000, 16000], duracion: 4200 },
+    { espera: [7000, 11000],  duracion: 6500 },
+    { espera: [5000, 8000],   duracion: null }
+  ];
 
   var LOGO_SEL = '[id="L3482832595"] .nav-logo, [id="N1901077103"] .nav-logo';
 
@@ -1066,6 +1095,8 @@
   var ultima = -1;      // la anterior, para no repetirla
   var reloj = null;     // el reloj del respiro
   var corte = null;     // el que apaga un destello
+  var nivel = 0;        // cuánto tiempo lleva quieto el sitio
+  var permanente = false;
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
 
@@ -1118,7 +1149,8 @@
     // El respiro sigue corriendo en todo el sitio; solo lo paran la preferencia
     // del sistema, la pestaña escondida o una bandera puesta por la mano.
     if (menos || document.hidden || porMano) return;
-    reloj = setTimeout(respirar, rnd(QUIETO_MIN, QUIETO_MAX));
+    var paso = RESPIROS[Math.min(nivel, RESPIROS.length - 1)];
+    reloj = setTimeout(respirar, rnd(paso.espera[0], paso.espera[1]));
   }
 
   function respirar() {
@@ -1127,18 +1159,33 @@
     // pudo cambiar la página, esconderse la pestaña o entrar la mano.
     if (menos || document.hidden || porMano) return agendar();
 
+    var paso = RESPIROS[Math.min(nivel, RESPIROS.length - 1)];
     mostrar();
+    nivel += 1;
+    if (paso.duracion == null) {
+      permanente = true;
+      return;
+    }
     clearTimeout(corte);
     corte = setTimeout(function () {
       corte = null;
       if (!porMano) ocultar();
       agendar();
-    }, FLASH);
+    }, paso.duracion);
   }
 
-  // Cualquier señal de vida reinicia el reloj. No apaga nada: si hay bandera
-  // puesta es porque la mano está en el logo, y eso lo maneja el otro lado.
-  function reiniciar() { agendar(); }
+  // Cualquier señal de vida devuelve el sitio al primer nivel. También retira
+  // la presencia permanente: la bandera responde a la quietud, no la castiga.
+  function reiniciar() {
+    nivel = 0;
+    permanente = false;
+    if (!porMano) {
+      clearTimeout(corte);
+      corte = null;
+      if (puesta) ocultar();
+    }
+    agendar();
+  }
 
   // — El logo —
   // Delegado en el documento y no atado al nodo: Cargo repinta el nav en cada
@@ -1207,9 +1254,14 @@
     if (document.hidden) {
       clearTimeout(reloj);
       reloj = null;
-      if (!porMano) ocultar();
+      if (!porMano) {
+        clearTimeout(corte);
+        corte = null;
+        permanente = false;
+        if (puesta) ocultar();
+      }
     } else {
-      agendar();
+      reiniciar();
     }
   });
 
@@ -1244,11 +1296,13 @@
       // manual desde About a una página donde el logo no la invoca.
       donde = location.href;
       porMano = false;
+      nivel = 0;
+      permanente = false;
       clearTimeout(corte);
       corte = null;
       ocultar();
       agendar();
-    } else if (!reloj && !porMano) {
+    } else if (!reloj && !corte && !permanente && !porMano) {
       // Se quedó sin reloj: pasa si la pestaña volvió a estar visible.
       agendar();
     }
@@ -1272,8 +1326,9 @@
     ocultar: ocultar,
     respirar: respirar,
     ritmo: function (min, max) {
-      QUIETO_MIN = min;
-      QUIETO_MAX = max == null ? min : max;
+      RESPIROS[0].espera = [min, max == null ? min : max];
+      nivel = 0;
+      permanente = false;
       agendar();
     },
   };

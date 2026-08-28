@@ -158,6 +158,28 @@
   display: none;
 }
 
+/* El cursor de las grietas usa exactamente el gesto del lema del nav. Cuando
+   acaba, la animación lo deja transparente, pero el pseudo-elemento sigue en
+   el flujo: reservar ese carácter evita que el texto dé un salto al apagarse.
+   `_runtime/escribir.js` lo retira solo cuando la grieta vuelve a cerrarse. */
+[data-ttx] .ttx-caret::after {
+  content: '▌';
+  opacity: 0;
+}
+
+[data-ttx] .is-typing .ttx-caret::after {
+  opacity: 1;
+}
+
+[data-ttx] .is-resting .ttx-caret::after {
+  animation: ttx-caret 0.5s steps(1) 3 both;
+}
+
+@keyframes ttx-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
 /* Los dos pesos de la alternancia. **Lo único que separa un grupo del
    siguiente es la junta y el peso**: ni un signo, ni un color. Un segundo tono
    sería un tercer nivel de información en una línea que solo tiene dos.

@@ -178,8 +178,9 @@ function piezaDestacada(r, { indiceArtistas }) {
   return {
     id: r.id,
     grupos: textos.filter(Boolean),
-    arte: urlMedia(r.home.arte),
-    video: r.home.video?.mp4
+    // El arte propio reemplaza a la carátula; sin él, la carátula es el arte.
+    arte: r.home?.arte ? urlMedia(r.home.arte) : cover(r.bcImageId, 10),
+    video: r.home?.video?.mp4
       ? { mp4: urlMedia(r.home.video.mp4), poster: urlMedia(r.home.video.poster) }
       : null,
     compra: r.purchaseUrl || '',

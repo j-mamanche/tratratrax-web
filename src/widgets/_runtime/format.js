@@ -196,7 +196,10 @@ export function esLiviano(i) {
  *
  * Tres condiciones, y las tres son "que no quede una pantalla a medias":
  *
- *   - **arte**, que es lo único que la composición no puede inventar;
+ *   - **arte**, que es lo único que la composición no puede inventar. La
+ *     carátula de Bandcamp cuenta: es la imagen que el release ya trae, y
+ *     `home.arte` está para reemplazarla cuando la portada merezca otra cosa,
+ *     no para que un disco entero se quede fuera del home por no tenerla;
  *   - **texto**, propio (`home.texto`) o derivable del título;
  *   - **visible**, porque un anuncio se elige a dedo (`fijo`) y no por azar.
  *
@@ -212,6 +215,9 @@ export function esLiviano(i) {
  */
 export function cumpleHome(r) {
   return Boolean(
-    r?.home?.arte && (r.home.texto || r.album) && r.visible !== false,
+    tieneArteHome(r) && (r.home?.texto || r.album) && r.visible !== false,
   );
 }
+
+/** El arte de la portada: el propio si lo subieron, la carátula de Bandcamp si no. */
+export const tieneArteHome = (r) => Boolean(r?.home?.arte || r?.bcImageId);

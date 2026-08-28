@@ -1,0 +1,94 @@
+/* La entrada no participa de la retícula de Cargo: es una sola imagen que
+   ocupa la ventana y se recorta como una cámara. Todo queda aislado bajo su
+   propio placeholder para que el CSS del sitio no altere ni el lienzo ni el
+   tratamiento de baja fidelidad. */
+[data-ttx='canas'] {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: block;
+  width: 100%;
+  height: 100svh;
+  padding: 0;
+  overflow: hidden;
+  background: #25361b;
+  cursor: default;
+  touch-action: none;
+}
+
+[data-ttx='canas'][data-canas-activo] { cursor: none; }
+
+[data-ttx='canas'] .ttx-canas-lienzo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+[data-ttx='canas'] .ttx-canas-machete {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: min(238px, 42vw);
+  pointer-events: none;
+  transform: translate3d(-100vw, -100vh, 0);
+}
+
+/* El wrapper solo viaja. La hoja interior es la única que rota, de modo que
+   ningún refresco del seguimiento puede borrar el golpe. */
+[data-ttx='canas'] .ttx-canas-hoja {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  image-rendering: pixelated;
+  transform-origin: 100% 100%;
+}
+
+[data-ttx='canas'] .ttx-canas-machete[data-cortando] .ttx-canas-hoja {
+  transform: rotate(-20deg);
+}
+
+/* Vive desde el primer fotograma, aun cuando el nav todavía está oculto. Así
+   su aparición no añade una mancha nueva sobre el cañaveral. */
+[data-ttx='canas']::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: auto 0 0;
+  height: clamp(9rem, 30svh, 20rem);
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.58), transparent);
+  transition: opacity 10s linear;
+}
+
+[data-ttx='canas'][data-canas-nav-entrando]::before,
+[data-ttx='canas'][data-canas-nav-listo]::before { opacity: 1; }
+
+[data-ttx='canas'][data-canas-nav-listo]::before,
+[data-ttx='canas'][data-canas-nav-reiniciando]::before { transition: none; }
+
+[data-ttx='canas'][data-canas-nav-reiniciando]::before { opacity: 0; }
+
+/* Una interferencia apenas visible evita que los bloques se lean como un
+   escalado limpio de pantalla Retina. No es un efecto de glitch: es la
+   compresión discreta de una imagen digital vieja. */
+[data-ttx='canas']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(17, 25, 9, 0.2) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255, 247, 204, 0.06) 0 1px, transparent 1px 4px);
+  mix-blend-mode: multiply;
+  z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ttx='canas']::after { opacity: 0.08; }
+}

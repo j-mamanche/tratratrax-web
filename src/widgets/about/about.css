@@ -416,6 +416,12 @@
   padding-left: var(--ttx-aire);
 }
 
+/* La línea usa `gap` entre sus enunciados, pero el caret tiene que quedar
+   pegado a la última letra. Compensa solo el gap que flex le pondría antes. */
+[data-ttx='about'] .ttx-about-vivo > .ttx-caret {
+  margin-left: calc(-1 * var(--ttx-aire));
+}
+
 /* Invisible pero midiendo, que es justo lo que `visibility` hace y ninguna otra
    cosa hace: `opacity: 0` dejaría los links atrapando clics y `display: none`
    no mediría nada. El `inert` y el `aria-hidden` van en el HTML: son cuatro
@@ -426,12 +432,30 @@
 }
 
 /* Una red o el correo: un enunciado de un solo grupo, así que va liviano y sin
-   junta. Sin subrayado y en la misma tinta que todo lo demás — aquí tampoco se
-   señala nada. */
+   junta. En reposo sigue siendo tinta negra; el color solo aparece con la mano
+   encima (o con foco de teclado), como los botones del artboard del About. */
 [data-ttx='about'] .ttx-about-enlace {
   flex: 0 0 auto;
+  color: var(--ttx-tinta);
   text-decoration: none;
   white-space: nowrap;
+}
+
+[data-ttx='about'] .ttx-about-enlace--instagram:is(:hover, :focus-visible) {
+  background-color: #ffff01;
+}
+
+[data-ttx='about'] .ttx-about-enlace--youtube:is(:hover, :focus-visible) {
+  background-color: #0015ff;
+  color: #ffffff;
+}
+
+[data-ttx='about'] .ttx-about-enlace--bandcamp:is(:hover, :focus-visible) {
+  background-color: #ff0000;
+}
+
+[data-ttx='about'] .ttx-about-enlace--bookings:is(:hover, :focus-visible) {
+  background-color: #b4ff9c;
 }
 
 [data-ttx='about'] .ttx-about-enlace:focus-visible {

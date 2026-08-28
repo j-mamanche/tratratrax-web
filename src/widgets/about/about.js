@@ -352,13 +352,14 @@ function crearTexto(about, estados) {
     // ninguna lleva junta y todas van livianas—, separadas por el aire.
     ...(about.redes ?? [])
       .filter((r) => r?.nombre && r?.url)
-      .map((r) => crearEnlace(r.nombre, r.url)),
+      .map((r) => crearEnlace(r.nombre, r.url, { tono: tonoEnlace(r.nombre) })),
     // Y el correo, que es un grupo solo: los dos puntos y el espacio son
     // parte del texto, no una junta. Es la única línea del sitio con un signo
     // adentro y así llegó de las capturas.
     about.bookings?.texto &&
       crearEnlace(about.bookings.texto, `mailto:${about.bookings.email || about.bookings.texto}`, {
         fuera: false,
+        tono: 'bookings',
       }),
   ];
 
@@ -441,17 +442,22 @@ function crearNombres({ clase }, estados) {
  * es el grupo 0 de su propio enunciado, y sin junta porque también es el
  * último.
  */
-function crearEnlace(texto, href, { fuera = true } = {}) {
+function crearEnlace(texto, href, { fuera = true, tono = '' } = {}) {
   return elemento(
     'a',
     {
-      class: 'ttx-about-enlace ttx-suave',
+      class: `ttx-about-enlace ttx-suave${tono ? ` ttx-about-enlace--${tono}` : ''}`,
       href,
       target: fuera && '_blank',
       rel: fuera && 'noopener',
     },
     texto,
   );
+}
+
+/** Los cuatro tonos vienen del estado de botones del artboard del About. */
+function tonoEnlace(nombre) {
+  return String(nombre).trim().toLocaleLowerCase('en-US').replace(/\s+/g, '');
 }
 
 // ── Los gestos ──────────────────────────────────────────────────────────

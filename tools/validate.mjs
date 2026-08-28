@@ -152,10 +152,10 @@ for (const [i, r] of releases.entries()) {
     err(`${at} credits[${j}]`, 'o `role` y `name`, o una línea suelta en `texto`');
   }
 
-  // El material del home vive con su release. Es opcional —casi ningún release
-  // sale en el home—, pero a medias no sirve: sin arte no hay composición.
+  // El material del home vive con su release. Es opcional en dos sentidos: casi
+  // ningún release sale en el home, y el que sale ya tiene imagen —la carátula
+  // de Bandcamp—. `arte` está para reemplazarla, no para habilitar la portada.
   if (r.home) {
-    if (!r.home.arte) err(`${at} home`, 'falta `arte` — es lo único que la composición no puede inventar');
     revisarMedia(`${at} home`, '`arte`', r.home.arte);
 
     if (r.home.video) {
@@ -225,9 +225,9 @@ if (existsSync(join(root, 'data', 'home.json'))) {
       err('home.json', 'modo `fijo` sin `release` — falta decir cuál');
     } else if (!r) {
       err('home.json', `\`release\` "${home.release}" no existe en releases.json`);
-    } else if (!r.home?.arte) {
-      err(`home.json "${r.album}"`, 'el release destacado no tiene `home.arte` — el home caería al respaldo');
-    } else if (!r.home.video?.mp4) {
+    } else if (!r.home?.arte && !r.bcImageId) {
+      err(`home.json "${r.album}"`, 'el destacado no tiene ninguna imagen —ni `home.arte` ni carátula de Bandcamp— y el home caería al respaldo');
+    } else if (!r.home?.video?.mp4) {
       warn(`home.json "${r.album}"`, 'sin `home.video` — el home se queda quieto, sin cenefa ni intercambio');
     }
   } else {
@@ -235,8 +235,23 @@ if (existsSync(join(root, 'data', 'home.json'))) {
     if (!candidatos.length) {
       warn(
         'home.json',
-        'modo `auto` y ningún release cumple (arte, texto, `purchaseUrl` y `listenUrl`, y visible) — el home usa el respaldo automático',
+        'modo `auto` y ningún release cumple (arte, texto y visible) — el home usa el respaldo automático',
       );
+    }
+  }
+
+  // `azar` acota el sorteo a una lista escrita a mano. Un id que ya no existe
+  // es un error —quedó apuntando al vacío—; uno que existe pero no cumple es un
+  // aviso, porque el sitio lo salta sin romperse.
+  if (home.azar != null) {
+    if (!Array.isArray(home.azar)) {
+      err('home.json', '`azar` tiene que ser una lista de ids');
+    } else {
+      for (const id of home.azar) {
+        const r = releases.find((x) => x.id === id);
+        if (!r) err('home.json', `\`azar\` nombra "${id}", que no existe en releases.json`);
+        else if (!cumpleHome(r)) warn('home.json', `"${r.album}" está en \`azar\` pero no cumple — el sorteo lo salta`);
+      }
     }
   }
 }

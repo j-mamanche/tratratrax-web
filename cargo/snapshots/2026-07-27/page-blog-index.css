@@ -28,6 +28,34 @@
 	align-items: center;
 }
 
+/*
+   Hover de las entradas del blog.
+
+   Cada `column-set.blog-listing` es una fila escrita en Cargo. El enlace
+   ocupa toda la columna del título; al pasar por él, las franjas verdes se
+   repiten por cada línea de texto. Así un título de dos líneas no se vuelve
+   un bloque alto: conserva dos bandas ceñidas a la altura de las mayúsculas.
+*/
+[id="T2278312101"] column-set.blog-listing > column-unit[slot="1"] > a {
+	display: block;
+	color: inherit;
+	line-height: 1.16;
+	text-decoration: none;
+}
+
+[id="T2278312101"] column-set.blog-listing:has(> column-unit[slot="1"] > a:hover) > column-unit[slot="1"] > a,
+[id="T2278312101"] column-set.blog-listing:has(> column-unit[slot="1"] > a:focus-visible) > column-unit[slot="1"] > a {
+	background-image: linear-gradient(
+		to bottom,
+		transparent 0.08em,
+		#b4ff9c 0.08em,
+		#b4ff9c 1em,
+		transparent 1em
+	);
+	background-repeat: repeat-y;
+	background-size: 100% 1.16em;
+}
+
 /* ⚠️ REGLA MUERTA: `[id="…"] .page` es un selector de DESCENDIENTE,
    pero el id ES el .page. Debería ser `[id="…"].page` (sin espacio),
    como la regla de min-height de arriba. El fade de transición nunca aplica. */

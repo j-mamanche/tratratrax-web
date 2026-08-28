@@ -108,6 +108,31 @@ export function maquina(raiz, opciones = {}) {
   let n = 0; // letras a la vista
   let meta = 0; // a dónde va
   let timer = null;
+  let caret = null;
+
+  // El caret es el mismo del lema del nav. Se agrega fuera de los nodos que se
+  // escriben para no tocar el marcado (ni convertir links en texto plano), y
+  // se queda en el flujo cuando termina de parpadear: opaco no significa que
+  // deje de medir. Esa reserva transparente evita el pequeño salto que daba el
+  // último carácter al apagarse el cursor.
+  const ponerCaret = () => {
+    if (caret) return;
+    caret = document.createElement('span');
+    caret.className = 'ttx-caret';
+    caret.setAttribute('aria-hidden', 'true');
+    raiz.append(caret);
+  };
+
+  const estadoCaret = (estado) => {
+    raiz.classList.toggle('is-typing', estado === 'typing');
+    raiz.classList.toggle('is-resting', estado === 'resting');
+  };
+
+  const quitarCaret = () => {
+    caret?.remove();
+    caret = null;
+    estadoCaret();
+  };
 
   const pintar = () => {
     for (const p of piezas) {
@@ -137,6 +162,8 @@ export function maquina(raiz, opciones = {}) {
   const correr = () => {
     if (n === meta) {
       parar();
+      if (n === total && total) estadoCaret('resting');
+      else if (n === 0) quitarCaret();
       return;
     }
     const subiendo = meta > n;
@@ -164,8 +191,14 @@ export function maquina(raiz, opciones = {}) {
     if (ya) {
       n = destino;
       pintar();
+      // Con movimiento reducido y teclado no hay una transición que el cursor
+      // tenga que acompañar: el texto llega entero y sin parpadeo.
+      if (n === 0) quitarCaret();
+      else estadoCaret();
       return;
     }
+    ponerCaret();
+    estadoCaret('typing');
     correr();
   };
 

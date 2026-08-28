@@ -1,6 +1,6 @@
 // De dónde salen los datos y cómo se cargan una sola vez por página.
 
-import { cumpleHome } from './format.js';
+import { cumpleHome, tieneArteHome } from './format.js';
 
 /**
  * Base de los datos: la carpeta donde vive este mismo bundle.
@@ -111,25 +111,46 @@ async function resolverHome() {
 /**
  * Qué release manda en el home, según la política.
  *
- * En `fijo` se exige el arte: un destacado a dedo sin material es un home a
- * medias, y el respaldo se ve mejor que media pantalla en negro. En `auto` se
- * sortea entre los que cumplen (`format.js:cumpleHome`) y, si no cumple
- * ninguno, también cae al respaldo.
+ * En `fijo` se exige el arte —el propio o la carátula de Bandcamp—: un
+ * destacado sin ninguna imagen es media pantalla en negro, y el respaldo se ve
+ * mejor. En `auto` se sortea, y si no queda ninguno también cae al respaldo.
+ *
+ * El sorteo tiene dos formas de acotarse. Si `home.json` trae `azar` con una
+ * lista de ids, sortea solo entre esos: es el sello diciendo cuáles quiere ver
+ * rotando. Si no la trae —o la trae vacía— entran todos los que cumplen, que es
+ * como se comportaba antes de que existiera el campo. Un `home.json` viejo por
+ * lo tanto sigue significando exactamente lo mismo.
  *
  * Sin `modo` escrito se deduce del propio archivo: si hay `release`, es fijo.
- * Así un `home.json` viejo —o escrito a la carrera— sigue significando algo.
  */
 function elegirDestacado(politica, releases) {
   const modo = politica?.modo ?? (politica?.release ? 'fijo' : 'auto');
 
   if (modo === 'fijo') {
     const r = releases.find((x) => x.id === politica?.release);
-    return r?.home?.arte ? r : null;
+    return tieneArteHome(r) ? r : null;
   }
 
-  const candidatos = releases.filter(cumpleHome);
+  const candidatos = enSorteo(politica, releases);
   if (!candidatos.length) return null;
   return candidatos[Math.floor(Math.random() * candidatos.length)];
+}
+
+/**
+ * Los que entran al sorteo. La lista escrita nunca manda sobre la regla: un id
+ * apuntado a mano que después perdió la carátula o se ocultó no puede colarse
+ * en la portada solo porque siga escrito.
+ */
+export function enSorteo(politica, releases) {
+  const puede = releases.filter(cumpleHome);
+  const marcados = politica?.azar;
+  if (!Array.isArray(marcados) || !marcados.length) return puede;
+  const marca = new Set(marcados);
+  const filtrados = puede.filter((r) => marca.has(r.id));
+  // Si la lista quedó apuntando solo a releases que ya no cumplen, se ignora:
+  // dejar la portada en el respaldo por una lista desactualizada es peor que
+  // sortear entre todos, que es lo que el sello tenía antes.
+  return filtrados.length ? filtrados : puede;
 }
 
 let promesaAbout = null;

@@ -1,0 +1,127 @@
+---
+// Maqueta de la entrada antes de conectarla a Cargo. El panel de prueba nunca
+// forma parte del sitio: permite volver a ver la primera visita sin borrar el
+// almacenamiento del navegador a mano.
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TraTraTrax · prueba de cañas</title>
+    <style>
+      html, body { margin: 0; width: 100%; min-height: 100%; overflow: hidden; background: #25361b; }
+
+      .prueba-nav {
+        position: fixed;
+        inset: auto 0 0;
+        z-index: 10000;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: end;
+        gap: 1rem;
+        padding: 1rem;
+        color: #fff;
+        font: 400 clamp(9px, 0.78vw, 12px)/1 Helvetica, Arial, sans-serif;
+        letter-spacing: 0.01em;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 320ms ease;
+      }
+
+      .prueba-nav[data-visible] { opacity: 1; pointer-events: auto; }
+      .prueba-nav p { margin: 0; opacity: 0.85; }
+      .prueba-nav b { font-weight: 400; letter-spacing: 0.16em; }
+      .prueba-nav ul { display: flex; justify-content: flex-end; gap: 0.28em; margin: 0; padding: 0; list-style: none; }
+      .prueba-nav li:first-child::after { content: '__'; letter-spacing: -0.13em; margin-right: 0.45em; }
+      .prueba-nav a { color: inherit; font-weight: 700; text-decoration: none; }
+
+      .prueba-controles {
+        position: fixed;
+        top: 0.75rem;
+        right: 0.75rem;
+        z-index: 10001;
+        display: flex;
+        gap: 0.35rem;
+      }
+      .prueba-controles button {
+        padding: 0.38rem 0.5rem;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        border-radius: 0;
+        font: 400 10px/1 Helvetica, Arial, sans-serif;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+      .prueba-controles button:hover { background: #fff; color: #000; }
+
+      @media (max-width: 650px) {
+        .prueba-nav { grid-template-columns: 1fr auto; }
+        .prueba-nav b { display: none; }
+        .prueba-nav ul { grid-column: 2; }
+      }
+    </style>
+  </head>
+  <body>
+    <div data-ttx="canas"></div>
+
+    <nav class="prueba-nav" aria-label="Navegación de prueba" data-nav-prueba>
+      <p>2026 © Todos los izquierdos públicos</p>
+      <b>TRATRATRAX</b>
+      <ul>
+        <li>Menu</li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#catalog">Catalog</a></li>
+        <li><a href="#merca">Merca</a></li>
+        <li><a href="#blog">Blog</a></li>
+      </ul>
+    </nav>
+
+    <div class="prueba-controles" aria-label="Controles de prueba">
+      <button type="button" data-reiniciar-canas>Reiniciar cañas</button>
+      <button type="button" data-reiniciar-visita>Reiniciar 10 s</button>
+    </div>
+
+    <script is:inline>
+      const clave = 'ttx-canas-nav-prueba-v1';
+      const escena = document.querySelector('[data-ttx="canas"]');
+      const nav = document.querySelector('[data-nav-prueba]');
+      let espera = 0;
+
+      const reiniciarEscena = () => escena.dispatchEvent(new Event('ttx:canas-reiniciar'));
+      const mostrarNav = () => {
+        delete escena.dataset.canasNavEntrando;
+        escena.dataset.canasNavListo = '';
+        nav.dataset.visible = '';
+        localStorage.setItem(clave, 'visto');
+      };
+      const iniciarPrimeraVisita = () => {
+        clearTimeout(espera);
+        escena.dataset.canasNavReiniciando = '';
+        delete escena.dataset.canasNavEntrando;
+        delete escena.dataset.canasNavListo;
+        // Fuerza el estado limpio antes de permitir la próxima entrada lenta.
+        void escena.offsetWidth;
+        delete escena.dataset.canasNavReiniciando;
+        delete nav.dataset.visible;
+        localStorage.removeItem(clave);
+        reiniciarEscena();
+      };
+      const iniciarCuenta = () => {
+        if (localStorage.getItem(clave) === 'visto' || espera) return;
+        escena.dataset.canasNavEntrando = '';
+        espera = setTimeout(mostrarNav, 10_000);
+      };
+
+      escena.addEventListener('ttx:canas-primera-interaccion', iniciarCuenta);
+      if (localStorage.getItem(clave) === 'visto') mostrarNav();
+
+      document.querySelector('[data-reiniciar-canas]').addEventListener('click', reiniciarEscena);
+      document.querySelector('[data-reiniciar-visita]').addEventListener('click', iniciarPrimeraVisita);
+    </script>
+    <script is:inline src={`${base}ttx.js`} data-ttx-datos={`${base}data/`} defer></script>
+  </body>
+</html>

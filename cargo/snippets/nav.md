@@ -421,6 +421,12 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
     el.classList.remove("is-typing");
     el.classList.add("is-resting"); // parpadea al cargar y se apaga
 
+    // En móvil el lema comparte fila con el menú. El texto vive dentro de una
+    // pista que se puede correr sin mover el prefijo `2026 ©` ni partir la
+    // línea. En escritorio la pista queda siempre en translateX(0).
+    ctl.track = document.createElement("span");
+    ctl.track.className = "glitch-track";
+
     ctl.out = document.createElement("span");
     ctl.out.className = "glitch-text";
     ctl.out.textContent = ctl.phrase;
@@ -429,8 +435,25 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
     caret.className = "glitch-caret";
     caret.setAttribute("aria-hidden", "true");
 
-    el.appendChild(ctl.out);
-    el.appendChild(caret);
+    ctl.track.appendChild(ctl.out);
+    ctl.track.appendChild(caret);
+    el.appendChild(ctl.track);
+
+    // Solo el nav móvil desplaza el lema. Se llama después de cada letra:
+    // cuando la frase pasa el ancho disponible, el cursor sigue entrando por
+    // la derecha en vez de empujar el menú a otra línea.
+    function followCaret() {
+      var mobile = el.closest('[id="N1901077103"]');
+      if (!mobile || !document.contains(mobile) || reduce) {
+        ctl.track.style.transform = "";
+        return;
+      }
+
+      var overflow = Math.ceil(ctl.track.scrollWidth - el.clientWidth);
+      ctl.track.style.transform = overflow > 0
+        ? "translateX(" + (-overflow) + "px)"
+        : "";
+    }
 
     // Un solo timer por lema: espera, borrado y tecleo se turnan.
     function later(fn, ms) {
@@ -483,6 +506,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
       }
 
       ctl.idle = false;
+      ctl.track.style.transform = "";
       el.classList.remove("is-resting");
       el.classList.add("is-typing");
 
@@ -500,6 +524,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
         }
 
         ctl.out.textContent = from.slice(0, erased);
+        followCaret();
         later(erase, rnd(DEL_MS - DEL_JIT, DEL_MS + DEL_JIT));
       }
 
@@ -512,6 +537,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
         }
 
         ctl.out.textContent = withTrail(to, typed, TRAIL);
+        followCaret();
         later(type, rnd(TYPE_MS - TYPE_JIT, TYPE_MS + TYPE_JIT));
       }
 
@@ -519,6 +545,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
       function settle(trail) {
         if (trail <= 0) {
           ctl.out.textContent = to;
+          followCaret();
           el.classList.remove("is-typing");
           el.classList.add("is-resting"); // dispara los parpadeos finales
           ctl.idle = true;
@@ -527,6 +554,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
         }
 
         ctl.out.textContent = withTrail(to, to.length, trail);
+        followCaret();
         later(function () { settle(trail - 1); }, rnd(TYPE_MS - TYPE_JIT, TYPE_MS + TYPE_JIT));
       }
 
@@ -539,6 +567,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
     ctl.resume = function () {
       if (ctl.idle && ctl.out.textContent !== ctl.phrase) {
         ctl.out.textContent = ctl.phrase;
+        followCaret();
       }
       if (ctl.stopped) {
         ctl.stopped = false;
@@ -1170,12 +1199,17 @@ bandera, los pesos, las reservas de ancho— es lo mismo con otro id.
 /* Fila 2 — el lema es el que cede ancho; el menú no se comprime nunca. */
 [id="N1901077103"] column-set > column-unit[slot="0"] {
 	order: 1;
+	/* `flex-basis: auto` toma el ancho de toda la frase antes de que el
+	   recorte de `.nav-lema` entre a trabajar. Con base cero esta columna toma
+	   únicamente el sobrante después del menú y nunca lo manda a otra fila. */
+	flex: 1 1 0;
+	width: 0;
 	min-width: 0;
 }
 
 [id="N1901077103"] column-set > column-unit[slot="2"] {
 	order: 2;
-	flex-shrink: 0;
+	flex: 0 0 auto;
 }
 
 /* Solo el logo necesita estirarse para que el text-align: center signifique
@@ -1231,6 +1265,11 @@ bandera, los pesos, las reservas de ancho— es lo mismo con otro id.
 }
 
 [id="N1901077103"] .nav-lema {
+	display: flex;
+	align-items: flex-end;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
 	text-align: left;
 	color: var(--nav-ink);
 	transition: color 220ms ease;
@@ -1314,8 +1353,20 @@ bandera, los pesos, las reservas de ancho— es lo mismo con otro id.
 /* — LEMA QUE SE HACKEA — */
 
 [id="N1901077103"] [data-glitch] {
+	display: block;
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/* La pista es más ancha que su ventana solo cuando hace falta. El script la
+   corre una letra a la vez al teclear; no hay marquee autónomo ni salto de
+   línea. */
+[id="N1901077103"] .glitch-track {
 	display: inline-block;
 	white-space: nowrap;
+	will-change: transform;
 }
 
 /* En reposo el cursor no está. Aparece fijo mientras teclea, parpadea tres
@@ -1412,9 +1463,10 @@ asoma sola un instante en cualquier página: el **respiro**.
 1. **Corte seco, en las dos direcciones.** Ni fundido de entrada ni de salida.
    Una bandera que se desvanece se lee como una transición de página; una que
    corta se lee como un destello. Lo que se calibra no es el borde sino
-   **cuánto dura puesta** — `FLASH` para el respiro, `COLA_MANO` para lo que
-   aguanta después de soltar el logo. Es la diferencia entre un parpadeo y una
-   presencia, y se consigue con el reloj, nunca con la opacidad.
+   **cuánto dura puesta** — la escalera `RESPIROS` para el respiro,
+   `COLA_MANO` para lo que aguanta después de soltar el logo. Es la diferencia
+   entre un parpadeo y una presencia, y se consigue con el reloj, nunca con la
+   opacidad.
 2. **El nav nunca se tapa.** La bandera va en `z-index: 9998` y el nav en
    `9999` (sección 2). Si alguien le quita el `z-index` al nav, la bandera se lo
    come — y el logo, que es lo que la invoca, deja de verse.
@@ -1441,10 +1493,12 @@ asoma sola un instante en cualquier página: el **respiro**.
 **Con la mano encima del logo la bandera se queda puesta** mientras la mano
 esté, y **aguanta `COLA_MANO` después de soltarla** antes de cortar en seco: sin
 esa cola, salir del logo apagaba la bandera en el mismo cuadro en que el ratón
-cruzaba el borde y se sentía como si algo se hubiera roto. El `FLASH` de abajo
-es lo que dura el destello del respiro, y `FLASH_DEDO` el del toque en teléfono
-— ahí el toque muestra la bandera **y navega al home igual**: se ve un instante
-y la página cambia debajo.
+cruzaba el borde y se sentía como si algo se hubiera roto. `RESPIROS` arranca
+con un destello aislado y, sin una sola señal de vida, acorta la espera y alarga
+la puesta en cuatro pasos; la quinta bandera queda fija. Cualquier movimiento,
+scroll, tecla, toque o cambio de página vuelve la escalera a cero y retira esa
+presencia. `FLASH_DEDO` es el toque en teléfono — ahí muestra la bandera **y
+navega al home igual**: se ve un instante y la página cambia debajo.
 
 Con `prefers-reduced-motion: reduce` **el respiro no corre**. El del logo sí: ese
 lo pidió el usuario con la mano.
@@ -1486,11 +1540,17 @@ lo pidió el usuario con la mano.
   var NAV_SEL = '[id="L3482832595"], [id="N1901077103"]';
 
   var Z = 9998;
-  var FLASH      = 1500;
   var FLASH_DEDO = 420;
   var COLA_MANO  = 800;
-  var QUIETO_MIN = 20000;
-  var QUIETO_MAX = 40000;
+  // La quietud se vuelve presencia, no ráfaga: cada aparición tarda menos y
+  // dura más. La última no corta hasta que alguien vuelva a dar una señal.
+  var RESPIROS = [
+    { espera: [20000, 40000], duracion: 1500 },
+    { espera: [14000, 22000], duracion: 2600 },
+    { espera: [10000, 16000], duracion: 4200 },
+    { espera: [7000, 11000],  duracion: 6500 },
+    { espera: [5000, 8000],   duracion: null }
+  ];
 
   var LOGO_SEL = '[id="L3482832595"] .nav-logo, [id="N1901077103"] .nav-logo';
 
@@ -1539,6 +1599,8 @@ lo pidió el usuario con la mano.
   var ultima = -1;
   var reloj = null;
   var corte = null;
+  var nivel = 0;
+  var permanente = false;
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
 
@@ -1580,23 +1642,41 @@ lo pidió el usuario con la mano.
     clearTimeout(reloj);
     reloj = null;
     if (menos || document.hidden || porMano) return;
-    reloj = setTimeout(respirar, rnd(QUIETO_MIN, QUIETO_MAX));
+    var paso = RESPIROS[Math.min(nivel, RESPIROS.length - 1)];
+    reloj = setTimeout(respirar, rnd(paso.espera[0], paso.espera[1]));
   }
 
   function respirar() {
     reloj = null;
     if (menos || document.hidden || porMano) return agendar();
 
+    var paso = RESPIROS[Math.min(nivel, RESPIROS.length - 1)];
     mostrar();
+    nivel += 1;
+    if (paso.duracion == null) {
+      permanente = true;
+      return;
+    }
     clearTimeout(corte);
     corte = setTimeout(function () {
       corte = null;
       if (!porMano) ocultar();
       agendar();
-    }, FLASH);
+    }, paso.duracion);
   }
 
-  function reiniciar() { agendar(); }
+  // La bandera responde a la quietud; una señal real devuelve el ciclo a cero
+  // y, si ya llegó a presencia permanente, la retira de inmediato.
+  function reiniciar() {
+    nivel = 0;
+    permanente = false;
+    if (!porMano) {
+      clearTimeout(corte);
+      corte = null;
+      if (puesta) ocultar();
+    }
+    agendar();
+  }
 
   // Delegado porque Cargo reemplaza el nav durante la navegación AJAX.
 
@@ -1655,9 +1735,14 @@ lo pidió el usuario con la mano.
     if (document.hidden) {
       clearTimeout(reloj);
       reloj = null;
-      if (!porMano) ocultar();
+      if (!porMano) {
+        clearTimeout(corte);
+        corte = null;
+        permanente = false;
+        if (puesta) ocultar();
+      }
     } else {
-      agendar();
+      reiniciar();
     }
   });
 
@@ -1676,11 +1761,13 @@ lo pidió el usuario con la mano.
     if (location.href !== donde) {
       donde = location.href;
       porMano = false;
+      nivel = 0;
+      permanente = false;
       clearTimeout(corte);
       corte = null;
       ocultar();
       agendar();
-    } else if (!reloj && !porMano) {
+    } else if (!reloj && !corte && !permanente && !porMano) {
       agendar();
     }
   }
@@ -1698,8 +1785,9 @@ lo pidió el usuario con la mano.
     ocultar: ocultar,
     respirar: respirar,
     ritmo: function (min, max) {
-      QUIETO_MIN = min;
-      QUIETO_MAX = max == null ? min : max;
+      RESPIROS[0].espera = [min, max == null ? min : max];
+      nivel = 0;
+      permanente = false;
       agendar();
     }
   };
@@ -1720,10 +1808,11 @@ TTX_BANDERA.ritmo(20000, 40000);  // volver a lo de verdad
 El preview trae además dos botones —**respiro ya** y **cada 3s**— y un
 interruptor de *home* para ver que ahí no dispara.
 
-**Lo que hay que mirar al calibrar:** que el destello se sienta —un segundo
-puesta, que es lo que lo separa de un parpadeo— sin llegar a leerse como un
-cambio de página, que el nav se siga leyendo encima, y que dejar el ratón quieto
-un minuto en una página cualquiera dé **uno** y no una ráfaga.
+**Lo que hay que mirar al calibrar:** que el primer destello se sienta —un
+segundo largo puesta, lo que lo separa de un parpadeo— sin leerse como un cambio
+de página; que los siguientes se vuelvan más presentes sin hacer ráfaga; que el
+nav se siga leyendo encima; y que, tras unos 70–110 segundos de quietud, la
+última bandera se quede puesta hasta el siguiente gesto.
 
 ### Los archivos
 

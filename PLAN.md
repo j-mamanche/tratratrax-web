@@ -15,7 +15,7 @@ Estado: plan aprobado para arrancar. Repo aún sin inicializar.
 | Player de audio | **No hay.** Solo información + un link externo a Bandcamp por release. |
 | Merca | **Vitrina.** Enlaza afuera. Sin checkout propio por ahora. |
 | Tipografía | La de Cargo. No es tema. |
-| Idiomas | Decisión editorial (mezcla ES/EN deliberada), no hay selector ni i18n técnico. |
+| Idiomas | Decisión editorial (mezcla ES/EN deliberada), no hay selector ni i18n técnico. **En revisión desde 2026-08-21: ver `PLAN-IDIOMAS.md`, que propone lo contrario y todavía no está decidido.** |
 | Diseño / código | Silvi diseña, tú programas. |
 | Landing de caña de azúcar | Fase 2. No entra en este plan. |
 
