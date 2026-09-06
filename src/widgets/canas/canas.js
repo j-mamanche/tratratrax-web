@@ -215,6 +215,11 @@ registrar('canas', async (host) => {
 function cargar(archivo) {
   return new Promise((resolve, reject) => {
     const imagen = new Image();
+    // Cargo carga el bundle desde GitHub Pages: las cañas llegan desde otro
+    // origen. Vamos a leer sus píxeles para detectar qué tallo se cortó, así
+    // que la petición tiene que ser CORS antes de asignar `src`; de otro modo
+    // `getImageData()` rechaza el canvas aunque la imagen se alcance a ver.
+    imagen.crossOrigin = 'anonymous';
     imagen.decoding = 'async';
     imagen.onload = () => resolve(imagen);
     imagen.onerror = () => reject(new Error(`No se pudo cargar media/canas/${archivo}`));

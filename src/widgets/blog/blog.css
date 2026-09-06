@@ -1,4 +1,4 @@
-[data-ttx='blog'] { --ttx-blog-gap:.625rem; display:grid; grid-template-rows:auto minmax(2rem,auto) minmax(0,1fr); height:var(--ttx-alto); min-height:0; padding:.625rem; overflow:hidden; background:var(--ttx-gris); font-family:inherit; font-size:clamp(16px,1.39vw,20px); line-height:1.08; }
+[data-ttx='blog'] { --ttx-blog-gap:.625rem; --ttx-nav-h:60px; display:grid; grid-template-rows:auto minmax(2rem,auto) minmax(0,1fr); height:var(--ttx-alto); min-height:0; padding:.625rem; overflow:hidden; background:var(--ttx-gris); font-family:inherit; font-size:clamp(16px,1.39vw,20px); line-height:1.08; }
 [data-ttx='blog'] .ttx-blog-highlight { display:grid; grid-template-columns:minmax(0,5fr) minmax(0,9fr); gap:var(--ttx-blog-gap); align-items:stretch; min-height:0; }
 [data-ttx='blog'] .ttx-blog-card { min-width:0; padding:.3125rem 0; }
 [data-ttx='blog'] .ttx-blog-card :is(h1,b) { display:block; margin:0; font:inherit; font-weight:800; line-height:1.16; }

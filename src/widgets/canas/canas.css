@@ -3,13 +3,26 @@
    propio placeholder para que el CSS del sitio no altere ni el lienzo ni el
    tratamiento de baja fidelidad. */
 [data-ttx='canas'] {
-  position: fixed;
-  inset: 0;
+  /* Cargo anima cada página dentro de un contenedor transformado. Ahí
+     `inset: 0` se mide contra ese recuadro y deja el borde del chrome
+     alrededor. Centramos una caja de viewport explícita para que la escena
+     salga de ese contenedor: la landing nunca lleva marco ni aire lateral. */
+  position: fixed !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 50% !important;
   z-index: 9999;
   display: block;
-  width: 100%;
-  height: 100svh;
-  padding: 0;
+  width: 100vw !important;
+  max-width: none !important;
+  height: 100dvh !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  transform: translate(-50%, -50%) !important;
   overflow: hidden;
   background: #25361b;
   cursor: default;
