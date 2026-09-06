@@ -12,9 +12,15 @@ const CLAVES = ['PANEL_PASSWORD', 'PANEL_SECRET', 'GITHUB_TOKEN', 'GITHUB_REPO',
 
 export function entorno() {
   const proceso = typeof process !== 'undefined' ? process.env ?? {} : {};
+  // El bundle de Astro incorpora `import.meta.env` en tiempo de build. Cuando
+  // se publica desde una máquina que tiene `.env`, eso puede incluir el API
+  // mock local (`http://localhost:8787`). Dentro de la Function de Netlify
+  // solo se deben aceptar las variables que Netlify inyecta en ejecución.
+  const enNetlify = Boolean(proceso.SITE_ID || proceso.URL || proceso.NETLIFY);
+  const duranteDesarrollo = enNetlify ? {} : import.meta.env ?? {};
   const salida = {};
   for (const clave of CLAVES) {
-    salida[clave] = proceso[clave] || import.meta.env[clave] || '';
+    salida[clave] = proceso[clave] || duranteDesarrollo[clave] || '';
   }
   return salida;
 }

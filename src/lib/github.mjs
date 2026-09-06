@@ -60,17 +60,24 @@ export function configDesde(env = {}) {
 }
 
 async function pedir(cfg, ruta, opciones = {}) {
-  const res = await fetch(`${cfg.api ?? API_POR_DEFECTO}/repos/${cfg.repo}${ruta}`, {
-    ...opciones,
-    headers: {
-      Authorization: `Bearer ${cfg.token}`,
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      'User-Agent': 'tratratrax-panel',
-      ...(opciones.body ? { 'Content-Type': 'application/json' } : null),
-      ...opciones.headers,
-    },
-  });
+  let res;
+  try {
+    res = await fetch(`${cfg.api ?? API_POR_DEFECTO}/repos/${cfg.repo}${ruta}`, {
+      ...opciones,
+      headers: {
+        Authorization: `Bearer ${cfg.token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'tratratrax-panel',
+        ...(opciones.body ? { 'Content-Type': 'application/json' } : null),
+        ...opciones.headers,
+      },
+    });
+  } catch (error) {
+    // No incluimos el token, pero sí el host, que permite distinguir una API
+    // local configurada por accidente de un problema de red real.
+    throw new Error(`No se pudo conectar a GitHub (${cfg.api}): ${error.message}`);
+  }
 
   if (res.ok) return res.json();
 
