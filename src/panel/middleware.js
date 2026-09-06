@@ -9,6 +9,7 @@
 
 import { defineMiddleware } from 'astro:middleware';
 import { haySesion } from '../lib/sesion.mjs';
+import { entorno } from './lib/entorno.js';
 
 const ABIERTAS = new Set(['/entrar', '/api/entrar', '/robots.txt']);
 
@@ -21,7 +22,10 @@ export const onRequest = defineMiddleware(async (contexto, siguiente) => {
   // publica Pages, y el panel no guarda nada privado en `public/`.
   if (ABIERTAS.has(ruta)) return siguiente();
 
-  const abierta = await haySesion(request, import.meta.env);
+  // La contraseña y la firma viven en variables de ejecución de Netlify.
+  // El login ya las lee con `entorno()`; usar `import.meta.env` aquí las
+  // congelaría al compilar y una cookie recién firmada nunca sería válida.
+  const abierta = await haySesion(request, entorno());
   locals.sesion = abierta;
 
   if (abierta) return siguiente();
