@@ -256,6 +256,27 @@ if (existsSync(join(root, 'data', 'home.json'))) {
   }
 }
 
+// ─── blog.json ───────────────────────────────────────────────────────────────
+
+if (existsSync(join(root, 'data', 'blog.json'))) {
+  const blog = load('blog.json') ?? {};
+  const idsBlog = new Set();
+  if (!Array.isArray(blog.items)) err('blog.json', '`items` debe ser una lista');
+  else for (const [i, item] of blog.items.entries()) {
+    const at = `blog items[${i}] "${item?.title ?? '¿?'}"`;
+    if (!SLUG.test(item?.id ?? '')) err(at, 'id inválido');
+    else if (idsBlog.has(item.id)) err(at, `id duplicado "${item.id}"`);
+    else idsBlog.add(item.id);
+    if (!item?.title) err(at, 'falta `title`');
+    if (item?.url && !isHttpUrl(item.url)) err(at, 'url no es válida');
+    if (typeof item?.order !== 'number') err(at, 'falta `order`');
+    if (typeof item?.visible !== 'boolean') err(at, 'falta `visible`');
+  }
+  if (blog.highlight?.article && !idsBlog.has(blog.highlight.article)) err('blog highlight', 'el artículo seleccionado no existe');
+  if (blog.highlight?.image && !isHttpUrl(blog.highlight.image) && !blog.highlight.image.startsWith('media/')) err('blog highlight', 'image debe ser una URL o ruta media/');
+  if (blog.ticker?.url && !isHttpUrl(blog.ticker.url)) err('blog ticker', 'url no es válida');
+}
+
 // ─── about.json ──────────────────────────────────────────────────────────────
 //
 // El About no tiene respaldo, y esa es la diferencia con el home. Allá, si el

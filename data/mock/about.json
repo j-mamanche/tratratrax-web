@@ -1,0 +1,34 @@
+{
+  "silabas": ["Tra", "Tra", "Trax"],
+  "sello": "*A record label run by*",
+  "lema": "*Sonic hustlers*since 2020*",
+  "redes": [
+    { "nombre": "Instagram", "url": "https://www.instagram.com/tratratrax" },
+    { "nombre": "YouTube", "url": "https://www.youtube.com/@tratratrax" },
+    { "nombre": "Bandcamp", "url": "https://tratratrax.bandcamp.com/" }
+  ],
+  "bookings": {
+    "texto": "Bookings: carin@outer-agency.com",
+    "email": "carin@outer-agency.com"
+  },
+  "djs": [
+    {
+      "nombre": "DJ Lomalinda",
+      "instagram": "https://www.instagram.com/djlomalinda/",
+      "emblema": "media/about/lomalinda.gif",
+      "quieto": "media/about/lomalinda.png"
+    },
+    {
+      "nombre": "Nyksan",
+      "instagram": "https://www.instagram.com/nyksan_/",
+      "emblema": "media/about/nyksan.gif",
+      "quieto": "media/about/nyksan.png"
+    },
+    {
+      "nombre": "Verraco",
+      "instagram": "https://www.instagram.com/verraco__/",
+      "emblema": "media/about/verraco.gif",
+      "quieto": "media/about/verraco.png"
+    }
+  ]
+}

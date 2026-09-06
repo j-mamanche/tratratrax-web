@@ -35,7 +35,7 @@
      casa, negra sobre claro. */
   --ttx-papel: var(--ttx-gris);
 
-  /* **Un solo renglón**, del grosor de la banda del home: el intersticio es la
+  /* **Un solo renglón**, del grosor de la banda del home: la grieta es la
      misma barra de chrome en las tres páginas, y por eso se reconoce de una a
      otra. Es un mínimo, no una altura fija: la fila del grid es `auto`. */
   --ttx-banda-h: 1.9rem;
@@ -441,20 +441,20 @@
   white-space: nowrap;
 }
 
-[data-ttx='about'] .ttx-about-enlace--instagram:is(:hover, :focus-visible) {
+[data-ttx='about'] .ttx-about-enlace--instagram:is(:hover, :focus-visible, .ttx-hover-rastro) {
   background-color: #ffff01;
 }
 
-[data-ttx='about'] .ttx-about-enlace--youtube:is(:hover, :focus-visible) {
+[data-ttx='about'] .ttx-about-enlace--youtube:is(:hover, :focus-visible, .ttx-hover-rastro) {
   background-color: #0015ff;
   color: #ffffff;
 }
 
-[data-ttx='about'] .ttx-about-enlace--bandcamp:is(:hover, :focus-visible) {
+[data-ttx='about'] .ttx-about-enlace--bandcamp:is(:hover, :focus-visible, .ttx-hover-rastro) {
   background-color: #ff0000;
 }
 
-[data-ttx='about'] .ttx-about-enlace--bookings:is(:hover, :focus-visible) {
+[data-ttx='about'] .ttx-about-enlace--bookings:is(:hover, :focus-visible, .ttx-hover-rastro) {
   background-color: #b4ff9c;
 }
 

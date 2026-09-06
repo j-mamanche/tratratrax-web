@@ -1,5 +1,5 @@
 /* El home: dos módulos que se turnan el video y el arte, y la franja del
-   lanzamiento en la mitad haciendo de bisagra. Todo cuelga de
+   lanzamiento en la mitad haciendo de grieta. Todo cuelga de
    [data-ttx='home'].
 
    La estructura, que es la misma del stack de siempre:
@@ -8,11 +8,11 @@
       ├─ .ttx-home-video   abs, inset: 0, z: 0   ← clip-path según el estado
       └─ .ttx-marco        rel,           z: 1   ← fondo transparente
           ├─ .ttx-home-caja.ttx-home-arriba   (el visor del stack)
-          ├─ .ttx-banda                       (la franja, encima de todo)
+          ├─ .ttx-banda                       (la grieta, encima de todo)
           └─ .ttx-home-caja.ttx-home-abajo    (el contenido del stack)
 
    El fondo negro lo pone el **host**, así que se ve por el aire de los lados,
-   por la franja y por donde el video no llegue. Las dos cajas van encima del
+   por la grieta y por donde el video no llegue. Las dos cajas van encima del
    video: la que tiene el arte lo pinta y tapa lo que haya debajo, la otra es
    transparente y lo deja pasar. En reposo ninguna de las dos pinta nada — el
    home en reposo es la cenefa y nada más. */
@@ -50,14 +50,14 @@
      filas del mismo grid— y el alto que salga. Lo que hace la composición es
      de dónde se recorta cada uno: el de abajo se ancla por arriba y el de
      arriba por abajo, así que el de arriba, que es más corto, pierde su parte
-     de arriba. La misma imagen, partida por la franja.
+     de arriba. La misma imagen, partida por la grieta.
 
      El video va `cover` siempre, porque nunca es una ventana propia: cubre el
      host entero y lo único que cambia es el rectángulo por el que se ve. */
   --ttx-home-ajuste: 100% auto;
   --ttx-home-video-ajuste: cover;
 
-  /* La franja dice `NO PARE, SIGUE SIGUE 4__ VARIOUS ARTISTS` y, con la mano
+  /* La grieta dice `NO PARE, SIGUE SIGUE 4__ VARIOUS ARTISTS` y, con la mano
      encima, `… VARIOUS ARTISTS__ BUY__ LISTEN`. Sin fecha y sin número de
      catálogo: son dos grupos, el disco en liviano y quién en fuerte. Lo que
      los separa es la junta y el peso, y eso no se calibra aquí — el `__` lo
@@ -102,13 +102,13 @@
    recorte de reposo.
 
    REPOSO — la cenefa. Es el estado por defecto y el que se ve casi siempre: el
-   video ocupa **solo la franja**, de borde a borde, y todo lo demás está
+   video ocupa **solo la grieta**, de borde a borde, y todo lo demás está
    apagado. Una grieta de video con el nombre del disco encima, sobre negro.
 
    Ahí está el hallazgo entero, y por eso es el reposo y no la excepción. El
    canal de información no se ilumina porque sea importante: se ilumina porque
-   es la bisagra, y el sitio se compone alrededor de ella solo cuando alguien la
-   toma. El video no es contenido: es el intersticio, y el intersticio es lo que
+   es la grieta, y el sitio se compone alrededor de ella solo cuando alguien la
+   toma. El video no es contenido: es la grieta, y la grieta es lo que
    el home enseña de entrada.
 
    Va a los lados sin `--ttx-margen`: la cenefa atraviesa, no se queda dentro
@@ -168,7 +168,7 @@
   overflow: hidden;
 }
 
-/* La misma imagen partida por la franja: la de arriba anclada por su borde
+/* La misma imagen partida por la grieta: la de arriba anclada por su borde
    inferior —se le va lo de arriba, que es más corto— y la de abajo por el
    superior. */
 [data-ttx='home'] .ttx-home-arriba {
@@ -186,7 +186,7 @@
 }
 
 /* En reposo el arte no está: de la cenefa para afuera no queda nada, y eso es
-   lo que hace que la franja sea lo único que se ve y no una franja más
+   lo que hace que la grieta sea lo único que se ve y no una grieta más
    brillante entre dos cosas que siguen ahí. La caja ya nace transparente, así
    que el reposo no necesita ninguna regla — el arte solo aparece al abrir, y
    en qué módulo aparece es lo que se turna entre una pasada y la siguiente.
@@ -239,12 +239,12 @@
   filter: var(--ttx-home-fx);
 }
 
-/* ── La franja ────────────────────────────────────────────────────────
-   Negra, con el texto blanco y centrado. La bisagra es la franja entera —no
+/* ── La grieta ────────────────────────────────────────────────────────
+   Negra, con el texto blanco y centrado. La grieta entera —no
    el título— y por eso el aire y el mínimo de alto viven aquí: lo que responde
    a la mano es toda la barra, y los links que aparecen son parte de ella.
 
-   La excepción es el reposo con video: ahí la franja **es** la cenefa, el
+   La excepción es el reposo con video: ahí la grieta **es** la cenefa, el
    hueco por el que se ve el video, y tiene que ser transparente. El título se
    queda encima y aguanta — a veces se leerá bien y a veces se perderá contra
    la imagen, y eso está decidido así. Es la apuesta que hace este home.
@@ -273,7 +273,7 @@
   text-align: center;
   white-space: normal;
   overflow: visible;
-  /* En teléfono se mantiene el dedo encima de la franja: sin esto sale la
+  /* En teléfono se mantiene el dedo encima de la grieta: sin esto sale la
      lupa, la selección de texto o el menú de iOS. */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
@@ -281,7 +281,7 @@
   touch-action: manipulation;
 }
 
-/* La cenefa: en reposo la franja es el hueco por donde se ve la capa —el video,
+/* La cenefa: en reposo la grieta es el hueco por donde se ve la capa —el video,
    o el arte quieto cuando el lanzamiento no tiene pieza audiovisual. */
 [data-ttx='home']:not([data-abierto]) .ttx-banda {
   background: transparent;
@@ -314,7 +314,7 @@
 }
 
 /* ── Los dos links ────────────────────────────────────────────────────
-   `BUY` y `LISTEN` solo existen con la franja abierta: en reposo la línea son
+   `BUY` y `LISTEN` solo existen con la grieta abierta: en reposo la línea son
    el disco y quién, y nada más. Que la línea se recomponga al abrir es la idea:
    está centrada, y reservarles el sitio dejaría el reposo descuadrado hacia la
    izquierda.
@@ -339,7 +339,7 @@
 
 /* La junta que solo existe cuando existen los links. El último grupo de la
    línea nunca lleva `__` (`format.js:grupos`), y cuál es el último cambia con
-   el estado: en reposo lo es el artista y con la franja abierta lo es
+   el estado: en reposo lo es el artista y con la grieta abierta lo es
    `LISTEN`. El `'__'` es el mismo de `tokens.css`; si allá cambiara, aquí
    también.
 

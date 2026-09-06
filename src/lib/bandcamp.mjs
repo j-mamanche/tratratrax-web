@@ -184,7 +184,9 @@ export async function importarAlbum(albumUrl, { artistas = [], faltantes = new M
       if (noteLines.length) noteLines.push('');
       continue;
     }
-    if (!date && /^released\b/i.test(line)) {
+    // Los pre-releases de Bandcamp dicen "releases <fecha>" en vez de
+    // "released <fecha>". Ambos textos contienen la misma fecha utilizable.
+    if (!date && /^releases?\b/i.test(line)) {
       date = parseDate(line);
       continue;
     }

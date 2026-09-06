@@ -1,0 +1,144 @@
+---
+/**
+ * El armazón de las pantallas: la barra, el carril y la obra.
+ *
+ * La barra lleva lo que se hace al final —guardar y salir— y nada más. El
+ * botón de guardar es uno solo para todo el studio y su lógica está en
+ * `lib/barra.js`; aquí solo está el sitio donde se para.
+ *
+ * `carril` es un slot con nombre porque lo que va ahí cambia por pantalla: la
+ * lista del catálogo, y nada en el home — que no tiene lista de la que elegir,
+ * así que `sinCarril` le deja la pantalla entera.
+ */
+import './estilo.css';
+
+const { titulo, actual, sinCarril = false } = Astro.props;
+
+const paginas = [
+  ['/catalogo', 'Catálogo'],
+  ['/home', 'Home'],
+  ['/blog', 'Blog'],
+];
+const nombreActual = paginas.find(([href]) => href === actual)?.[1] ?? 'Secciones';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="color-scheme" content="light" />
+    <title>{titulo} · TraTraTrax Studio</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <div class:list={['app', sinCarril && 'app-ancha']}>
+      <header class="barra">
+        <!-- La vuelta a la lista, solo en pantalla angosta y solo cuando hay
+             una ficha abierta encima. Vive en la barra y no en la ficha porque
+             es donde ya se busca volver, y porque una ficha que empieza con un
+             botón de irse empieza mal. -->
+        <button class="atras" id="volver" type="button" aria-label="Volver a la lista">‹</button>
+
+        <a class="marca" href="/catalogo">TraTraTrax <small>studio</small></a>
+
+        <nav class="barra-nav">
+          {paginas.map(([href, nombre]) => (
+            <a href={href} aria-current={actual === href ? 'page' : null} data-i18n={href.slice(1)}>{nombre}</a>
+          ))}
+        </nav>
+
+        <details class="barra-secciones">
+          <summary>Secciones <span>{nombreActual}</span></summary>
+          <nav class="barra-menu-caja">
+            {paginas.map(([href, nombre]) => (
+              <a href={href} aria-current={actual === href ? 'page' : null}>{nombre}</a>
+            ))}
+          </nav>
+        </details>
+
+        <div class="barra-acciones">
+          <button class="boton barra-vista" id="verVista" type="button" aria-label="Vista previa" data-vista={actual.slice(1)}>
+            <span class="boton-icon" aria-hidden="true">◉</span><span class="largo" data-i18n="vista">Vista previa</span><span class="corto" data-i18n="vista">Vista previa</span>
+          </button>
+          <button class="estado" id="estadoBarra" type="button" aria-expanded="false" aria-controls="detalleCambios"></button>
+          <button class="boton fuerte" id="guardar" type="button" disabled>
+            <span class="boton-icon" aria-hidden="true">↑</span><span class="largo" data-i18n="guardar">Guardar cambios</span><span class="corto">Guardar</span>
+          </button>
+          <form method="post" action="/api/salir">
+            <button class="boton callado" type="submit"><span data-i18n="salir">Salir</span> <span class="boton-icon" aria-hidden="true">↗</span></button>
+          </form>
+          <button class="idioma" id="idioma" type="button" aria-label="Switch to English">EN</button>
+
+        </div>
+
+        <details class="barra-opciones">
+          <summary>Opciones</summary>
+          <div class="barra-menu-caja">
+            <button class="menu-barra-item" id="verVistaMovil" type="button">Vista previa</button>
+            <button class="menu-barra-item" id="guardarMovil" type="button">Guardar cambios</button>
+            <span class="menu-barra-etiqueta">Publicación</span>
+            <span class="menu-barra-estado" id="estadoBarraMovil">Guardado</span>
+            <button class="menu-barra-item" id="idiomaMovil" type="button">English</button>
+            <form method="post" action="/api/salir">
+              <button class="menu-barra-item" type="submit" data-i18n="salir">Salir</button>
+            </form>
+          </div>
+        </details>
+      </header>
+
+      <div class="parte parte-barra" id="parteBarra" hidden></div>
+      <div class="detalle-cambios" id="detalleCambios" hidden></div>
+
+      {!sinCarril && (
+        <aside class="carril">
+          <slot name="carril" />
+        </aside>
+      )}
+
+      <main class="obra">
+        <slot />
+      </main>
+    </div>
+    <script>
+      import { montarIdioma } from './lib/idioma.js';
+      import { verVista } from './lib/borrador.js';
+      montarIdioma();
+
+      document.getElementById('verVista')?.addEventListener('click', (event) => verVista(`/vista?w=${event.currentTarget.dataset.vista}`));
+      document.getElementById('verVistaMovil')?.addEventListener('click', () => document.getElementById('verVista')?.click());
+      document.getElementById('guardarMovil')?.addEventListener('click', () => document.getElementById('guardar')?.click());
+
+      const abrirMenu = document.getElementById('abrirMenuBarra');
+      const menu = document.getElementById('menuBarra');
+      const idiomaPrincipal = document.getElementById('idioma');
+      const idiomaMovil = document.getElementById('idiomaMovil');
+
+      const pintarIdiomaMovil = () => {
+        if (idiomaMovil) idiomaMovil.textContent = idiomaPrincipal?.textContent === 'EN' ? 'English' : 'Español';
+      };
+      pintarIdiomaMovil();
+
+      const cerrarMenu = () => {
+        if (!menu || !abrirMenu) return;
+        menu.hidden = true;
+        abrirMenu.setAttribute('aria-expanded', 'false');
+      };
+
+      abrirMenu?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        menu.hidden = !menu.hidden;
+        abrirMenu.setAttribute('aria-expanded', String(!menu.hidden));
+      });
+      idiomaMovil?.addEventListener('click', () => {
+        idiomaPrincipal?.click();
+        pintarIdiomaMovil();
+        cerrarMenu();
+      });
+      addEventListener('click', (event) => {
+        if (menu && !menu.contains(event.target) && event.target !== abrirMenu) cerrarMenu();
+      });
+      addEventListener('keydown', (event) => { if (event.key === 'Escape') cerrarMenu(); });
+    </script>
+  </body>
+</html>

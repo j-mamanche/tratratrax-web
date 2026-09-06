@@ -9,3 +9,5 @@ dist/
 
 # Generado por tools/build-widgets.mjs
 public/
+dist-panel/
+.netlify/

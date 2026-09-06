@@ -37,14 +37,13 @@
    un bloque alto: conserva dos bandas ceñidas a la altura de las mayúsculas.
 */
 [id="T2278312101"] column-set.blog-listing > column-unit[slot="1"] > a {
-	display: block;
+	display: inline;
 	color: inherit;
 	line-height: 1.16;
 	text-decoration: none;
 }
 
-[id="T2278312101"] column-set.blog-listing:has(> column-unit[slot="1"] > a:hover) > column-unit[slot="1"] > a,
-[id="T2278312101"] column-set.blog-listing:has(> column-unit[slot="1"] > a:focus-visible) > column-unit[slot="1"] > a {
+[id="T2278312101"] column-set.blog-listing > column-unit[slot="1"] > a:is(:hover, :focus-visible, .ttx-hover-rastro) {
 	background-image: linear-gradient(
 		to bottom,
 		transparent 0.08em,
@@ -54,6 +53,13 @@
 	);
 	background-repeat: repeat-y;
 	background-size: 100% 1.16em;
+}
+
+[id="T2278312101"] column-set.blog-listing > column-unit[slot="1"] > a:is(:hover, :focus-visible, .ttx-hover-rastro)::after {
+	content: "__READ";
+	display: inline;
+	margin-left: 0.28em;
+	font-weight: 400;
 }
 
 /* ⚠️ REGLA MUERTA: `[id="…"] .page` es un selector de DESCENDIENTE,

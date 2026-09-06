@@ -148,6 +148,13 @@ const CIERRE = 500;
 const BARRA = ' / ';
 
 registrar('about', async (host) => {
+  // Cargo puede reciclar el placeholder al navegar entre páginas. `data-abierto`
+  // es un estado efímero del gesto, no parte del contenido: si llega pegado de
+  // un montaje anterior, el CSS nacería con la grieta cerrada y la entrada ya
+  // desplegada. Al quitarlo antes de crear la banda, el primer hover siempre
+  // parte del reposo y puede animar la expansión.
+  host.removeAttribute('data-abierto');
+
   const about = await cargarAbout();
 
   const djs = (about?.djs ?? []).map(normalizar).filter(Boolean);
@@ -240,11 +247,13 @@ registrar('about', async (host) => {
   const soltarMenos = escuchar(menos, () => {
     for (const est of estados) est.revisarMovimiento();
   });
+  const soltarRastro = rastroHover(banda.querySelectorAll('.ttx-about-enlace'));
 
   return {
     destruir() {
       soltarDisparos();
       soltarMenos();
+      soltarRastro();
       abrir.cerrar();
       letras.soltar();
       for (const est of estados) est.soltar();
@@ -260,6 +269,29 @@ function escuchar(mq, fn) {
   }
   mq.addListener(fn);
   return () => mq.removeListener(fn);
+}
+
+/** Mantiene el color 800 ms al salir y lo corta sin fundido. */
+function rastroHover(elementos, rastro = 800) {
+  const ac = new AbortController();
+  const timers = new WeakMap();
+  for (const el of elementos) {
+    el.addEventListener('pointerenter', () => {
+      clearTimeout(timers.get(el));
+      el.classList.add('ttx-hover-rastro');
+    }, { signal: ac.signal });
+    el.addEventListener('pointerleave', () => {
+      clearTimeout(timers.get(el));
+      timers.set(el, setTimeout(() => el.classList.remove('ttx-hover-rastro'), rastro));
+    }, { signal: ac.signal });
+  }
+  return () => {
+    ac.abort();
+    for (const el of elementos) {
+      clearTimeout(timers.get(el));
+      el.classList.remove('ttx-hover-rastro');
+    }
+  };
 }
 
 /**

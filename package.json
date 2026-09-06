@@ -6,7 +6,10 @@
   "description": "Contenido, widgets y herramienta de gestión del sitio TraTraTrax (Cargo.site)",
   "scripts": {
     "dev": "astro dev",
+    "dev:panel": "astro dev --config astro.config.panel.mjs --port 4322",
+    "dev:mock": "node tools/mock-github-api.mjs",
     "build": "npm run validate && npm run build:widgets && astro build",
+    "build:panel": "npm run build:widgets && astro build --config astro.config.panel.mjs",
     "build:widgets": "node tools/build-widgets.mjs",
     "preview": "astro preview",
     "validate": "node tools/validate.mjs",
@@ -15,6 +18,7 @@
     "prepreview": "npm run build:widgets"
   },
   "devDependencies": {
+    "@astrojs/netlify": "^6.6.5",
     "astro": "^5.13.0",
     "esbuild": "^0.27.7"
   }

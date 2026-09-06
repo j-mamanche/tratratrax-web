@@ -116,10 +116,9 @@ async function resolverHome() {
  * mejor. En `auto` se sortea, y si no queda ninguno también cae al respaldo.
  *
  * El sorteo tiene dos formas de acotarse. Si `home.json` trae `azar` con una
- * lista de ids, sortea solo entre esos: es el sello diciendo cuáles quiere ver
- * rotando. Si no la trae —o la trae vacía— entran todos los que cumplen, que es
- * como se comportaba antes de que existiera el campo. Un `home.json` viejo por
- * lo tanto sigue significando exactamente lo mismo.
+ * lista de ids, sortea solo entre esos. Si no la trae entran todos; una lista
+ * vacía no muestra ninguno. Así los archivos antiguos siguen funcionando y el
+ * Studio puede quitar todos de la selección.
  *
  * Sin `modo` escrito se deduce del propio archivo: si hay `release`, es fijo.
  */
@@ -144,13 +143,9 @@ function elegirDestacado(politica, releases) {
 export function enSorteo(politica, releases) {
   const puede = releases.filter(cumpleHome);
   const marcados = politica?.azar;
-  if (!Array.isArray(marcados) || !marcados.length) return puede;
+  if (!Array.isArray(marcados)) return puede;
   const marca = new Set(marcados);
-  const filtrados = puede.filter((r) => marca.has(r.id));
-  // Si la lista quedó apuntando solo a releases que ya no cumplen, se ignora:
-  // dejar la portada en el respaldo por una lista desactualizada es peor que
-  // sortear entre todos, que es lo que el sello tenía antes.
-  return filtrados.length ? filtrados : puede;
+  return puede.filter((r) => marca.has(r.id));
 }
 
 let promesaAbout = null;

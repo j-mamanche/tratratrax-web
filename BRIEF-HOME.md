@@ -54,7 +54,7 @@ REPOSO                    MANO ENCIMA A             MANO ENCIMA B
 
 1. **Reposo** — la cenefa. Lo único encendido en toda la pantalla es la franja
    del título. Lo que se reproduce *es* la grieta: el video no es contenido, es
-   el intersticio, y el intersticio es lo que el home enseña de entrada.
+   la grieta, y la grieta es lo que el home enseña de entrada.
 2. **La mano entra al título** — la grieta se abre: carátula arriba, video
    abajo.
 3. **La mano se va** — corte seco, y vuelve la cenefa.

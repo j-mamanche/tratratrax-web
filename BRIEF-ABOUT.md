@@ -137,7 +137,7 @@ desde el placeholder, pero por defecto no recortan nada. El reparto de capas lo
 hace el `z-index`: campo `0`, banda `1`.
 
 La bisagra es **una barra de un solo renglón, del grosor de la del home**
-(`--ttx-banda-h: 1.9rem`). El intersticio es la misma barra de chrome en las
+(`--ttx-banda-h: 1.9rem`). La grieta es la misma barra de chrome en las
 tres páginas: si aquí fuera un párrafo de tres líneas dejaría de reconocerse
 como la línea que atraviesa el sitio y pasaría a ser el encabezado de esta
 pantalla. En teléfono la línea no cabe y envuelve — el renglón único es una

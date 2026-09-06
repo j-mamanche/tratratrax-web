@@ -1,0 +1,455 @@
+---
+/**
+ * El home. Una decisión y su material.
+ *
+ * La decisión es de dos: siempre el mismo lanzamiento, o uno distinto en cada
+ * visita. Se toma mirando carátulas, y por eso esta pantalla no tiene carril:
+ * lo que había ahí eran dos botones de radio y un link, y una columna de
+ * veintidós rem para eso dejaba las carátulas —lo único que hay que mirar—
+ * apretadas contra el borde derecho.
+ *
+ * Ahora el modo es lo primero que se ve, ancho, y debajo va lo que ese modo
+ * necesita: en `fijo`, elegir uno y su material; en `aleatorio`, marcar cuáles
+ * entran.
+ *
+ * `home.json` guarda solo la decisión. El material —arte, video, franja— vive
+ * en el bloque `home` del release, así que esta pantalla edita dos archivos.
+ * Guardarlos es cosa del botón de la barra, que manda lo que esté sin guardar.
+ */
+import Marco from '../Marco.astro';
+import { estado } from '../lib/servidor.js';
+
+export const prerender = false;
+
+const s = await estado();
+---
+
+<Marco titulo="Home" actual="/home" sinCarril>
+  {!s.ok && <p class="parte mal">No se pudo leer el repo: {s.error}</p>}
+
+  <div class="cabeza-home">
+    <div class="opciones" role="radiogroup" aria-label="Cómo se elige la portada">
+      <label class="opcion">
+        <input type="radio" name="modo" value="fijo" id="modoFijo" />
+        <b data-i18n="fijo">Fijo</b>
+        <small id="pieFijo" data-i18n="fijoPie">Muestra un lanzamiento.</small>
+      </label>
+      <label class="opcion">
+        <input type="radio" name="modo" value="auto" id="modoAuto" />
+        <b data-i18n="aleatorio">Aleatorio</b>
+        <small id="pieAuto" data-i18n="autoPie">Elige entre los marcados.</small>
+      </label>
+    </div>
+  </div>
+
+  <div id="pantalla"></div>
+
+  <script is:inline type="application/json" id="modelo" set:html={JSON.stringify({
+    releases: s.releases, artists: s.artists, home: s.home, about: s.about, shas: s.shas,
+  })} />
+
+  <script>
+    import { abrir, leer, tocar, avisarAlSalir } from '../lib/borrador.js';
+    import { montarBarra } from '../lib/barra.js';
+    import { t } from '../lib/idioma.js';
+    import { el, bloque, campo, vaciar, leerIsla, parte } from '../lib/piezas.js';
+    import { hacerSubidor } from '../lib/subidor.js';
+    import { montarPoster } from '../lib/poster.js';
+
+    abrir(leerIsla('modelo'));
+    avisarAlSalir();
+    montarBarra({
+      alFallar() {
+        document.getElementById('pantalla')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+    });
+
+    const $ = (id) => document.getElementById(id);
+    const cover = (id, tam = 7) => (id ? `https://f4.bcbits.com/img/${id}_${tam}.jpg` : '');
+    const urlDeMedia = (ruta) => (/^https?:/.test(ruta) ? ruta : `/${String(ruta).replace(/^\//, '')}`);
+
+    const politica = () => leer().home ?? {};
+    const modoDe = (h) => h.modo ?? (h.release ? 'fijo' : 'auto');
+    // Es una preferencia de esta vista, no una decisión que deba llegar a
+    // `home.json`: al volver a entrar, una selección ya hecha nace plegada.
+    let selectorAbierto;
+
+    /**
+     * Las dos reglas, que no son la misma.
+     *
+     * **Arte** ya no quiere decir «arte subido a mano»: la carátula de Bandcamp
+     * es la imagen que el release trae puesta, y `home.arte` está para
+     * reemplazarla cuando la portada merezca otra cosa. Un disco entero se
+     * quedaba fuera del home por no tener una imagen que la composición ya
+     * sabía de dónde sacar.
+     *
+     * Para **elegir uno a dedo** basta con eso. Un lanzamiento por anunciar se
+     * prepara justamente así —oculto del catálogo y puesto en la portada— y
+     * exigirle que esté visible haría imposible el caso para el que existe.
+     *
+     * Para **el aleatorio** sí hace falta que esté visible: por azar no puede
+     * salir algo que todavía no se ha anunciado. Es la misma regla de
+     * `format.js:cumpleHome`, escrita cortita y aquí porque aquel módulo es del
+     * bundle e importa CSS.
+     */
+    const tieneArte = (r) => Boolean(r?.home?.arte || r?.bcImageId);
+    const sirveFijo = (r) => tieneArte(r);
+    const sirveAzar = (r) => Boolean(tieneArte(r) && (r.home?.texto || r.album) && r.visible !== false);
+
+    const arteDe = (r) => (r?.home?.arte ? urlDeMedia(r.home.arte) : cover(r?.bcImageId));
+
+    /**
+     * Quiénes entran al aleatorio.
+     *
+     * Sin lista escrita entran todos los que pueden, que es como se comportaba
+     * el sitio antes de que el campo existiera: un `home.json` viejo sigue
+     * significando lo mismo. En cuanto se desmarca uno, la lista se escribe
+     * entera y a partir de ahí manda.
+     */
+    function marcados() {
+      const h = politica();
+      const puede = leer().releases.filter(sirveAzar);
+      if (!Array.isArray(h.azar)) return new Set(puede.map((r) => r.id));
+      const escritos = new Set(h.azar);
+      return new Set(puede.filter((r) => escritos.has(r.id)).map((r) => r.id));
+    }
+
+    function fijarPolitica(cambios) {
+      tocar({ home: { ...politica(), ...cambios } });
+      pintar();
+    }
+
+    $('modoFijo').addEventListener('change', () => {
+      const h = politica();
+      const puestos = leer().releases.filter(sirveFijo);
+      selectorAbierto = true;
+      fijarPolitica({ modo: 'fijo', release: h.release || puestos[0]?.id || '' });
+    });
+
+    // En `auto` el `release` se borra: dejarlo escrito es dejar una decisión
+    // vieja en el archivo, y la próxima persona que lo abra no va a saber si
+    // manda o no. `azar` en cambio se conserva — es la decisión del otro modo.
+    $('modoAuto').addEventListener('change', () => {
+      const { release, ...resto } = politica();
+      selectorAbierto = true;
+      tocar({ home: { ...resto, modo: 'auto' } });
+      pintar();
+    });
+
+    // Un radio ya activo no emite `change`. Ese segundo clic es precisamente
+    // la forma rápida de volver a abrir su selección plegada.
+    for (const id of ['modoFijo', 'modoAuto']) {
+      $(id).addEventListener('click', (e) => {
+        if (modoDe(politica()) !== e.currentTarget.value) return;
+        selectorAbierto = true;
+        pintar();
+      });
+    }
+
+    addEventListener('ttx:idioma', () => pintar());
+
+    // ── el material del elegido, que vive en su release ─────────────────────
+
+    function fijarMaterial(ruta, valor) {
+      const id = politica().release;
+      const { releases } = leer();
+      const i = releases.findIndex((r) => r.id === id);
+      if (i < 0) return;
+
+      const copia = structuredClone(releases[i]);
+      const partes = ruta.split('.');
+      let nodo = copia;
+      for (const p of partes.slice(0, -1)) {
+        nodo[p] = nodo[p] ?? {};
+        nodo = nodo[p];
+      }
+      const ultima = partes.at(-1);
+      if (valor === '' || valor == null) delete nodo[ultima];
+      else nodo[ultima] = valor;
+
+      if (copia.home?.video && !copia.home.video.mp4) delete copia.home.video;
+      if (copia.home && !copia.home.arte && !copia.home.video?.mp4 && !copia.home.texto) delete copia.home;
+
+      const nuevos = [...releases];
+      nuevos[i] = copia;
+      tocar({ releases: nuevos });
+      pintarRejilla();
+    }
+
+    // ── pintar ──────────────────────────────────────────────────────────────
+
+    /**
+     * Una carátula de la rejilla.
+     *
+     * La palomita solo sale en `fijo`, donde marca a **uno** entre treinta y
+     * seis. En el aleatorio casi todos están dentro, y una palomita en cada
+     * una no distingue nada: ahí lo que dice quién entra es la opacidad.
+     */
+    function carta(r, { elegido = false, apagada = false, marca = false, alTocar }) {
+      const nombres = new Map(leer().artists.map((a) => [a.slug, a.display]));
+
+      return el('div', { clase: 'carta-wrap' },
+        el(
+          'button',
+          {
+            type: 'button',
+            clase: `carta ${apagada ? 'apagada' : ''}`,
+            'aria-pressed': String(elegido),
+            title: r.album || 'Sin título',
+            onclick: alTocar,
+          },
+          el('span', { clase: 'lienzo' },
+            el('img', { src: arteDe(r), alt: '', loading: 'lazy' }),
+            r.home?.video?.mp4 ? el('span', { clase: 'marca-video' }, 'video') : null,
+            marca && elegido ? el('span', { clase: 'marca-elegido' }, '✓') : null,
+          ),
+          el('b', {}, r.album || 'Sin título'),
+          el('small', {}, (r.artists ?? []).map((a) => nombres.get(a) ?? a).join(', ')),
+        ),
+        el('a', { clase: 'tarjeta-editar', href: `/catalogo?id=${encodeURIComponent(r.id)}` }, 'Editar →'),
+      );
+    }
+
+    /**
+     * El desplegable para poner en la portada uno que no tiene ninguna imagen.
+     *
+     * Con la carátula de Bandcamp valiendo como arte esto es ya un caso raro:
+     * un lanzamiento por anunciar, creado a mano, que todavía no existe allá.
+     * Sigue estando porque es justo el caso para el que se inventó el modo.
+     */
+    function otroLanzamiento() {
+      const fuera = leer().releases.filter((r) => !sirveFijo(r));
+      if (!fuera.length) return null;
+
+      return el('label', { clase: 'campo', style: 'margin-top:0.9rem; max-width:22rem' },
+        el('span', {}, 'Otro lanzamiento'),
+        el('select', {
+          value: '',
+          onchange: (e) => {
+            const id = e.target.value;
+            e.target.value = '';
+            if (!id) return;
+            selectorAbierto = false;
+            fijarPolitica({ release: id });
+            document.getElementById('bloqueMaterial')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+        },
+          el('option', { value: '' }, 'Elegir lanzamiento…'),
+          ...fuera.map((r) => el('option', { value: r.id }, r.album || 'Sin título')),
+        ),
+        el('small', { clase: 'pie' }, 'Sin carátula: añade arte abajo.'),
+      );
+    }
+
+    function pintarRejilla() {
+      const h = politica();
+      const modo = modoDe(h);
+      const { releases } = leer();
+      const cuenta = document.getElementById('cuantos');
+
+      if (modo === 'fijo') {
+        // El elegido va en la rejilla aunque no tenga ninguna imagen: si no, se
+        // elige del desplegable y la marca no aparece en ninguna parte, que es
+        // como no haber elegido nada.
+        const dentro = releases.filter((r) => sirveFijo(r) || r.id === h.release);
+        vaciar(document.getElementById('rejilla')).append(
+          ...dentro.map((r) =>
+            carta(r, {
+              elegido: r.id === h.release,
+              marca: true,
+              alTocar: () => {
+                selectorAbierto = false;
+                fijarPolitica({ release: r.id });
+              },
+            }),
+          ),
+        );
+        cuenta.textContent = dentro.length ? `${dentro.length} disponibles` : 'No hay lanzamientos con imagen';
+        return;
+      }
+
+      const puede = releases.filter(sirveAzar);
+      const dentro = marcados();
+      vaciar(document.getElementById('rejilla')).append(
+        ...puede.map((r) =>
+          carta(r, {
+            elegido: dentro.has(r.id),
+            apagada: !dentro.has(r.id),
+            alTocar: () => alternar(r.id),
+          }),
+        ),
+      );
+      cuenta.textContent = puede.length
+        ? `${dentro.size} de ${puede.length} marcados`
+        : 'No hay lanzamientos disponibles';
+    }
+
+    /** Marca o desmarca un lanzamiento del aleatorio. */
+    function alternar(id) {
+      const puede = leer().releases.filter(sirveAzar).map((r) => r.id);
+      const dentro = marcados();
+
+      if (dentro.has(id)) dentro.delete(id);
+      else dentro.add(id);
+
+      // Si están todos, se borra la lista: es lo mismo y deja el archivo
+      // diciendo «todos los que puedan», que sigue valiendo mañana cuando haya
+      // un release más.
+      const todos = puede.length === dentro.size;
+      const { azar, ...resto } = politica();
+      tocar({ home: todos ? resto : { ...resto, azar: puede.filter((x) => dentro.has(x)) } });
+      pintarRejilla();
+    }
+
+    function marcarTodo(marcar) {
+      const ids = leer().releases.filter(sirveAzar).map((r) => r.id);
+      const { azar, ...resto } = politica();
+      // Una lista vacía significa «todos» en el sitio. Para dejar ninguno
+      tocar({ home: marcar ? resto : { ...resto, azar: [] } });
+      pintarRejilla();
+    }
+
+    function haySeleccion(h, modo) {
+      return modo === 'fijo' ? Boolean(h.release) : marcados().size > 0;
+    }
+
+    function selectorEstaAbierto(h, modo) {
+      return selectorAbierto ?? !haySeleccion(h, modo);
+    }
+
+    function resumenSeleccion(h, modo) {
+      const releases = leer().releases;
+      const elegidos = modo === 'fijo'
+        ? releases.filter((r) => r.id === h.release)
+        : releases.filter((r) => marcados().has(r.id));
+      const texto = modo === 'fijo'
+        ? elegidos[0]?.album || 'Sin lanzamiento seleccionado'
+        : `${elegidos.length} lanzamiento${elegidos.length === 1 ? '' : 's'} marcado${elegidos.length === 1 ? '' : 's'}`;
+      const accion = modo === 'fijo' ? 'Escoger otro lanzamiento' : 'Editar selección';
+      const miniatura = modo === 'fijo' && arteDe(elegidos[0]);
+
+      return el('div', { clase: 'resumen-seleccion' },
+        el('div', { clase: 'resumen-seleccion-dato' },
+          miniatura ? el('img', {
+            clase: 'resumen-seleccion-miniatura',
+            src: miniatura,
+            alt: `Carátula de ${elegidos[0].album || 'este lanzamiento'}`,
+            loading: 'lazy',
+          }) : null,
+          el('strong', {}, texto),
+        ),
+        el('button', {
+          type: 'button',
+          clase: 'boton chico',
+          onclick: () => { selectorAbierto = true; pintar(); },
+        }, accion),
+      );
+    }
+
+    function pintar() {
+      const h = politica();
+      const modo = modoDe(h);
+      const abierto = selectorEstaAbierto(h, modo);
+      $('modoFijo').checked = modo === 'fijo';
+      $('modoAuto').checked = modo === 'auto';
+
+      // `append` con un `null` escribe la palabra «null» en la página: no es
+      // como `el()`, que filtra. Los huecos se caen antes de llegar ahí.
+      vaciar($('pantalla')).append(
+        ...[
+        bloque(
+          modo === 'fijo' ? 'Elegir lanzamiento' : 'En el aleatorio',
+          abierto && modo === 'fijo'
+            ? [
+                el('p', { html: 'Selecciona el lanzamiento que verá el sitio.' }),
+                el('p', { html: 'Usa su carátula o añade arte propio abajo.' }),
+              ]
+            : abierto ? [
+                el('p', { html: 'Selecciona los lanzamientos que pueden aparecer.' }),
+                el('p', { html: 'Solo aparecen lanzamientos visibles con imagen.' }),
+              ] : null,
+          !abierto
+            ? resumenSeleccion(h, modo)
+            : modo === 'auto'
+            ? el('div', { clase: 'acciones-rejilla' },
+                el('button', { clase: 'boton chico', type: 'button', onclick: () => marcarTodo(true) }, t('seleccionarTodo')),
+                el('button', { clase: 'boton chico', type: 'button', onclick: () => marcarTodo(false) }, t('quitarTodo')),
+              )
+            : null,
+          abierto ? el('p', { clase: 'pie', id: 'cuantos', style: 'margin:-0.35rem 0 0.7rem' }) : null,
+          abierto ? el('div', { clase: 'rejilla', id: 'rejilla' }) : null,
+          abierto && modo === 'fijo' ? otroLanzamiento() : null,
+          abierto && modo === 'auto' ? el('p', { clase: 'parte', id: 'avisoAzar', hidden: true, style: 'margin:0.8rem 0 0' }) : null,
+        ),
+        modo === 'fijo' ? bloqueMaterial(h) : null,
+        ].filter(Boolean),
+      );
+
+      if (abierto) pintarRejilla();
+    }
+
+    function bloqueMaterial(h) {
+      const r = leer().releases.find((x) => x.id === h.release);
+      if (!r) {
+        return el('p', { clase: 'parte ojo' },
+          'Selecciona un lanzamiento arriba.');
+      }
+
+      const aviso = el('p', { clase: 'parte', hidden: true, style: 'margin:0.6rem 0 0' });
+      const actual = () => leer().releases.find((x) => x.id === politica().release);
+      const subidor = hacerSubidor({ actual, fijar: fijarMaterial, aviso });
+      const poster = montarPoster({ actual, fijar: fijarMaterial, aviso, subidor });
+
+      const video = subidor('Video', 'home.video.mp4', 'video', 'video/mp4,video/webm', {
+        alElegir: (file) => poster.desdeArchivo(file),
+      });
+      video.addEventListener('input', () => poster.revisar());
+
+      const caja = bloque(
+        `Material de ${r.album || 'este lanzamiento'}`,
+        [
+          el('p', { html: 'Arte propio reemplaza la carátula.' }),
+          el('p', { html: 'Video y póster son opcionales.' }),
+          el('p', { html: 'En la grieta, <code>*</code> separa ambos grupos.' }),
+        ],
+        campoArte(r, subidor),
+        video,
+        poster.nodo,
+        campo('Texto de la grieta', el('input', {
+          type: 'text', value: r.home?.texto ?? '',
+          placeholder: franjaPorDefecto(r),
+          oninput: (e) => fijarMaterial('home.texto', e.target.value),
+        })),
+        el('p', { style: 'margin:0.7rem 0 0' },
+          el('a', { clase: 'boton callado', href: `/catalogo?id=${encodeURIComponent(r.id)}` }, 'Abrir su ficha →')),
+        aviso,
+      );
+
+      caja.id = 'bloqueMaterial';
+      return caja;
+    }
+
+    /** El arte de portada, con lo que va a salir si nadie sube nada. */
+    function campoArte(r, subidor) {
+      const nodo = subidor('Arte de portada', 'home.arte', 'home', 'image/*');
+      const propio = Boolean(r.home?.arte);
+
+      nodo.append(
+        el('div', { clase: 'muestra' },
+          el('img', { clase: 'miniatura', src: arteDe(r), alt: '' }),
+          el('small', { clase: 'pie' }, propio ? 'arte propio' : 'la carátula de Bandcamp'),
+        ),
+      );
+      return nodo;
+    }
+
+    /** Lo que va a salir en la franja si nadie escribe nada. */
+    function franjaPorDefecto(r) {
+      const nombres = new Map(leer().artists.map((a) => [a.slug, a.display]));
+      const quien = (r.artists ?? []).map((a) => nombres.get(a) ?? a).join(' & ');
+      return [r.album, quien].filter(Boolean).join('*') || 'Título*Artista';
+    }
+
+    pintar();
+  </script>
+</Marco>

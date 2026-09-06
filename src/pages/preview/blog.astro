@@ -1,0 +1,21 @@
+---
+// El Blog real con los datos publicados. Cargo usa exactamente este widget.
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TraTraTrax · preview del blog</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #e5e5e5; color: #000; font-family: ui-sans-serif, system-ui, sans-serif; }
+      .chrome { position: fixed; inset: auto 0 0; z-index: 2; display: flex; justify-content: space-between; padding: 0.35rem 0.6rem; background: #fff; border-top: 1px solid rgba(0,0,0,.22); font-size: 10px; text-transform: uppercase; }
+    </style>
+  </head>
+  <body>
+    <div data-ttx="blog" style="--ttx-nav-h: 1.6rem"></div>
+    <div class="chrome"><span>2026 © Todos los izquierdos públicos</span><span>About Catalog Merca <b>Blog</b></span></div>
+    <script is:inline src={`${base}ttx.js`} data-ttx-datos={`${base}data/`} defer></script>
+  </body>
+</html>

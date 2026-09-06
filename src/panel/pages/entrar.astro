@@ -1,0 +1,55 @@
+---
+/**
+ * La puerta. Una contraseña, sin usuario: el staff del sello son tres
+ * personas y no hay nada que distinguir entre ellas — lo que se guarda queda
+ * firmado por el token del panel en el commit, no por quién lo escribió.
+ *
+ * `?volver=` conserva a dónde iba el que llegó aquí por sesión vencida.
+ */
+import '../estilo.css';
+import { faltaConfigurar } from '../lib/entorno.js';
+
+const volver = Astro.url.searchParams.get('volver') ?? '/';
+const error = Astro.url.searchParams.get('error');
+const falta = faltaConfigurar();
+
+const MENSAJES = {
+  mala: 'Contraseña incorrecta.',
+  vacia: 'Escribe la contraseña.',
+  frenado: 'Demasiados intentos. Espera unos minutos.',
+  rota: 'Falta configuración del panel.',
+};
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Entrar · panel TraTraTrax</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <div class="puerta">
+      <form method="post" action="/api/entrar">
+        <h1>TraTraTrax Studio</h1>
+        <p>Edita y publica el contenido del sitio.</p>
+
+        {error && <p class="parte mal">{MENSAJES[error] ?? 'No se pudo entrar.'}</p>}
+
+        {falta.length > 0 && (
+          <p class="parte ojo">
+            Faltan: {falta.map((f) => <code>{f}</code>)}. Revisa <code>.env.example</code>.
+          </p>
+        )}
+
+        <input type="hidden" name="volver" value={volver} />
+        <label class="campo">
+          <span>Contraseña</span>
+          <input type="password" name="clave" autocomplete="current-password" autofocus required />
+        </label>
+        <button class="boton fuerte" type="submit" style="width:100%; justify-content:center">Entrar</button>
+      </form>
+    </div>
+  </body>
+</html>

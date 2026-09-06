@@ -24,7 +24,7 @@ que el sitio y la trampa del apilamiento se vea antes y no después.
 Reemplaza el `<column-set>` entero:
 
 ```html
-<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="zoomable" hash="Y3055296379683564288776637724874" limit-by="width" scale="15%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><span class="nav-menu">MENU</span><a href="about" rel="history" data-label="ABOUT">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG">CATALOG</a><a href="merca" rel="history" data-label="MERCA">MERCA</a><a href="blog" rel="history" data-label="BLOG">BLOG</a></div></column-unit></column-set>
+<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="zoomable" hash="Y3055296379683564288776637724874" limit-by="width" scale="15%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT" data-nav-highlight="about">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" data-nav-highlight="catalog">CATALOG</a><a href="blog" rel="history" data-label="BLOG" data-nav-highlight="blog">BLOG</a><a href="merca" rel="history" data-label="MERCA" data-nav-highlight="merca">MERCA</a></div></column-unit></column-set>
 ```
 
 Seis cosas que no son cosméticas:
@@ -46,28 +46,20 @@ Seis cosas que no son cosméticas:
 - **`data-label` repite la etiqueta.** El CSS lo usa para reservar desde siempre
   el ancho de los dos pesos —negrilla e itálica regular—, así el menú no se
   corre cuando cambias de página.
-- **`MENU` va primero y es un `<span>`, no un `<a>`.** Es texto inerte: rotula la
-  lista, no lleva a ninguna parte. Un link a un menú que ya está desplegado sería
-  un link a nada.
-- **El `__` de `MENU__` no se escribe.** Lo imprime el CSS, igual que en los
-  widgets. Escribirlo en el HTML lo dejaría dentro del texto seleccionable y del
-  lector de pantalla.
+- **No hay rótulo `MENU`.** Los cuatro destinos y sus colores ya hacen explícita
+  la navegación sin convertir la barra en un footer.
+- **El orden es About · Catalog · Blog · Merca.** Merca queda última porque abre
+  la gaveta, que tiene una lógica visual distinta de las otras tres páginas.
 
 El `<span data-glitch>` es lo único que rota. El `2026 ©` se queda quieto.
 
-**El nav no usa el sistema de juntas del resto del sitio.** Es la única
-excepción y está decidida: solo `MENU` lleva junta, y los cuatro links van
-separados por un espacio normal, sin `__` entre ellos y sin alternancia de peso.
-
-```
-MENU__ ABOUT CATALOG MERCA BLOG
-     └junta┘    └── espacios normales ──┘
-```
+**El nav no usa juntas.** Los cuatro links se separan con un espacio normal,
+sin `__` ni alternancia de peso.
 
 **Los cuatro links van en negrilla y el activo en itálica regular** — al revés
 de lo que uno esperaría, y a propósito: lo que pesa es a dónde se puede ir, no
 dónde se está. En el home no va ninguno en itálica, porque el home no está en la
-lista. `MENU__` y el lema no cambian: siguen en regular.
+lista. El lema sigue en regular.
 
 ---
 
@@ -179,7 +171,7 @@ lista. `MENU__` y el lema no cambian: siguen en regular.
 	--nav-logo-filter: none;
 }
 
-[id="L3482832595"][data-bandera] :is(.nav-lema, .nav-menu, .nav-links a),
+[id="L3482832595"][data-bandera] :is(.nav-lema, .nav-links a),
 [id="L3482832595"][data-bandera] media-item::part(media) {
 	transition: none;
 }
@@ -291,6 +283,14 @@ lista. `MENU__` y el lema no cambian: siguen en regular.
 	font-weight: 400;
 }
 
+/* Los highlights son los del About: aparecen al pasar por el destino, se
+   quedan 1s al salir y se cortan sin fundido. */
+[id="L3482832595"] .nav-links a[data-nav-highlight]:is(:hover, :focus-visible, .ttx-hover-rastro) { transition: none !important; }
+[id="L3482832595"] .nav-links a[data-nav-highlight="about"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ffff01; color: #000000; }
+[id="L3482832595"] .nav-links a[data-nav-highlight="catalog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #0015ff; color: #ffffff; }
+[id="L3482832595"] .nav-links a[data-nav-highlight="blog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ff0000; color: #000000; }
+[id="L3482832595"] .nav-links a[data-nav-highlight="merca"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #b4ff9c; color: #000000; }
+
 /* — LEMA QUE SE HACKEA — */
 
 [id="L3482832595"] [data-glitch] {
@@ -372,6 +372,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
   // vuelve marcada como "lista" y nadie la vuelve a arrancar. Un WeakMap no
   // se copia con el nodo, así que un clon se reinicializa solo.
   var seen = new WeakMap();
+  var hoverTimers = new WeakMap();
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
 
@@ -606,6 +607,35 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
       links[i].classList.toggle("is-active", href !== "" && href === here);
     }
   }
+
+  function linkConHighlight(node) {
+    var link = node && node.closest && node.closest('.nav-links a[data-nav-highlight]');
+    return link && link.closest(NAV_SEL) ? link : null;
+  }
+
+  function apagarHighlight(link) {
+    link.style.transition = 'none';
+    link.classList.remove('ttx-hover-rastro');
+    void link.offsetWidth;
+    link.style.transition = '';
+  }
+
+  // El mismo rastro del About: 1s después de salir y final seco. Delegado
+  // porque Cargo reemplaza el nav durante la navegación AJAX.
+  document.addEventListener('pointerover', function (event) {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
+    var link = linkConHighlight(event.target);
+    if (!link || link.contains(event.relatedTarget)) return;
+    clearTimeout(hoverTimers.get(link));
+    link.classList.add('ttx-hover-rastro');
+  });
+  document.addEventListener('pointerout', function (event) {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
+    var link = linkConHighlight(event.target);
+    if (!link || link.contains(event.relatedTarget)) return;
+    clearTimeout(hoverTimers.get(link));
+    hoverTimers.set(link, setTimeout(function () { apagarHighlight(link); }, 1000));
+  });
 
   function scan() {
     var lemas = document.querySelectorAll("[data-glitch]");
@@ -1102,13 +1132,13 @@ agregar esas clases a `PARTS` en el script de la sección 4 — es lo que se mid
 
 **Tres cosas cambian respecto al escritorio**, y solo tres: la maquetación (dos
 filas en vez de tres columnas), el logo (es un link al home, no un zoom) y el
-menú (sin `MENU__`, que no cabe). Todo lo demás —los dos juegos de tinta, la
+reparto de columnas. Todo lo demás —los dos juegos de tinta, la
 bandera, los pesos, las reservas de ancho— es lo mismo con otro id.
 
 ### El HTML
 
 ```html
-<column-set gutter="1" mobile-stack="false"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="linked" disable-zoom="true" hash="Y3055296379683564288776637724874" href="home" limit-by="width" rel="history" scale="40%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><a data-label="ABOUT" href="about" rel="history">ABOUT</a><a data-label="CATALOG" href="catalog" rel="history">CATALOG</a><a data-label="MERCA" href="merca" rel="history">MERCA</a><a data-label="BLOG" href="blog" rel="history">BLOG</a></div></column-unit></column-set>
+<column-set gutter="1" mobile-stack="false"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="linked" disable-zoom="true" hash="Y3055296379683564288776637724874" href="home" limit-by="width" rel="history" scale="40%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><a data-label="ABOUT" data-nav-highlight="about" href="about" rel="history">ABOUT</a><a data-label="CATALOG" data-nav-highlight="catalog" href="catalog" rel="history">CATALOG</a><a data-label="BLOG" data-nav-highlight="blog" href="blog" rel="history">BLOG</a><a data-label="MERCA" data-nav-highlight="merca" href="merca" rel="history">MERCA</a></div></column-unit></column-set>
 ```
 
 - **`mobile-stack="false"` no es opcional.** Es lo que le dice a Cargo que no
@@ -1120,8 +1150,7 @@ bandera, los pesos, las reservas de ancho— es lo mismo con otro id.
   `.nav-logo` —el div de afuera— y no del `media-item`, así que el toque muestra
   la bandera y navega al home en el mismo gesto. Es exactamente lo que describe
   `FLASH_DEDO`: se ve un instante y la página cambia debajo.
-- **Sin `MENU__`.** Es lo único del sistema nuevo que no pasó al móvil, y no por
-  gusto: no cabe. Está medido más abajo.
+- **Sin `MENU`.** El nav no lleva rótulo en ninguna de las dos instancias.
 - **El `<span data-glitch>` va limpio.** Si copias el nav del inspector te traes
   `class="glitch is-resting"` y los dos `<span>` de adentro (`.glitch-text` y
   `.glitch-caret`): eso lo escribe el script de la sección 3 en cada carga, no se
@@ -1350,6 +1379,13 @@ bandera, los pesos, las reservas de ancho— es lo mismo con otro id.
 	font-weight: 400;
 }
 
+/* Mismos cuatro colores y mismo rastro de 1s que en el escritorio. */
+[id="N1901077103"] .nav-links a[data-nav-highlight]:is(:hover, :focus-visible, .ttx-hover-rastro) { transition: none !important; }
+[id="N1901077103"] .nav-links a[data-nav-highlight="about"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ffff01; color: #000000; }
+[id="N1901077103"] .nav-links a[data-nav-highlight="catalog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #0015ff; color: #ffffff; }
+[id="N1901077103"] .nav-links a[data-nav-highlight="blog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ff0000; color: #000000; }
+[id="N1901077103"] .nav-links a[data-nav-highlight="merca"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #b4ff9c; color: #000000; }
+
 /* — LEMA QUE SE HACKEA — */
 
 [id="N1901077103"] [data-glitch] {
@@ -1442,10 +1478,10 @@ Dos cosas menores del móvil:
 Va debajo de los otros dos, en el mismo HTML global. Es independiente de los
 dos: si borras cualquiera, los demás siguen funcionando.
 
-**Qué hace.** En About, pasar la mano por el logo tapa la página entera con una
-de las cuatro banderas del sello, al azar, **menos el nav** — en las cuatro
-capturas la barra de abajo sigue visible y legible encima de la bandera. En las
-demás páginas el logo no la invoca. Y cada tanto, con el usuario quieto, una se
+**Qué hace.** Fuera del home, pasar la mano por el logo tapa la página entera
+con una de las cuatro banderas del sello, al azar, **menos el nav** — en las
+cuatro capturas la barra de abajo sigue visible y legible encima de la bandera.
+En el home el logo no la invoca. Y cada tanto, con el usuario quieto, una se
 asoma sola un instante en cualquier página: el **respiro**.
 
 ```
@@ -1633,9 +1669,10 @@ lo pidió el usuario con la mano.
     puesta = false;
   }
 
-  function enAbout() {
+  function fueraDeHome() {
     var here = location.pathname.replace(/^\/|\/$/g, "").toLowerCase();
-    return here === "about";
+    // `home-1` es el slug publicado hoy; `home` cubre el slug de la guía.
+    return here !== "" && here !== "home" && here !== "home-1";
   }
 
   function agendar() {
@@ -1687,7 +1724,7 @@ lo pidió el usuario con la mano.
 
   document.addEventListener("pointerover", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
-    if (!enAbout()) return;
+    if (!fueraDeHome()) return;
     var logo = logoDe(e.target);
     if (!logo || logoDe(e.relatedTarget) === logo) return;
     clearTimeout(corte);
@@ -1700,7 +1737,7 @@ lo pidió el usuario con la mano.
 
   document.addEventListener("pointerout", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
-    if (!enAbout()) return;
+    if (!fueraDeHome()) return;
     var logo = logoDe(e.target);
     if (!logo || logoDe(e.relatedTarget) === logo) return;
     porMano = false;
@@ -1715,7 +1752,7 @@ lo pidió el usuario con la mano.
 
   document.addEventListener("pointerdown", function (e) {
     if (!e.pointerType || e.pointerType === "mouse") return;
-    if (!enAbout()) return;
+    if (!fueraDeHome()) return;
     if (!logoDe(e.target)) return;
     mostrar();
     clearTimeout(corte);

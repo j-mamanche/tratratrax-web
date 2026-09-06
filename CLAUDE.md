@@ -77,6 +77,30 @@ página; se desincroniza al mover `--ttx-visor-h` y nadie se entera.
 `style` inline le gana al CSS global de Cargo, que es lo único que siempre
 funciona allá.
 
+## Dos destinos de despliegue, un solo repo
+
+- **`astro.config.mjs`** → sitio estático a **GitHub Pages**. Es lo que
+  publica Actions en cada push a `main`, y de ahí saca Cargo el bundle y los
+  datos. `srcDir` es `src/`, así que sus páginas son `src/pages/`.
+- **`astro.config.panel.mjs`** → el **panel de edición** —que de cara al sello
+  se llama **TraTraTrax Studio**; `panel` es solo el nombre de la carpeta—, SSR con
+  `@astrojs/netlify`, a un subdominio con contraseña (`netlify.toml`). Su
+  `srcDir` es `src/panel/`, así que sus páginas son `src/panel/pages/`.
+
+No se pisan porque Astro solo mira `<srcDir>/pages`. Comparten `publicDir`
+—lo que genera `build:widgets`— y eso es a propósito: es lo que permite que la
+previsualización del panel monte los widgets de verdad.
+
+**El build del panel no corre el validador.** Es la herramienta con la que se
+arreglan los datos que el validador rechaza; si su despliegue dependiera de que
+los datos estén buenos, el día que se rompan no habría con qué arreglarlos. La
+revisión se hace antes de commitear (`src/lib/datos.mjs:revisar`), no al
+compilar.
+
+**El token de GitHub solo vive en el servidor del panel.** Nunca en la cookie,
+nunca en una respuesta, nunca en `public/`. Si alguna vez hace falta algo del
+repo en el navegador, se pasa por una ruta de `src/panel/pages/api/`.
+
 ## Al terminar cualquier cambio en `data/`
 
 ```bash

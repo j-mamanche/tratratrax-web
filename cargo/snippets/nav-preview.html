@@ -109,7 +109,7 @@
 		--nav-logo-filter: none;
 	}
 
-	[id="L3482832595"][data-bandera] :is(.nav-lema, .nav-menu, .nav-links a),
+	[id="L3482832595"][data-bandera] :is(.nav-lema, .nav-links a),
 	[id="L3482832595"][data-bandera] .fake-logo {
 		transition: none;
 	}
@@ -184,6 +184,12 @@
 		font-style: italic;
 		font-weight: 400;
 	}
+
+	.nav-links a[data-nav-highlight]:is(:hover, :focus-visible, .ttx-hover-rastro) { transition: none !important; }
+	.nav-links a[data-nav-highlight="about"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ffff01; color: #000000; }
+	.nav-links a[data-nav-highlight="catalog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #0015ff; color: #ffffff; }
+	.nav-links a[data-nav-highlight="blog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ff0000; color: #000000; }
+	.nav-links a[data-nav-highlight="merca"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #b4ff9c; color: #000000; }
 
 	[data-glitch] {
 		display: inline-block;
@@ -263,7 +269,7 @@
      para que el preview mienta igual que el sitio. -->
 <div class="page" id="L3482832595" style="z-index: 399;"><div class="page-content">
 
-<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><span class="fake-logo"></span></div></column-unit><column-unit slot="2"><div class="nav-links"><span class="nav-menu">MENU</span><a href="about" rel="history" data-label="ABOUT">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" class="active">CATALOG</a><a href="merca-2" rel="history" data-label="MERCA">MERCA</a><a href="blog-2" rel="history" data-label="BLOG">BLOG</a></div></column-unit></column-set>
+<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><span class="fake-logo"></span></div></column-unit><column-unit slot="2"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT" data-nav-highlight="about">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" data-nav-highlight="catalog" class="active">CATALOG</a><a href="blog" rel="history" data-label="BLOG" data-nav-highlight="blog">BLOG</a><a href="merca" rel="history" data-label="MERCA" data-nav-highlight="merca">MERCA</a></div></column-unit></column-set>
 
 </div></div>
 
@@ -324,6 +330,7 @@
   // vuelve marcada como "lista" y nadie la vuelve a arrancar. Un WeakMap no
   // se copia con el nodo, así que un clon se reinicializa solo.
   var seen = new WeakMap();
+  var hoverTimers = new WeakMap();
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
 
@@ -552,6 +559,33 @@
       links[i].classList.toggle("is-active", href !== "" && href === here);
     }
   }
+
+  function linkConHighlight(node) {
+    var link = node && node.closest && node.closest('.nav-links a[data-nav-highlight]');
+    return link && link.closest(NAV_SEL) ? link : null;
+  }
+
+  function apagarHighlight(link) {
+    link.style.transition = 'none';
+    link.classList.remove('ttx-hover-rastro');
+    void link.offsetWidth;
+    link.style.transition = '';
+  }
+
+  document.addEventListener('pointerover', function (event) {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
+    var link = linkConHighlight(event.target);
+    if (!link || link.contains(event.relatedTarget)) return;
+    clearTimeout(hoverTimers.get(link));
+    link.classList.add('ttx-hover-rastro');
+  });
+  document.addEventListener('pointerout', function (event) {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
+    var link = linkConHighlight(event.target);
+    if (!link || link.contains(event.relatedTarget)) return;
+    clearTimeout(hoverTimers.get(link));
+    hoverTimers.set(link, setTimeout(function () { apagarHighlight(link); }, 1000));
+  });
 
   function scan() {
     var lemas = document.querySelectorAll("[data-glitch]");
@@ -1135,12 +1169,13 @@
 
   // — El respiro —
 
-  function enAbout() {
-    // El preview vive como archivo suelto, no bajo la ruta /about: ahí lo
-    // tratamos como About para poder seguir calibrando el gesto manual.
+  function fueraDeHome() {
+    // El preview vive como archivo suelto: no es home y debe conservar el
+    // gesto manual para poder calibrarlo.
     if (location.protocol === "file:") return true;
     var here = location.pathname.replace(/^\/|\/$/g, "").toLowerCase();
-    return here === "about";
+    // `home-1` es el slug publicado hoy; `home` cubre el slug de la guía.
+    return here !== "" && here !== "home" && here !== "home-1";
   }
 
   function agendar() {
@@ -1199,7 +1234,7 @@
 
   document.addEventListener("pointerover", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
-    if (!enAbout()) return;
+    if (!fueraDeHome()) return;
     var logo = logoDe(e.target);
     if (!logo || logoDe(e.relatedTarget) === logo) return; // movimiento adentro
     clearTimeout(corte);
@@ -1213,7 +1248,7 @@
 
   document.addEventListener("pointerout", function (e) {
     if (e.pointerType && e.pointerType !== "mouse") return;
-    if (!enAbout()) return;
+    if (!fueraDeHome()) return;
     var logo = logoDe(e.target);
     if (!logo || logoDe(e.relatedTarget) === logo) return;
     porMano = false;
@@ -1233,7 +1268,7 @@
   // ser el link al home por mostrar una bandera.
   document.addEventListener("pointerdown", function (e) {
     if (!e.pointerType || e.pointerType === "mouse") return;
-    if (!enAbout()) return;
+    if (!fueraDeHome()) return;
     if (!logoDe(e.target)) return;
     mostrar();
     clearTimeout(corte);
@@ -1293,7 +1328,7 @@
 
     if (location.href !== donde) {
       // Página nueva: el reloj arranca de cero y nunca arrastra una bandera
-      // manual desde About a una página donde el logo no la invoca.
+      // manual al home, donde el logo no la invoca.
       donde = location.href;
       porMano = false;
       nivel = 0;

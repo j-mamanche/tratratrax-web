@@ -1,0 +1,17 @@
+# El panel de edición. GitHub Pages no se toca: lo sigue publicando Actions
+# desde `astro.config.mjs`.
+[build]
+  command = "npm run build:panel"
+  publish = "dist-panel"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Un panel con contraseña no tiene nada que hacer en un buscador. El
+# `robots.txt` lo sirve una ruta del propio panel; esto es el cinturón.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "same-origin"

@@ -1,0 +1,1147 @@
+/* TraTraTrax Studio: barra arriba, lista a la izquierda, trabajo a la derecha.
+
+   No se parece al sitio y es a propósito. El sitio es negro, a sangre y sin
+   bordes; una herramienta que se le parezca hace dudar de si lo que se está
+   viendo es la página o el formulario que la edita. Aquí manda la legibilidad:
+   mucho contraste, poca decoración, y todo lo que se toca del tamaño de un
+   dedo — el asistente del sello trabaja tanto en el teléfono como en la mesa. */
+
+:root {
+  --bg: #f2f1ec;
+  --superficie: #fff;
+  --superficie-2: #f7f7f4;
+  --superficie-3: #e7e7e1;
+  --borde: #d6d6cf;
+  --borde-vivo: #17171a;
+  --tinta: #171716;
+  --tinta-2: #61615b;
+  --tinta-3: #85857d;
+  --acento: #242424;
+  --acento-suave: #ecece8;
+  --alarma: #c4321d;
+  --alarma-suave: #fff0ed;
+  --aviso: #a45b00;
+  --aviso-suave: #fff6dc;
+  --bien: #167444;
+  --bien-suave: #e9f8e9;
+  --radio: 14px;
+  --radio-chico: 8px;
+  --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  --barra-h: 4rem;
+  --carril-inset: clamp(0.75rem, 2vh, 1.5rem);
+  --carril-ancho: 25rem;
+  --t: 0.16s ease;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--tinta);
+  font: 400 14px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+a { color: inherit; }
+
+h1, h2, h3 { margin: 0; font-size: inherit; font-weight: inherit; }
+
+/* ── el armazón ─────────────────────────────────────────────────────────── */
+
+.app {
+  display: grid;
+  grid-template-rows: var(--barra-h) 1fr;
+  /* La primera columna reserva el lugar del carril fijo, incluido su margen
+     izquierdo. Así el editor nunca pasa por debajo de él. */
+  grid-template-columns: calc(var(--carril-ancho) + 1rem) minmax(0, 1fr);
+  grid-template-areas: 'barra barra' 'carril obra';
+  min-height: 100dvh;
+}
+
+/* El ambiente del lanzamiento pertenece al lienzo entero, no al ancho del
+   formulario. Barra, carril y tarjetas conservan sus superficies opacas. */
+.app-con-caratula {
+  position: relative;
+  isolation: isolate;
+}
+.app-con-caratula::before {
+  content: '';
+  /* Aunque sea fija, una pseudo-capa de un grid puede crear una pista
+     implícita. Al asignarla a toda la rejilla nunca desplaza carril ni obra. */
+  grid-area: 1 / 1 / -1 / -1;
+  position: fixed;
+  z-index: 0;
+  inset: -2rem;
+  background-image:
+    linear-gradient(135deg, rgb(242 241 236 / 0.87), rgb(242 241 236 / 0.7)),
+    var(--fondo-lanzamiento);
+  background-position: center;
+  background-size: cover;
+  filter: blur(38px) saturate(0.72);
+  opacity: 0.76;
+  pointer-events: none;
+}
+.app-con-caratula > .obra { position: relative; z-index: 1; }
+
+/* El home no tiene de dónde elegir: sus dos opciones son una fila, no una
+   columna. Sin carril, la rejilla de carátulas usa la pantalla entera. */
+.app-ancha {
+  grid-template-columns: 1fr;
+  grid-template-areas: 'barra' 'obra';
+}
+
+.barra {
+  grid-area: barra;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0 1.25rem;
+  height: var(--barra-h);
+  min-width: 0;
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borde);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.02);
+  /* La barra pertenece al viewport; el resto del panel puede recorrer debajo
+     sin desplazar navegación ni la acción de guardar. */
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+}
+
+/* La vuelta a la lista: solo existe donde la lista y la ficha se turnan. */
+.atras {
+  display: none;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background: var(--superficie);
+  font: 400 17px/1 var(--sans);
+  color: var(--tinta-2);
+  cursor: pointer;
+}
+.atras:hover { border-color: var(--borde-vivo); color: var(--tinta); }
+
+.marca {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.marca small {
+  font: 400 10px/1 var(--mono);
+  color: var(--tinta-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.barra-nav { display: flex; gap: 0.3rem; min-width: 0; }
+.barra-nav a {
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radio-chico);
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--tinta-2);
+  white-space: nowrap;
+}
+.barra-nav a:hover { background: var(--superficie-2); color: var(--tinta); }
+.barra-nav a[aria-current] { background: var(--acento); color: #fff; font-weight: 650; }
+
+.barra-acciones {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.barra-acciones form { display: contents; }
+.idioma {
+  width: 2.45rem;
+  min-height: 2.45rem;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  background: var(--superficie);
+  color: var(--tinta-2);
+  font: 650 10px/1 var(--mono);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background var(--t), color var(--t), transform var(--t);
+}
+.idioma:hover { background: var(--tinta); color: #fff; transform: rotate(8deg); }
+
+/* El estado no grita: dice cuánto falta por guardar y se calla cuando no
+   falta nada. Es la única cifra permanente del panel. */
+.estado {
+  padding: 0.25rem 0.35rem;
+  border: 0;
+  border-radius: var(--radio-chico);
+  background: none;
+  font: 400 11px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tinta-3);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.estado.pendiente { color: var(--aviso); }
+.estado:disabled { cursor: default; }
+.estado:not(:disabled):hover, .estado[aria-expanded='true'] { background: var(--superficie-3); color: var(--tinta); }
+
+.detalle-cambios {
+  position: fixed;
+  z-index: 30;
+  top: calc(var(--barra-h) + 0.5rem);
+  right: 7.5rem;
+  width: min(31rem, calc(100vw - 1.5rem));
+  max-height: min(70vh, 34rem);
+  overflow: auto;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background: var(--superficie);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+  font-size: 12px;
+}
+.detalle-cambios strong { font: 600 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--tinta-3); }
+.detalle-cambios .detalle-titulo { display:block; margin-top:0.9rem; }
+.detalle-cambios .detalle-titulo:first-child { margin-top:0; }
+.detalle-cambios .detalle-conflictos { color:var(--alarma); }
+.detalle-cambios .detalle-explica { margin:0.35rem 0 0; color:var(--tinta-2); font-size:12px; }
+.detalle-cambios ul { margin: 0.45rem 0 0; padding-left: 1rem; }
+.detalle-cambios .detalle-conflictos-lista { padding-left:0; list-style:none; }
+.detalle-conflicto { width:100%; padding:0.4rem 0.45rem; border:0; border-left:2px solid var(--alarma); background:var(--superficie-2); color:inherit; font:400 12px/1.35 var(--sans); text-align:left; cursor:pointer; }
+.detalle-conflicto:hover { background:var(--superficie-3); }
+
+.barra-acciones .corto { display: none; }
+
+.barra-menu { display: none; }
+.barra-secciones, .barra-opciones { display:none; }
+
+.parte-barra {
+  position: fixed;
+  z-index: 30;
+  top: calc(var(--barra-h) + 0.5rem);
+  right: 0.75rem;
+  max-width: min(28rem, calc(100vw - 1.5rem));
+  margin: 0;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+}
+
+.carril {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  /* Es fijo al viewport, no sticky dentro de la altura de la ficha: el
+     catálogo se recorre por su cuenta mientras el formulario sigue a la
+     derecha. */
+  position: fixed;
+  z-index: 2;
+  top: calc(var(--barra-h) + var(--carril-inset));
+  bottom: var(--carril-inset);
+  left: 1rem;
+  width: var(--carril-ancho);
+  margin: 0;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  padding: 0.9rem;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.045);
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  height: auto;
+}
+
+.obra {
+  grid-area: obra;
+  padding: 2rem 2.25rem 7rem;
+  min-width: 0;
+  width: 100%;
+  /* Con `max-width` a secas el formulario se pegaba al borde izquierdo de su
+     columna y dejaba un vacío a la derecha del ancho de media pantalla. */
+  max-width: 60rem;
+  margin-inline: auto;
+}
+
+.app-ancha .obra { max-width: 72rem; }
+
+/* ── el armazón en el teléfono ──────────────────────────────────────────── */
+
+/* Dos pantallas, no dos mitades apretadas: la lista ocupa todo y la ficha se
+   abre encima. `data-vista` en el <body> dice cuál se está mirando. */
+@media (max-width: 62rem) {
+  .app { grid-template-columns: 1fr; grid-template-areas: 'barra' 'carril' 'obra'; }
+
+  .carril {
+    grid-area: carril;
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .obra { padding: 0.75rem 0.75rem 7rem; max-width: none; }
+
+  /* El carril se come la pantalla solo donde de verdad es una pantalla: en el
+     catálogo, donde la lista y la ficha se turnan. El home no se turna con
+     nada —sus opciones son cuatro líneas— y estirarlo dejaba las carátulas
+     debajo del pliegue, con media pantalla en blanco encima. */
+  body[data-vista] .carril { min-height: calc(100dvh - var(--barra-h)); }
+  body[data-vista='obra'] .carril { display: none; }
+  body[data-vista='lista'] .obra { display: none; }
+  body[data-vista='obra'] .atras { display: grid; }
+}
+
+/* ── bloques del formulario ─────────────────────────────────────────────── */
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.25rem;
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.018);
+}
+.tarjeta + .tarjeta { margin-top: 0.9rem; }
+
+.tarjeta-cabeza {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.tarjeta-cabeza h2 {
+  font: 650 10.5px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tinta-3);
+}
+
+/* El `?`: pequeño, redondo, y siempre en el mismo sitio de cada bloque. */
+.ayuda {
+  flex: 0 0 auto;
+  width: 1.15rem;
+  height: 1.15rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  background: var(--superficie);
+  font: 600 10px/1 var(--sans);
+  color: var(--tinta-3);
+  cursor: pointer;
+  transition: color var(--t), border-color var(--t);
+}
+.ayuda:hover, .ayuda[aria-expanded='true'] { color: #fff; border-color: var(--tinta); background: var(--acento); }
+
+.ayuda-texto {
+  margin: -0.15rem 0 1rem;
+  padding: 0.75rem 0.85rem;
+  background: var(--superficie-2);
+  border-radius: var(--radio-chico);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--tinta-2);
+}
+.ayuda-texto p { margin: 0; }
+.ayuda-texto p { display: grid; grid-template-columns: 0.55rem 1fr; gap: 0.45rem; }
+.ayuda-texto p::before { content: '•'; color: var(--tinta-3); }
+.ayuda-texto p + p { margin-top: 0.45rem; }
+.ayuda-texto[hidden] { display: none; }
+
+/* ── campos ─────────────────────────────────────────────────────────────── */
+
+label { display: block; }
+.campo { margin-bottom: 1rem; }
+.campo:last-child { margin-bottom: 0; }
+.campo > span {
+  display: block;
+  margin-bottom: 0.4rem;
+  font: 400 10.5px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tinta-3);
+}
+.pie { display: block; margin-top: 0.35rem; font-size: 11.5px; color: var(--tinta-3); }
+
+input[type='text'],
+input[type='url'],
+input[type='date'],
+input[type='password'],
+input[type='number'],
+select,
+textarea {
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  font: 400 13.5px/1.4 var(--sans);
+  color: inherit;
+  transition: border-color var(--t), box-shadow var(--t);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--tinta);
+  box-shadow: 0 0 0 3px rgb(23 23 22 / 0.16);
+}
+input[readonly] { background: var(--superficie-2); color: var(--tinta-2); }
+
+textarea {
+  min-height: 6rem;
+  resize: vertical;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* El campo que el servidor señaló al rechazar el guardado. */
+.malo input, .malo textarea, .malo select, input.malo, textarea.malo {
+  border-color: var(--alarma);
+  background: var(--alarma-suave);
+}
+
+.fila { display: flex; gap: 0.6rem; align-items: flex-end; }
+.fila > * { flex: 1; min-width: 0; margin-bottom: 0; }
+
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 13px;
+  min-height: 2rem;
+}
+.casilla input { width: auto; accent-color: var(--tinta); }
+
+/* ── botones ────────────────────────────────────────────────────────────── */
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.65rem;
+  padding: 0.5rem 0.9rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  font: 400 13px/1 var(--sans);
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: transform var(--t), border-color var(--t), background var(--t), opacity var(--t);
+}
+.boton:hover:not(:disabled) { border-color: var(--borde-vivo); transform: translateY(-1px); }
+.boton:disabled { opacity: 0.4; cursor: default; }
+.boton.fuerte { background: var(--acento); border-color: var(--acento); color: #fff; font-weight: 700; }
+.boton.fuerte:hover:not(:disabled) { background: #000; }
+.boton.callado { border-color: transparent; background: none; color: var(--tinta-2); }
+.boton.callado:hover:not(:disabled) { background: var(--superficie-2); color: var(--tinta); }
+.boton.peligro { color: var(--alarma); }
+.boton.chico { min-height: 1.8rem; padding: 0.25rem 0.55rem; font-size: 12px; }
+.boton-icon { display: inline-grid; place-items: center; width: 1em; font-size: 1.05em; line-height: 1; }
+
+.botonera { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+
+/* ── la lista del carril ────────────────────────────────────────────────── */
+
+.lista { display: flex; flex-direction: column; gap: 0.2rem; margin-top: 0.35rem; }
+
+.lista .fila-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3.5rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--radio-chico);
+  background: var(--superficie);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.lista .fila-item:hover { background: var(--superficie-3); }
+.lista.arrastrandose { cursor: grabbing; }
+.lista .fila-item[aria-current] { background: var(--tinta); color: #fff; box-shadow: 0 3px 10px rgb(0 0 0 / 0.13); }
+
+.lista .fila-item.arrastrando {
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.18);
+  background: var(--superficie);
+  color: var(--tinta);
+}
+.lista.arrastrandose .fila-item { transition: none; }
+
+/* El asa. La fila entera se puede arrastrar —con el ratón basta con moverla,
+   con el dedo hay que mantener pulsado—, pero el asa sigue ahí: es lo que dice
+   que la lista se reordena, y con el dedo arranca de una sin esperar. */
+.asa {
+  flex: 0 0 auto;
+  width: 1.4rem;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  color: var(--tinta-3);
+  font: 400 13px/1 var(--sans);
+  cursor: grab;
+  touch-action: none;
+  opacity: 0.5;
+}
+.fila-item:hover .asa { opacity: 1; }
+.fila-item[aria-current] .asa { color: rgb(255 255 255 / 0.65); }
+
+.miniatura {
+  flex: 0 0 auto;
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 3px;
+  object-fit: cover;
+  background: var(--superficie-3);
+}
+
+.fila-texto { flex: 1; min-width: 0; }
+.fila-texto b { display: block; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fila-texto small {
+  display: block;
+  font: 400 10.5px/1.3 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--tinta-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fila-item[aria-current] small { color: rgb(255 255 255 / 0.6); }
+
+/* La marca de «le falta algo». Un punto y nada más: la frase que lo explica
+   está en el campo que hay que llenar, no aquí. */
+.punto {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tinta-3);
+}
+.punto.malo { background: var(--alarma); }
+.fila-item[aria-current] .punto { box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.5); }
+
+.buscador { margin: 0; }
+.vista-catalogo { flex: 0 0 auto; width: 2.65rem; padding: 0; }
+.vista-catalogo svg { width: 1.05rem; height: 1.05rem; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.vista-catalogo[aria-pressed='true'] { background: var(--tinta); border-color: var(--tinta); color: #fff; }
+
+.carril-seccion { display: flex; flex-direction: column; gap: 0.7rem; }
+.carril-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: 600 10.5px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tinta);
+}
+.carril-titulo .cuenta { margin-left: auto; padding: 0.25rem 0.45rem; border-radius: 99px; background: var(--superficie-3); color: var(--tinta-2); font-weight: 500; }
+
+/* En cuadrícula la portada es toda la ficha. El nombre sigue expuesto al
+   lector de pantalla mediante el aria-label de cada lanzamiento. */
+.lista.lista-cuadricula {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+.lista-cuadricula .fila-item {
+  position: relative;
+  display: block;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radio-chico) - 1px);
+}
+.lista.lista-cuadricula .fila-item:hover { transform: none; border-color: var(--borde-vivo); }
+.lista-cuadricula .fila-item[aria-current] { border-color: var(--tinta); box-shadow: 0 0 0 2px var(--tinta); }
+.lista-cuadricula .miniatura { display: block; width: 100%; height: 100%; border-radius: 0; }
+.lista-cuadricula .asa { position: absolute; z-index: 1; inset: auto auto 0.2rem 0.2rem; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: rgb(0 0 0 / 0.48); color: #fff; opacity: 0; }
+.lista-cuadricula .fila-item:hover .asa, .lista-cuadricula .fila-item:focus-within .asa { opacity: 1; }
+
+/* ── cabecera de la ficha ───────────────────────────────────────────────── */
+
+.ficha-cabeza {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.ficha-cabeza .titulo { flex: 1; min-width: 0; }
+.ficha-cabeza .titulo b {
+  display: block;
+  font: 700 24px/1.15 var(--sans);
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+.ficha-cabeza .titulo small {
+  font: 400 11px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--tinta-3);
+}
+
+/* ── chips de artista ───────────────────────────────────────────────────── */
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.35rem 0.25rem 0.35rem 0.65rem;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+  border-radius: 99px;
+  font-size: 12.5px;
+}
+.chip button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--tinta-3);
+  font: inherit;
+  line-height: 1;
+  padding: 0.15rem 0.3rem;
+  border-radius: 99px;
+}
+.chip button:hover { color: var(--tinta); background: var(--superficie-3); }
+.chip button.quitar:hover { color: var(--alarma); }
+
+/* ── rejilla de carátulas (el home) ─────────────────────────────────────── */
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: 1rem;
+}
+
+.carta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.carta-wrap { min-width: 0; }
+.tarjeta-editar { display: inline-block; margin-top: 0.15rem; font-size: 11.5px; color: var(--tinta-2); text-underline-offset: 2px; }
+.tarjeta-editar:hover { color: var(--tinta); }
+.carta .lienzo {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radio);
+  overflow: hidden;
+  background: var(--superficie-3);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color var(--t), transform var(--t), filter var(--t);
+}
+.carta .lienzo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.carta:hover .lienzo { outline-color: var(--borde-vivo); transform: translateY(-2px); }
+.carta[aria-pressed='true'] .lienzo { outline-color: var(--tinta); }
+.carta b { font-weight: 650; font-size: 13px; line-height: 1.25; overflow-wrap: anywhere; }
+.carta small {
+  font: 400 10.5px/1.3 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tinta-3);
+}
+
+/* Los que están fuera del aleatorio. Apagados, no ausentes: la rejilla es de
+   dónde se marcan, así que tienen que seguir viéndose y siendo tocables. */
+.carta.apagada .lienzo { opacity: 0.45; }
+.carta.apagada b, .carta.apagada small { color: var(--tinta-3); }
+
+.marca-elegido {
+  position: absolute;
+  inset: auto 0.3rem 0.3rem auto;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--tinta);
+  color: #fff;
+  font-size: 11px;
+}
+
+.marca-video {
+  position: absolute;
+  inset: 0.3rem auto auto 0.3rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  font: 400 9px/1.5 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── las dos opciones del home ──────────────────────────────────────────── */
+
+/* El modo, y el link para ir a mirar. Es lo primero de la pantalla del home
+   y ocupa el ancho: la decisión se toma antes que nada de lo que hay debajo. */
+.cabeza-home {
+  display: flex;
+  align-items: stretch;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+.cabeza-home .opciones { flex: 1; min-width: 0; }
+.cabeza-home .boton { flex: 0 0 auto; }
+
+.opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.opcion {
+  display: block;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background: var(--superficie);
+  cursor: pointer;
+  transition: border-color var(--t), background var(--t);
+}
+.opcion:hover { border-color: var(--borde-vivo); }
+.opcion:has(input:checked) { border-color: var(--tinta); background: var(--superficie-3); }
+.opcion input { position: absolute; opacity: 0; pointer-events: none; }
+.opcion b { display: block; font-weight: 700; font-size: 14px; }
+.opcion small { display: block; margin-top: 0.25rem; color: var(--tinta-2); font-size: 12px; line-height: 1.4; }
+
+.acciones-rejilla { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: -0.25rem 0 1rem; }
+.acciones-rejilla .boton { min-height: 2.15rem; background: var(--superficie-2); }
+
+.resumen-seleccion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background: var(--superficie-2);
+}
+.resumen-seleccion-dato { display: flex; flex:1 1 auto; align-items: center; min-width: 0; gap: 0.65rem; }
+.resumen-seleccion strong { min-width: 0; overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.resumen-seleccion-miniatura {
+  display: block;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: calc(var(--radio-chico) - 2px);
+  object-fit: cover;
+  background: var(--superficie-3);
+}
+.resumen-seleccion .boton { flex: 0 0 auto; min-height: 2.15rem; }
+
+/* ── el menú del `+` ────────────────────────────────────────────────────── */
+
+/* Crear en blanco y traer de Bandcamp son la misma acción con dos orígenes, y
+   dos botones al lado del buscador los ponían a competir por el sitio con lo
+   que de verdad se hace todo el día, que es buscar. */
+
+.menu { position: relative; }
+.menu > .boton { width: 2.65rem; font-size: 20px; padding: 0; }
+
+.menu-caja {
+  position: absolute;
+  z-index: 15;
+  top: calc(100% + 0.3rem);
+  right: 0;
+  min-width: 11rem;
+  padding: 0.25rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+}
+.menu-caja[hidden] { display: none; }
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 0;
+  border-radius: var(--radio-chico);
+  background: none;
+  font: 400 13px/1.2 var(--sans);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.menu-item:hover { background: var(--superficie-2); }
+
+/* ── lo que le falta al lanzamiento ─────────────────────────────────────── */
+
+/* El punto de la lista dice que pasa algo; esto dice qué, y lleva al campo.
+   Va debajo del encabezado de la ficha y desaparece cuando ya no falta nada. */
+
+.faltante { margin-bottom: 0.75rem; }
+.faltante ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.9rem;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.faltante li::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  vertical-align: 0.15em;
+  background: currentColor;
+  opacity: 0.45;
+}
+.faltante li.traba::before { opacity: 1; }
+
+.como-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.como-link:hover { text-decoration-thickness: 2px; }
+
+/* ── el buscador de artistas ────────────────────────────────────────────── */
+
+/* Una barra, y debajo los nombres como fichas. Al tocarla salen todos: el
+   sello tiene treinta y cuatro artistas y los conoce, y verlos repartidos es
+   más rápido que leer la columna que pinta un `<datalist>`. */
+
+.busca { position: relative; margin-top: 0.5rem; }
+
+.busca-panel {
+  position: absolute;
+  z-index: 15;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  right: 0;
+  max-height: 15rem;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde-vivo);
+  border-radius: var(--radio-chico);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.14);
+}
+.busca-panel[hidden] { display: none; }
+
+.busca-fichas { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.busca-fichas[hidden] { display: none; }
+
+.chip-toca {
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  transition: border-color var(--t), background var(--t);
+}
+.chip-toca:hover, .chip-toca.marcada {
+  border-color: var(--tinta);
+  background: var(--tinta);
+  color: #fff;
+}
+
+.busca-crear {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border: 0;
+  border-top: 1px solid var(--borde);
+  border-radius: 0 0 var(--radio-chico) var(--radio-chico);
+  background: none;
+  font: 400 12.5px/1.2 var(--sans);
+  color: var(--tinta-2);
+  text-align: left;
+  cursor: pointer;
+}
+.busca-crear:hover { background: var(--superficie-2); color: var(--tinta); }
+.busca-crear[hidden] { display: none; }
+
+.busca-mas {
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--superficie-3);
+  font: 600 11px/1 var(--sans);
+}
+
+/* ── el póster del video ────────────────────────────────────────────────── */
+
+/* Solo aparece cuando hay video: un campo que pide algo que todavía no se
+   puede dar es un campo que se aprende a saltar. */
+
+.poster[hidden] { display: none; }
+.poster { margin-bottom: 0.7rem; }
+.poster-acciones { margin-top: 0.35rem; }
+
+.fotogramas {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+.fotogramas[hidden] { display: none; }
+
+.fotograma {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.fotograma img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radio-chico);
+  background: var(--superficie-3);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color var(--t);
+}
+.fotograma:hover img { outline-color: var(--borde-vivo); }
+.fotograma.puesto img { outline-color: var(--tinta); }
+.fotograma small {
+  font: 400 10px/1 var(--mono);
+  color: var(--tinta-3);
+  text-align: center;
+}
+
+/* ── la muestra del arte de portada ─────────────────────────────────────── */
+
+/* Debajo del campo, la imagen que va a salir y de dónde sale. El campo está
+   vacío casi siempre —lo normal es que valga la carátula— y sin esto parecía
+   que faltaba algo. */
+.muestra {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+.muestra .miniatura { width: 2.6rem; height: 2.6rem; }
+.muestra .pie { margin-top: 0; }
+
+/* ── partes de estado ───────────────────────────────────────────────────── */
+
+.parte {
+  margin: 0 0 0.75rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background: var(--superficie);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.parte.mal { border-color: #fda29b; background: var(--alarma-suave); color: var(--alarma); }
+.parte.ojo { border-color: #fedf89; background: var(--aviso-suave); color: var(--aviso); }
+.parte.bien { border-color: #a6f4c5; background: var(--bien-suave); color: var(--bien); }
+.parte ul { margin: 0.35rem 0 0; padding-left: 1.1rem; }
+.parte li { margin: 0.1rem 0; }
+.parte[hidden] { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tarjeta, .lista .fila-item, .opcion, .parte { transition: transform var(--t), box-shadow var(--t), border-color var(--t), background var(--t); }
+  .tarjeta:hover { border-color: #bebeb7; box-shadow: 0 5px 16px rgb(0 0 0 / 0.035); }
+  .lista .fila-item:hover { transform: translateX(2px); }
+  .opcion:hover { transform: translateY(-1px); }
+  .parte:not([hidden]) { animation: parte-entra 0.18s ease-out both; }
+  @keyframes parte-entra { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.vacio[hidden] { display: none; }
+.vacio {
+  display: grid;
+  place-items: center;
+  min-height: 50dvh;
+  color: var(--tinta-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+code {
+  font: 400 12px/1 var(--mono);
+  background: var(--superficie-3);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+
+/* ── la puerta ──────────────────────────────────────────────────────────── */
+
+.puerta { display: grid; place-items: center; min-height: 100dvh; padding: 1rem; }
+.puerta form { width: min(21rem, 100%); }
+.puerta h1 { margin: 0 0 0.15rem; font-size: 16px; font-weight: 600; }
+.puerta p { margin: 0 0 1.1rem; color: var(--tinta-3); font-size: 12.5px; }
+
+/* ── el teléfono ────────────────────────────────────────────────────────── */
+
+@media (max-width: 62rem) {
+  /* 16px o menos hace que iOS haga zoom al enfocar un campo, y de ahí no se
+     vuelve: la página se queda torcida el resto de la sesión. */
+  input[type='text'], input[type='url'], input[type='date'],
+  input[type='password'], input[type='number'], select, textarea {
+    font-size: 16px;
+  }
+  textarea { font-size: 14px; }
+
+  .boton { min-height: 2.5rem; padding: 0.5rem 0.85rem; }
+  /* En móvil hay dos decisiones claras: adónde ir y qué hacer. Los enlaces y
+     acciones no compiten entre sí a lo ancho de una barra demasiado angosta. */
+  .barra { justify-content:space-between; gap:0.6rem; padding:0 0.75rem; }
+  .marca { display: none; }
+  .barra-nav, .barra-acciones { display:none; }
+  .barra-secciones, .barra-opciones { position:relative; display:block; }
+  .barra-secciones summary, .barra-opciones summary {
+    display:flex;
+    align-items:center;
+    gap:.45rem;
+    min-height:2.5rem;
+    padding:.45rem .7rem;
+    border:1px solid var(--borde);
+    border-radius:var(--radio-chico);
+    background:var(--superficie);
+    color:var(--tinta-2);
+    font:600 12px/1 var(--sans);
+    list-style:none;
+    cursor:pointer;
+  }
+  .barra-secciones summary::-webkit-details-marker, .barra-opciones summary::-webkit-details-marker { display:none; }
+  .barra-secciones summary::after, .barra-opciones summary::after {
+    content:'';
+    flex:0 0 .75rem;
+    width:.75rem;
+    height:.5rem;
+    display:block;
+    color:var(--tinta-3);
+    background:currentColor;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='black' stroke-width='1.6'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='black' stroke-width='1.6'/%3E%3C/svg%3E") center / contain no-repeat;
+    transform-origin:center;
+    transition:transform var(--t), color var(--t);
+  }
+  .barra-secciones[open] summary, .barra-opciones[open] summary { border-color:var(--tinta); color:var(--tinta); }
+  .barra-secciones[open] summary::after, .barra-opciones[open] summary::after { transform:rotate(180deg); }
+  .barra-secciones summary span { color:var(--tinta); }
+  .barra-menu-caja {
+    position: absolute;
+    z-index: 40;
+    top: calc(100% + 0.5rem);
+    display: flex;
+    flex-direction: column;
+    min-width: 13rem;
+    padding: 0.5rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    background: var(--superficie);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
+  }
+  .barra-secciones .barra-menu-caja { left:0; }
+  .barra-opciones .barra-menu-caja { right:0; }
+  .barra-menu-caja a {
+    display:block;
+    min-height:2.5rem;
+    padding:.7rem .45rem;
+    border-radius:var(--radio-chico);
+    color:var(--tinta-2);
+    font:400 13px/1 var(--sans);
+    text-decoration:none;
+  }
+  .barra-menu-caja a[aria-current], .barra-menu-caja a:hover { background:var(--superficie-2); color:var(--tinta); }
+  .menu-barra-etiqueta {
+    padding: 0.35rem 0.45rem 0.1rem;
+    font: 600 10px/1 var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--tinta-3);
+  }
+  .menu-barra-estado {
+    padding: 0.4rem 0.45rem 0.65rem;
+    border-bottom: 1px solid var(--borde);
+    font: 500 12px/1.2 var(--sans);
+    color: var(--bien);
+  }
+  .menu-barra-estado.pendiente { color: var(--aviso); }
+  .menu-barra-item {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.45rem;
+    border: 0;
+    border-radius: var(--radio-chico);
+    background: none;
+    color: var(--tinta-2);
+    font: 400 13px/1 var(--sans);
+    text-align: left;
+    cursor: pointer;
+  }
+  .menu-barra-item:hover { background: var(--superficie-2); color: var(--tinta); }
+  .detalle-cambios { right: 0.6rem; max-width: calc(100vw - 1.2rem); }
+
+  .lista .fila-item { padding: 0.5rem 0.4rem; }
+  .miniatura { width: 2.6rem; height: 2.6rem; }
+  .asa { width: 2rem; font-size: 15px; }
+
+  .opciones { grid-template-columns: 1fr; }
+  .rejilla { grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); }
+  .fotogramas { grid-template-columns: repeat(3, 1fr); }
+  .cabeza-home { flex-direction: column; }
+}
+
+@media (max-width: 26rem) {
+  .barra-nav a { padding: 0.4rem 0.45rem; font-size: 12px; }
+  .barra { gap: 0.4rem; }
+}
+
+@media (max-width: 22rem) {
+  .barra-acciones .corto { display: none; }
+  .boton#guardar { min-width: 2.5rem; padding-inline: 0.55rem; }
+}

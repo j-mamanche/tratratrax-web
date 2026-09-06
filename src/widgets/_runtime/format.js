@@ -48,14 +48,18 @@ export function fechaLarga(iso) {
  * es una frase aparte, es un crédito más. El que la pinta la separa del
  * resto con aire, no con otro formato.
  *
- * El número de catálogo **no** entra: ya se lee en la etiqueta del ítem, y
- * repetirlo aquí era una línea de ruido.
+ * El número de catálogo entra en el panel, no en la etiqueta. Así el carril
+ * conserva una lectura breve (álbum y artista) y el dato técnico aparece al
+ * abrir el release.
  */
 export function lineasCredito(release) {
   const lineas = [];
   // `suelta` le dice al que la pinta que esta línea va separada del resto.
   if (release.date) {
     lineas.push({ rol: 'Released', valor: fechaLarga(release.date), suelta: true });
+  }
+  if (release.catalog) {
+    lineas.push({ rol: 'Catalog', valor: numeroCatalogo(release.catalog) });
   }
 
   let previaLibre = false;
@@ -72,7 +76,9 @@ export function lineasCredito(release) {
       continue;
     }
 
-    if (/^cat/i.test(c.role)) continue; // el número de catálogo va en la etiqueta
+    // El campo estructurado `catalog` ya se añadió arriba; ignorar la copia
+    // que pueda venir en créditos evita mostrar el número dos veces.
+    if (/^cat/i.test(c.role)) continue;
     lineas.push({ rol: c.role, valor: c.name });
     previaLibre = false;
   }

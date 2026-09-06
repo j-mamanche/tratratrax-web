@@ -62,7 +62,7 @@ CSS, incluido el global de Cargo, así que esto siempre funciona:
 | `--ttx-visor-h` | alto de la franja de arriba | `clamp(64px, 16%, 190px)` |
 | `--ttx-visor-fx` | el filtro del reflejo | `url(#ttx-visor-fx)` |
 | `--ttx-banda-h` | alto de la franja de etiquetas | `1.45rem` |
-| `--ttx-etiqueta-sep` | separador entre número, álbum y artistas | ninguno |
+| `--ttx-etiqueta-sep` | separador entre álbum y artistas | `__` |
 | `--ttx-panel-w` | ancho del panel de créditos abierto | `21rem` |
 | `--ttx-w-max` | tope de ancho del ítem (para teléfono) | `88vw` |
 | `--ttx-dur` | duración del acordeón | `0.5s` |
@@ -155,11 +155,11 @@ está mirando. Es `position: sticky` con hermanos, sin una línea de JS.
 - **Ni `scroll-snap`.** Recorrer treinta y cinco discos y que el carril
   frenara y se acomodara en cada uno se sentía mal. Lo único que se coloca
   solo es el release que se abre.
-- **Ni separadores en la etiqueta.** El número, el álbum y los artistas van
-  pegados, sin un carácter de por medio: lo que los separa es el peso y la
-  tinta —el álbum en negrita y negro, el resto en gris—. Si alguna pantalla
-  llega a querer guiones bajos, `--ttx-etiqueta-sep` ya los cierra con el
-  tracking negativo para que se lean como una raya y no picados.
+- **Sin número en la etiqueta.** Cada release muestra solo álbum y artistas,
+  unidos con `__`; el álbum va en negrita. El número de catálogo, cuando
+  exista, aparece dentro del panel de información expandido. Si alguna
+  pantalla necesita otro separador, `--ttx-etiqueta-sep` conserva el tracking
+  negativo para que los guiones bajos se lean como una raya y no picados.
 - **Ni cerrar el `__` de los créditos a mano.** Ese tracking ya está puesto.
 - **Ni ordenar a mano.** Manda el campo `order` del JSON.
 - **Ni volver a entrar a Cargo para publicar.** Un release nuevo es un

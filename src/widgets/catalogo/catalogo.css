@@ -50,10 +50,8 @@
 }
 
 /* ── La etiqueta ──────────────────────────────────────────────────────
-   `TRA 031PYREXIAEHUA & FLORE`, pegado y sin un solo carácter de por medio.
-   Lo que separa es tipografía: el álbum en negrita y tinta plena, el número
-   y los artistas en gris y peso normal. Es lo mismo que hace la ref, solo
-   que ahí va en tres líneas y aquí en una. */
+   `PYREXIA__EHUA & FLORE`: álbum y artista se unen con dos guiones bajos,
+   como en la barra del sitio. El álbum queda en negrita. */
 [data-ttx='catalogo'] .ttx-etiqueta {
   display: flex;
   align-items: center;
@@ -74,18 +72,19 @@
   cursor: pointer;
 }
 
-/* Por defecto no hay separador: van pegados. La variable queda por si
-   alguna pantalla quiere meter algo — si son guiones bajos, el
-   `letter-spacing` negativo los cierra en una raya continua en vez de
-   dejarlos picados uno a uno (el mismo -0.13em de la barra de artistas). */
-[data-ttx='catalogo'] .ttx-cat::after,
+/* Por defecto álbum y artista van separados por `__`. La variable permite que
+   alguna pantalla lo reemplace; el `letter-spacing` negativo cierra los
+   guiones bajos en una raya continua, en vez de dejarlos picados. */
 [data-ttx='catalogo'] .ttx-album::after {
-  content: var(--ttx-etiqueta-sep, '');
+  content: var(--ttx-etiqueta-sep, '__');
   display: inline-block;
   letter-spacing: -0.13em;
+  /* El tracking cierra los dos guiones; este margen deja respirar al artista
+     que sigue y evita que las letras parezcan montarse sobre la junta. */
+  margin-right: calc(0.15em + var(--ttx-junta));
 }
 
-/* Los tres van en tinta plena: lo único que los separa es el peso. */
+/* Los dos van en tinta plena: lo único que los separa es el peso. */
 [data-ttx='catalogo'] .ttx-album {
   font-weight: 700;
 }
@@ -169,8 +168,8 @@
      Purchase
 
    La fecha no es una frase aparte: es una línea `Rol__ Valor` más, solo que
-   suelta arriba. Y el número de catálogo no va aquí — ya se lee en la
-   etiqueta del ítem. Sin párrafo editorial y sin player: se descartaron.
+   suelta arriba. El número de catálogo aparece aquí, dentro de la información
+   del álbum. Sin párrafo editorial y sin player: se descartaron.
 
    El rótulo va en gris y más chico que el chrome: tiene que nombrar el
    bloque, no encabezarlo. */

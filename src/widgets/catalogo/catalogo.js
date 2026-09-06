@@ -5,7 +5,6 @@ import { espejo } from '../_runtime/espejo.js';
 import { hscroll } from '../_runtime/hscroll.js';
 import {
   cover,
-  numeroCatalogo,
   lineasCredito,
   nombresArtistas,
   grupos,
@@ -97,16 +96,14 @@ registrar('catalogo', async (host) => {
 function crearItem(r, indiceArtistas, sufijo) {
   const idPanel = `ttx-panel-${sufijo}`;
   const artistas = nombresArtistas(r.artists, indiceArtistas);
-  const numero = numeroCatalogo(r.catalog);
 
   // La etiqueta es un `<button>` de verdad: así el catálogo se recorre y se
   // abre con teclado sin escribir una sola línea de JS de accesibilidad.
   const etiqueta = elemento(
     'button',
     { class: 'ttx-etiqueta', type: 'button', 'aria-expanded': 'false', 'aria-controls': idPanel },
-    // Sin separadores en el contenido: los `·` y las rayas son ::after del CSS,
-    // igual que en el sitio viejo.
-    numero && elemento('span', { class: 'ttx-cat' }, numero),
+    // El número de catálogo no se muestra aquí: la etiqueta solo identifica
+    // álbum y artistas. El `__` lo pone el ::after del CSS.
     elemento('span', { class: 'ttx-album' }, r.album),
     artistas && elemento('span', { class: 'ttx-artistas' }, artistas),
   );

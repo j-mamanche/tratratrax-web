@@ -1,0 +1,158 @@
+---
+import Marco from '../Marco.astro';
+import { estado } from '../lib/servidor.js';
+export const prerender = false;
+const s = await estado();
+---
+<Marco titulo="Blog" actual="/blog" sinCarril>
+  {!s.ok && <p class="parte mal">No se pudo leer el repo: {s.error}</p>}
+  <p class="parte" id="aviso" hidden></p>
+  <div id="formulario"></div>
+  <style is:global>
+    #formulario.blog-editor { display:grid; gap:1.5rem; max-width:58rem; }
+    .blog-editor > .tarjeta { margin:0; padding:1.1rem 1.2rem 1.2rem; }
+    .blog-editor > .tarjeta > .tarjeta-cabeza { margin-bottom:.9rem; }
+    .blog-editor .blog-plegable { padding:0; }
+    .blog-editor .blog-plegable-cabeza { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.1rem 1.2rem; cursor:pointer; list-style:none; }
+    .blog-editor .blog-plegable-cabeza::-webkit-details-marker { display:none; }
+    .blog-editor .blog-plegable-cabeza::after { content:''; flex:0 0 .75rem; width:.75rem; height:.5rem; display:block; color:var(--tinta-3); background:currentColor; -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='black' stroke-width='1.6'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='black' stroke-width='1.6'/%3E%3C/svg%3E") center / contain no-repeat; transform-origin:center; transition:transform var(--t), color var(--t); }
+    .blog-editor details[open] > .blog-plegable-cabeza::after { color:var(--tinta); transform:rotate(180deg); }
+    .blog-editor .blog-plegable-nombre { font:650 10.5px/1 var(--mono); text-transform:uppercase; letter-spacing:.07em; color:var(--tinta-3); }
+    .blog-editor .blog-plegable-pista { overflow:hidden; color:var(--tinta-3); font:400 12px/1.2 var(--sans); text-align:right; text-overflow:ellipsis; white-space:nowrap; }
+    .blog-editor .blog-plegable-resumen { min-width:0; margin-left:auto; overflow:hidden; color:var(--tinta-2); font:400 12px/1.2 var(--sans); text-align:right; text-overflow:ellipsis; white-space:nowrap; }
+    .blog-editor .blog-plegable[open] .blog-plegable-resumen { display:none; }
+    .blog-editor .blog-plegable-contenido { padding:0 1.2rem 1.2rem; }
+    .blog-editor .blog-fields { display:grid; grid-template-columns:minmax(0,1fr) minmax(11rem,.55fr); gap:.7rem 1rem; align-items:end; }
+    .blog-editor .blog-fields .ancho-total { grid-column:1 / -1; }
+    .blog-editor .blog-fields .campo { margin:0; }
+    .blog-editor .campo > span { margin-bottom:.35rem; font:500 12px/1.2 var(--sans); letter-spacing:0; text-transform:none; color:var(--tinta-2); }
+    .blog-editor .blog-articulo { padding:0; border:0; border-top:1px solid var(--borde); border-radius:0; box-shadow:none; background:transparent; }
+    .blog-editor .blog-articulo:first-of-type { border-top:0; }
+    .blog-editor .blog-articulo-cabeza { padding:.9rem 0; }
+    .blog-editor .blog-articulo-contenido { padding:0 0 1rem; }
+    .blog-editor .blog-articulo[open] { position:relative; }
+    .blog-editor .blog-articulo[open] > .blog-articulo-cabeza { position:absolute; z-index:1; top:.9rem; right:0; width:4.65rem; height:2.45rem; padding:0; justify-content:flex-end; }
+    .blog-editor .blog-articulo[open] .blog-articulo-cabeza .blog-plegable-pista { display:none; }
+    .blog-editor .blog-articulo[open] .blog-articulo-contenido { padding-top:.9rem; }
+    .blog-editor .blog-articulo[open] .blog-article-top { padding-right:5.15rem; }
+    .blog-editor .blog-articulos-cabeza { display:grid; grid-template-columns:minmax(0,1fr) auto; width:100%; }
+    .blog-editor .boton.fuerte.blog-nuevo { justify-self:end; align-self:center; width:2rem; min-height:2rem; padding:0; border:0; background:transparent; color:var(--tinta-3); font:400 1.5rem/1 var(--sans); }
+    .blog-editor .boton.fuerte.blog-nuevo:hover:not(:disabled) { background:var(--tinta); color:#fff; }
+    .blog-editor .blog-article-top { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(12rem,.8fr) max-content max-content; gap:.5rem; align-items:center; }
+    .blog-editor .blog-title-input, .blog-editor .blog-link-input { min-width:0; min-height:2.45rem; border:0; border-bottom:1px solid var(--borde); border-radius:0; padding:.35rem 0; background:transparent; font:500 15px/1.25 var(--sans); }
+    .blog-editor .blog-title-input { font-weight:650; }
+    .blog-editor .blog-link-wrap { display:flex; align-items:center; gap:.35rem; min-width:0; color:var(--tinta-3); }
+    .blog-editor .blog-link-wrap > span { font-size:14px; }
+    .blog-editor .blog-link-input { width:100%; font-weight:400; }
+    .blog-editor .blog-copy { width:100%; height:1.85rem; min-height:1.85rem; margin-top:.75rem; padding:.15rem 0; border:0; border-radius:0; background:transparent; font:400 14px/1.55 var(--sans); overflow:hidden; resize:none; }
+    .blog-editor .blog-copy:focus, .blog-editor .blog-title-input:focus, .blog-editor .blog-link-input:focus { box-shadow:none; border-color:var(--tinta); }
+    .blog-editor .blog-estado { min-height:2rem; padding:.25rem .55rem; border:1px solid var(--borde); border-radius:99px; background:transparent; font:500 12px/1 var(--sans); }
+    .blog-editor .blog-estado[aria-pressed='false'] { color:var(--tinta-3); }
+    .blog-editor textarea { min-height:4.6rem; }
+    .blog-editor .blog-highlight-fields > :first-child { grid-column:1 / -1; }
+    .blog-editor .blog-highlight-select { width:100%; }
+    .blog-editor .blog-media-control { display:grid; grid-template-columns:4rem minmax(0,1fr); gap:.75rem; align-items:center; }
+    .blog-editor .blog-media-preview { display:block; width:4rem; height:4rem; border:1px solid var(--borde); border-radius:var(--radio-chico); object-fit:cover; background:var(--superficie-2); }
+    .blog-editor .blog-media-preview[hidden] { display:none; }
+    .blog-editor .blog-media-row { display:grid; grid-template-columns:minmax(0,1fr) max-content; gap:.5rem; align-items:end; }
+    .blog-editor .blog-media-input { min-width:0; }
+    .blog-editor .blog-media-button { min-height:2.4rem; padding:.25rem .7rem; }
+    .blog-editor .blog-highlight-media { grid-column:1 / -1; }
+    .blog-editor .blog-ticker-editor { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:.75rem 1rem; }
+    .blog-editor .blog-ticker-copy { grid-column:1 / -1; }
+    .blog-editor .blog-article-controls { display:flex; align-items:center; gap:.1rem; flex:0 0 auto; }
+    .blog-editor .blog-article-controls .boton { min-width:1.8rem; min-height:1.8rem; padding:0; }
+    .blog-editor .blog-articulo-cabeza .blog-plegable-pista { margin-right:auto; text-align:left; }
+    .blog-editor .blog-reubicado { animation:blog-reubicado .65s ease-out; }
+    @keyframes blog-reubicado { 0% { background:var(--acento-suave); box-shadow:inset 0 0 0 2px var(--tinta); } 100% { background:transparent; box-shadow:none; } }
+    .blog-editor .arrastrando { opacity:.55; }
+    @media (max-width:700px) { .blog-editor .blog-fields { grid-template-columns:1fr; } .blog-editor .blog-fields .ancho-total { grid-column:auto; } .blog-editor .blog-articulo[open] .blog-article-top { padding-right:0; } .blog-editor .blog-article-top { grid-template-columns:minmax(0,1fr) max-content max-content; } .blog-editor .blog-title-input { grid-column:1 / -1; grid-row:1; margin-right:5.15rem; } .blog-editor .blog-link-wrap { grid-column:1; grid-row:2; width:100%; } .blog-editor .blog-estado { grid-column:2; grid-row:2; } .blog-editor .blog-article-top > .peligro { grid-column:3; grid-row:2; } .blog-editor .blog-ticker-editor { grid-template-columns:1fr; } .blog-editor .blog-plegable-pista, .blog-editor .blog-plegable-resumen { max-width:55vw; } }
+  </style>
+  <script is:inline type="application/json" id="modelo" set:html={JSON.stringify({ releases:s.releases, artists:s.artists, home:s.home, about:s.about, blog:s.blog, shas:s.shas })} />
+  <script>
+    import { abrir, leer, tocar, avisarAlSalir } from '../lib/borrador.js';
+    import { montarBarra } from '../lib/barra.js';
+    import { el, campo, vaciar, leerIsla, parte } from '../lib/piezas.js';
+    import { subir } from '../lib/material.js';
+    abrir(leerIsla('modelo')); avisarAlSalir(); montarBarra({alFallar(errores){
+      const m=/^blog items\[(\d+)\]/.exec(errores[0]??'');
+      if(!m){document.getElementById('formulario')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+      const item=blog().items?.[Number(m[1])];
+      const tarjeta=item&&document.querySelector(`[data-fila="${CSS.escape(item.id)}"]`);
+      const plegable=tarjeta?.closest('details');
+      if(plegable) plegable.open=true;
+      tarjeta?.scrollIntoView({behavior:'smooth',block:'center'});
+      tarjeta?.querySelector('input, textarea, button')?.focus({preventScroll:true});
+    }});
+    const caja=document.getElementById('formulario'), aviso=document.getElementById('aviso'); caja.classList.add('blog-editor');
+    const blog=()=>leer().blog ?? {highlight:{article:'',image:'',imageAlt:''},ticker:{label:'LAST NEWS',text:'',url:''},items:[]};
+    const guardar=(cambios)=>tocar({blog:{...blog(),...cambios}});
+    const cambiarArticulo=(i,clave,valor)=>{const b=structuredClone(blog()); b.items[i][clave]=valor; guardar(b)};
+    let articuloAbierto='';
+    function bloquePlegable(nombre,resumen,...hijos){return el('details',{clase:'tarjeta blog-plegable'},
+      el('summary',{clase:'blog-plegable-cabeza'},el('span',{clase:'blog-plegable-nombre'},nombre),el('span',{clase:'blog-plegable-resumen','data-resumen':nombre.toLowerCase()},resumen)),
+      el('div',{clase:'blog-plegable-contenido'},...hijos));}
+    function crearArticulo(){const b=structuredClone(blog());b.items=b.items.map(x=>({...x,order:(x.order??0)+1}));const nuevo={id:`articulo-${Date.now()}`,title:'',text:'',url:'',order:1,visible:true};b.items.push(nuevo);articuloAbierto=nuevo.id;guardar(b);pintar();document.querySelector(`[data-fila="${CSS.escape(nuevo.id)}"] input`)?.focus()}
+    function bloqueArticulos(...hijos){return el('section',{clase:'tarjeta'},
+      el('header',{clase:'tarjeta-cabeza blog-articulos-cabeza'},el('h2',{},'Artículos'),el('button',{type:'button',clase:'boton fuerte blog-nuevo',title:'Añadir artículo',onclick:crearArticulo},'+')),
+      ...hijos);}
+    function reordenar(desde,hasta){
+      if(hasta<0)return;
+      const b=structuredClone(blog()),orden=[...b.items].sort((a,z)=>(a.order??0)-(z.order??0));
+      if(hasta>=orden.length)return;
+      const [movido]=orden.splice(desde,1);orden.splice(hasta,0,movido);
+      const puestos=new Map(orden.map((x,i)=>[x.id,i+1]));
+      b.items=b.items.map(x=>({...x,order:puestos.get(x.id)}));guardar(b);pintar();
+      requestAnimationFrame(()=>document.querySelector(`[data-fila="${CSS.escape(movido.id)}"]`)?.classList.add('blog-reubicado'));
+    }
+    function imagen(){
+      const urlDePreview=(ruta)=>!ruta?'':/^https?:/i.test(ruta)?ruta:(location.hostname==='localhost'?`http://localhost:8787/${ruta}`:`/${ruta.replace(/^\//,'')}`);
+      const preview=el('img',{clase:'blog-media-preview',alt:'Vista previa de imagen',hidden:!blog().highlight?.image});
+      const actualizar=(ruta)=>{const src=urlDePreview(ruta);preview.hidden=!src;if(src)preview.src=src;}; actualizar(blog().highlight?.image);
+      const input=el('input',{clase:'blog-media-input',type:'text',value:blog().highlight?.image??'',placeholder:'https://… o media/…',oninput:e=>{guardar({highlight:{...blog().highlight,image:e.target.value}});actualizar(e.target.value)}});
+      const file=el('input',{type:'file',accept:'image/*',style:'display:none',onchange:async e=>{const f=e.target.files?.[0];if(!f)return;parte(aviso,{texto:`Subiendo ${f.name}…`});try{const ruta=await subir(f,'blog-highlight');guardar({highlight:{...blog().highlight,image:ruta}});actualizar(ruta);parte(aviso,{tono:'bien',texto:`Imagen lista: ${ruta}`})}catch(err){parte(aviso,{tono:'mal',texto:err.message})}}});
+      return campo('Imagen del highlight',el('div',{clase:'blog-media-control'},preview,el('div',{clase:'blog-media-row'},input,el('button',{type:'button',clase:'boton blog-media-button',onclick:()=>file.click()},'Subir…'),file)),'Una URL directa de imagen o un archivo propio.');
+    }
+    const actualizarResumen=(nombre,texto)=>{const nodo=caja.querySelector(`[data-resumen="${nombre}"]`);if(nodo)nodo.textContent=texto};
+    function pintar(){
+      const b=blog(), orden=[...(b.items??[])].sort((a,z)=>(a.order??0)-(z.order??0));
+      const resumenActualGrieta=()=>[blog().ticker?.label,blog().ticker?.text].filter(Boolean).join(' — ')||'Sin contenido';
+      const elegir=campo('Artículo',el('select',{clase:'blog-highlight-select',onchange:e=>{guardar({highlight:{...b.highlight,article:e.target.value}});actualizarResumen('highlight',orden.find(x=>x.id===e.target.value)?.title||'Sin artículo seleccionado')}},...orden.map(x=>el('option',{value:x.id,selected:x.id===b.highlight?.article},x.title||x.id))));
+      const etiqueta=campo('Etiqueta',el('input',{type:'text',value:b.ticker?.label??'LAST NEWS',oninput:e=>{guardar({ticker:{...b.ticker,label:e.target.value}});actualizarResumen('grieta',resumenActualGrieta())}}));
+      const link=campo('Link ↗',el('input',{type:'url',value:b.ticker?.url??'',placeholder:'https://…',oninput:e=>guardar({ticker:{...b.ticker,url:e.target.value}})}));
+      const texto=el('div',{clase:'blog-ticker-copy'},campo('Texto',el('textarea',{rows:3,value:b.ticker?.text??'',oninput:e=>{guardar({ticker:{...b.ticker,text:e.target.value}});actualizarResumen('grieta',resumenActualGrieta())}})));
+      const elegido=orden.find(x=>x.id===b.highlight?.article);
+      const resumenHighlight=elegido?.title||'Sin artículo seleccionado';
+      const resumenGrieta=[b.ticker?.label,b.ticker?.text].filter(Boolean).join(' — ')||'Sin contenido';
+      vaciar(caja).append(
+        bloquePlegable('Highlight',resumenHighlight,el('div',{clase:'blog-fields blog-highlight-fields'},elegir,el('div',{clase:'blog-highlight-media'},imagen()))),
+        bloquePlegable('Grieta',resumenGrieta,el('div',{clase:'blog-ticker-editor'},etiqueta,link,texto)),
+        bloqueArticulos(...orden.map((x,posicion)=>tarjeta(x,b.items.indexOf(x),posicion,orden.length)))
+      );
+    }
+    function tarjeta(x,i,posicion,total){
+      const titulo=el('span',{clase:'blog-plegable-pista'},x.title||'Artículo sin título');
+      const parar=(accion)=>(e=>{e.preventDefault();e.stopPropagation();accion()});
+      const controles=el('div',{clase:'blog-article-controls'},
+        el('button',{type:'button',clase:'boton callado',title:'Subir artículo',disabled:posicion===0,onclick:parar(()=>reordenar(posicion,posicion-1))},'↑'),
+        el('button',{type:'button',clase:'boton callado',title:'Bajar artículo',disabled:posicion===total-1,onclick:parar(()=>reordenar(posicion,posicion+1))},'↓'));
+      const detalle=el('details',{'data-fila':x.id,clase:'tarjeta blog-articulo',open:x.id===articuloAbierto},
+        el('summary',{clase:'blog-plegable-cabeza blog-articulo-cabeza'},titulo,controles),
+        el('div',{clase:'blog-articulo-contenido'},el('div',{clase:'blog-article-top'},
+        el('input',{clase:'blog-title-input',value:x.title??'',placeholder:'Título del artículo',oninput:e=>cambiarArticulo(i,'title',e.target.value)}),
+        el('div',{clase:'blog-link-wrap'},el('span',{'aria-hidden':'true'},'↗'),el('input',{clase:'blog-link-input',type:'url',value:x.url??'',placeholder:'Link externo',oninput:e=>cambiarArticulo(i,'url',e.target.value)})),
+        el('button',{type:'button',clase:'blog-estado','aria-pressed':String(x.visible!==false),onclick:e=>{const visible=e.currentTarget.getAttribute('aria-pressed')!=='true';cambiarArticulo(i,'visible',visible);e.currentTarget.setAttribute('aria-pressed',String(visible));e.currentTarget.textContent=visible?'Visible':'Oculto'}},x.visible!==false?'Visible':'Oculto'),
+        el('button',{type:'button',clase:'boton callado peligro',title:'Eliminar artículo',onclick:()=>{const b=structuredClone(blog());b.items.splice(i,1);guardar(b);pintar()}},'×')),
+        el('textarea',{clase:'blog-copy',rows:1,value:x.text??'',placeholder:'Escribe el texto o extracto…',oninput:e=>{cambiarArticulo(i,'text',e.target.value);ajustarTexto(e.currentTarget)}})));
+      detalle.querySelector('.blog-title-input').addEventListener('input',e=>{const texto=e.target.value||'Artículo sin título';titulo.textContent=texto;if(blog().highlight?.article===x.id)actualizarResumen('highlight',texto)});
+      detalle.addEventListener('toggle',()=>{
+        if(detalle.open){articuloAbierto=x.id;caja.querySelectorAll('.blog-articulo[open]').forEach(otro=>{if(otro!==detalle)otro.open=false});requestAnimationFrame(()=>ajustarTexto(detalle.querySelector('.blog-copy')));}
+        else if(articuloAbierto===x.id)articuloAbierto='';
+      });
+      ajustarTexto(detalle.querySelector('.blog-copy'));
+      return detalle;
+    }
+    function ajustarTexto(area){area.style.height='auto';area.style.height=`${area.scrollHeight}px`;}
+    pintar();
+  </script>
+</Marco>

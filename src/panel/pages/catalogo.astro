@@ -1,0 +1,821 @@
+---
+/**
+ * El catálogo. La pantalla donde el sello pasa el rato.
+ *
+ * Es una sola: los artistas no tienen página propia porque no son una entidad
+ * que el sello administre, son un campo del release. Se crean escribiendo el
+ * nombre en la ficha, se renombran ahí mismo, y sus grafías viejas —las que el
+ * importador de Bandcamp necesita para no duplicar a nadie— se mantienen solas.
+ *
+ * El modelo entero se pinta una vez en la página y a partir de ahí se edita en
+ * el navegador contra el borrador. Quien guarda es el botón de la barra, que
+ * es uno para todo el studio.
+ *
+ * `?id=` abre un release directo: es lo que usan los links del home.
+ */
+import Marco from '../Marco.astro';
+import { estado } from '../lib/servidor.js';
+
+export const prerender = false;
+
+const s = await estado();
+const inicial = Astro.url.searchParams.get('id') ?? '';
+---
+
+<Marco titulo="Catálogo" actual="/catalogo">
+  <Fragment slot="carril">
+    <div class="carril-seccion">
+      <div class="carril-titulo">
+        <span data-i18n="catalogo">Catálogo</span>
+        <button class="ayuda" type="button" id="ayudaCatalogo" aria-expanded="false" aria-label="Qué es el catálogo">?</button>
+        <span class="cuenta" id="cuenta"></span>
+      </div>
+
+      <div class="ayuda-texto" id="textoCatalogo" hidden>
+        <p data-i18n="ayudaCatalogo">Arrastra para cambiar el orden. Gris: pendiente. Rojo: bloquea la publicación.</p>
+      </div>
+
+      <div class="fila">
+        <input class="buscador" type="text" id="buscar" placeholder="Buscar…" data-i18n-placeholder="buscar" autocomplete="off" />
+        <button class="boton vista-catalogo" id="vistaCatalogo" type="button" aria-label="Ver catálogo en cuadrícula" aria-pressed="false" title="Ver cuadrícula">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>
+        </button>
+        <div class="menu" style="flex:0 0 auto">
+          <button class="boton fuerte" id="abrirNuevo" type="button" aria-expanded="false" aria-label="Añadir un lanzamiento"><span aria-hidden="true">+</span></button>
+          <div class="menu-caja" id="menuNuevo" hidden>
+            <button class="menu-item" id="nuevo" type="button" data-i18n="nuevo">Nuevo lanzamiento</button>
+            <button class="menu-item" id="abrirImport" type="button" data-i18n="importarBandcamp">Importar de Bandcamp</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="cajaImport" hidden>
+        <div class="fila">
+          <input type="url" id="bcUrl" placeholder="https://tratratrax.bandcamp.com/album/…" />
+          <button class="boton" id="importar" type="button" style="flex:0 0 auto"><span class="boton-icon" aria-hidden="true">↓</span> <span data-i18n="importar">Importar</span></button>
+        </div>
+        <p class="parte" id="parteImport" hidden style="margin-top:0.5rem"></p>
+      </div>
+
+      <div class="lista" id="lista"></div>
+    </div>
+  </Fragment>
+
+  {!s.ok && <p class="parte mal">No se pudo leer el repo: {s.error}</p>}
+
+  <p class="parte" id="parteDesfase" hidden></p>
+  <p class="parte" id="parteBorrado" hidden></p>
+
+  <div id="obra" hidden>
+    <div class="ficha-cabeza">
+      <div class="titulo" id="tituloFicha"></div>
+      <div class="botonera">
+        <button class="boton callado peligro" id="borrar" type="button"><span class="boton-icon" aria-hidden="true">×</span> <span data-i18n="borrar">Borrar</span></button>
+      </div>
+    </div>
+
+    <div id="faltante" hidden></div>
+
+    <div id="formulario"></div>
+  </div>
+
+  <p class="vacio" id="vacio">Selecciona o crea un lanzamiento.</p>
+
+  <script is:inline type="application/json" id="modelo" set:html={JSON.stringify({
+    releases: s.releases,
+    artists: s.artists,
+    home: s.home,
+    about: s.about,
+    shas: s.shas,
+    inicial,
+  })} />
+
+  <script>
+    import { abrir, leer, tocar, avisarAlSalir, recuperarBorrador, descartarBorrador } from '../lib/borrador.js';
+    import { montarBarra, indiceDelError } from '../lib/barra.js';
+    import { el, bloque, campo, vaciar, leerIsla, parte, slugificar, slugLibre } from '../lib/piezas.js';
+    import { arrastrable, recolocar } from '../lib/arrastrar.js';
+    import { hacerSubidor } from '../lib/subidor.js';
+    import { buscadorDeArtistas } from '../lib/artistas.js';
+    import { montarPoster } from '../lib/poster.js';
+    import { analizar, escribir as escribirCreditos } from '../../lib/creditos.mjs';
+
+    const delServidor = leerIsla('modelo');
+    const inicial = delServidor.inicial;
+    delete delServidor.inicial;
+
+    const arranque = abrir(delServidor);
+    avisarAlSalir();
+
+    const $ = (id) => document.getElementById(id);
+    let activo = inicial || null;
+    let vistaCatalogo = localStorage.getItem('ttx:catalogo-vista') === 'cuadricula' ? 'cuadricula' : 'lista';
+
+    // Los ids que ya están en el repo. Mientras un lanzamiento sea nuevo, su
+    // identificador sigue al título; en cuanto se guarda queda congelado,
+    // porque a partir de ahí puede haber links apuntándole.
+    const yaGuardados = new Set(JSON.parse(arranque.base?.releases ?? '[]').map((r) => r.id));
+
+    const cover = (id, tam = 3) => (id ? `https://f4.bcbits.com/img/${id}_${tam}.jpg` : '');
+    const nombresDe = () => new Map(leer().artists.map((a) => [a.slug, a.display]));
+
+    // ── qué le falta a un lanzamiento ───────────────────────────────────────
+    //
+    // Una sola lista, y de ella salen las dos cosas que la miran: el punto de
+    // la lista y la franja de la ficha. Escritas aparte se contradecían el día
+    // que alguien cambiara una — un punto rojo sin nada que arreglar en la
+    // franja es peor que no tener punto.
+    //
+    // `bloquea` es «así no se publica»: el mismo subconjunto que rechaza el
+    // validador. Lo demás es «le falta algo».
+
+    function faltantes(r, slugs) {
+      const puestos = r.artists ?? [];
+      const huerfano = puestos.some((s) => !slugs.has(s));
+
+      return [
+        !r.album && { que: 'el título', bloquea: true, campo: 'campoAlbum' },
+        !puestos.length && { que: 'los artistas', bloquea: true, campo: 'campoArtistas' },
+        huerfano && { que: 'un artista que ya no existe', bloquea: true, campo: 'campoArtistas' },
+        !/^\d{4}-\d{2}-\d{2}$/.test(r.date ?? '') && { que: 'la fecha', bloquea: true, campo: 'campoFecha' },
+        !r.bcImageId && {
+          que: 'la carátula',
+          // Sin carátula, un lanzamiento oculto todavía se puede guardar: así
+          // es como se prepara un anuncio antes de que Bandcamp exista.
+          bloquea: r.visible !== false,
+          campo: 'campoCaratula',
+        },
+        !r.purchaseUrl && { que: 'el link para comprar', bloquea: false, campo: 'campoComprar' },
+        !(r.credits ?? []).length && { que: 'los créditos', bloquea: false, campo: 'campoCreditos' },
+      ].filter(Boolean);
+
+      // El linktree no entra: no lo tiene ninguno todavía, y un aviso que
+      // llevan los treinta y seis no distingue nada. El número tampoco: las
+      // compilaciones van sin número a propósito.
+    }
+
+    const problemas = (r, slugs) => {
+      const lista = faltantes(r, slugs);
+      return { bloquea: lista.some((f) => f.bloquea), falta: lista.length > 0 };
+    };
+
+    /**
+     * La franja de la ficha: qué le falta y dónde se arregla.
+     *
+     * Va debajo del encabezado y encima de todo lo demás, siempre que haya algo
+     * que decir. El punto de la lista avisa de que pasa algo; esto es lo único
+     * que dice qué.
+     */
+    function pintarFaltante(r) {
+      const caja = $('faltante');
+      const lista = faltantes(r, new Set(leer().artists.map((a) => a.slug)));
+      caja.hidden = lista.length === 0;
+      if (!lista.length) return vaciar(caja);
+
+      const bloquea = lista.some((f) => f.bloquea);
+      vaciar(caja).className = `parte faltante ${bloquea ? 'mal' : 'ojo'}`;
+      caja.append(
+        el('strong', {}, bloquea ? 'No se puede guardar. Falta:' : 'Pendiente:'),
+        el('ul', {},
+          ...lista.map((f) =>
+            el('li', { clase: f.bloquea ? 'traba' : '' },
+              el('button', {
+                type: 'button',
+                clase: 'como-link',
+                onclick: () => irAlCampo(f.campo),
+              }, f.que),
+            ),
+          ),
+        ),
+      );
+    }
+
+    /** Lleva al campo que hay que llenar, abierto y con el cursor puesto. */
+    function irAlCampo(id) {
+      const nodo = $(id);
+      if (!nodo) return;
+      nodo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nodo.focus({ preventScroll: true });
+    }
+
+    // ── el carril ───────────────────────────────────────────────────────────
+
+    function pintarLista() {
+      const filtro = $('buscar').value.trim().toLowerCase();
+      const { releases } = leer();
+      const nombre = nombresDe();
+
+      $('cuenta').textContent = `${releases.length}`;
+
+      const visibles = releases.filter((r) => {
+        if (!filtro) return true;
+        const texto = [r.album, r.catalog, ...(r.artists ?? []).map((a) => nombre.get(a) ?? a)]
+          .join(' ')
+          .toLowerCase();
+        return texto.includes(filtro);
+      });
+
+      const lista = vaciar($('lista'));
+      lista.classList.toggle('lista-cuadricula', vistaCatalogo === 'cuadricula');
+      $('vistaCatalogo').setAttribute('aria-pressed', String(vistaCatalogo === 'cuadricula'));
+      $('vistaCatalogo').setAttribute('aria-label', vistaCatalogo === 'cuadricula' ? 'Ver catálogo en lista' : 'Ver catálogo en cuadrícula');
+      $('vistaCatalogo').title = vistaCatalogo === 'cuadricula' ? 'Ver lista' : 'Ver cuadrícula';
+
+      lista.append(
+        ...visibles.map((r) => {
+          const artistas = (r.artists ?? []).map((a) => nombre.get(a) ?? a).join(', ');
+
+          return el(
+            'div',
+            {
+              'data-fila': r.id,
+              clase: 'fila-item',
+              'aria-current': r.id === activo ? 'true' : null,
+              'aria-label': [r.album || 'Sin título', artistas].filter(Boolean).join(' · '),
+              onclick: () => elegir(r.id),
+            },
+            // Sin arrastre mientras se busca: la lista filtrada no es el orden
+            // del catálogo, y soltar ahí movería el release a un sitio que
+            // quien arrastra no está viendo.
+            filtro
+              ? null
+              : el('span', { 'data-asa': true, clase: 'asa', 'aria-hidden': 'true' }, '⠿'),
+            el('img', { clase: 'miniatura', src: cover(r.bcImageId) || cover(''), alt: '', loading: 'lazy' }),
+            vistaCatalogo === 'lista'
+              ? el('div', { clase: 'fila-texto' },
+                  el('b', {}, r.album || 'Sin título'),
+                  el('small', {}, [r.catalog, artistas, r.visible === false ? 'oculto' : null].filter(Boolean).join(' · ') || '—'),
+                )
+              : null,
+          );
+        }),
+      );
+    }
+
+    $('buscar').addEventListener('input', pintarLista);
+    $('vistaCatalogo').addEventListener('click', () => {
+      vistaCatalogo = vistaCatalogo === 'lista' ? 'cuadricula' : 'lista';
+      localStorage.setItem('ttx:catalogo-vista', vistaCatalogo);
+      pintarLista();
+    });
+    addEventListener('ttx:idioma', pintarLista);
+
+    arrastrable($('lista'), {
+      alSoltar(desde, hasta) {
+        const orden = recolocar(leer().releases, desde, hasta);
+        tocar({ releases: orden.map((r, i) => ({ ...r, order: i + 1 })) });
+        pintarLista();
+      },
+    });
+
+    function elegir(id) {
+      activo = id;
+      history.replaceState(null, '', id ? `/catalogo?id=${encodeURIComponent(id)}` : '/catalogo');
+      document.body.dataset.vista = id ? 'obra' : 'lista';
+      pintarLista();
+      pintarFormulario();
+      if (matchMedia('(max-width: 62rem)').matches) scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    $('volver').addEventListener('click', () => {
+      document.body.dataset.vista = 'lista';
+      scrollTo(0, 0);
+    });
+
+    // ── editar ──────────────────────────────────────────────────────────────
+
+    const release = () => leer().releases.find((r) => r.id === activo) ?? null;
+
+    /** Cambia un campo del release activo. `ruta` puede ser "home.video.mp4". */
+    function fijar(ruta, valor, { repintar = false } = {}) {
+      const { releases } = leer();
+      const i = releases.findIndex((r) => r.id === activo);
+      if (i < 0) return;
+
+      const copia = structuredClone(releases[i]);
+      const partes = ruta.split('.');
+      let nodo = copia;
+      for (const p of partes.slice(0, -1)) {
+        nodo[p] = nodo[p] ?? {};
+        nodo = nodo[p];
+      }
+      const ultima = partes.at(-1);
+      if (valor === '' || valor == null) delete nodo[ultima];
+      else nodo[ultima] = valor;
+
+      // Un bloque `home` que se quedó sin nada no es un home a medias: es
+      // ninguno. Vaciarlo evita dejar un objeto vacío en el JSON.
+      if (copia.home?.video && !copia.home.video.mp4) delete copia.home.video;
+      if (copia.home && !copia.home.arte && !copia.home.video?.mp4 && !copia.home.texto) delete copia.home;
+
+      // Mientras no esté guardado, el identificador sigue al título. Después
+      // se congela: puede haber links apuntándole.
+      if (ruta === 'album' && !yaGuardados.has(copia.id)) {
+        const nuevo = slugLibre(valor, new Set(releases.filter((_, j) => j !== i).map((r) => r.id)));
+        copia.id = nuevo;
+        activo = nuevo;
+      }
+
+      const nuevos = [...releases];
+      nuevos[i] = copia;
+      tocar({ releases: nuevos });
+
+      pintarLista();
+      pintarCabeza();
+      pintarFaltante(release() ?? copia);
+      pintarFondo(release() ?? copia);
+      if (repintar) pintarFormulario();
+    }
+
+    const entrada = (ruta, props = {}) =>
+      el('input', {
+        type: 'text',
+        value: release()?.[ruta] ?? '',
+        ...props,
+        oninput: (e) => fijar(ruta, e.target.value.trim()),
+      });
+
+    function pintarCabeza() {
+      const r = release();
+      if (!r) return;
+      const nombre = nombresDe();
+      vaciar($('tituloFicha')).append(
+        el('b', {}, r.album || 'Sin título'),
+        el('small', {}, [r.catalog, (r.artists ?? []).map((a) => nombre.get(a) ?? a).join(', ')]
+          .filter(Boolean).join(' · ') || 'sin número'),
+      );
+    }
+
+    /** La carátula se vuelve una capa ambiental, nunca el fondo literal de los campos. */
+    function pintarFondo(r = release()) {
+      const aplicacion = document.querySelector('.app');
+      if (!aplicacion) return;
+      const imagen = cover(r?.bcImageId, 6);
+      aplicacion.classList.toggle('app-con-caratula', Boolean(imagen));
+      if (imagen) aplicacion.style.setProperty('--fondo-lanzamiento', `url("${imagen}")`);
+      else aplicacion.style.removeProperty('--fondo-lanzamiento');
+    }
+
+    function pintarFormulario() {
+      const r = release();
+      $('obra').hidden = !r;
+      $('vacio').hidden = Boolean(r);
+      if (!r) {
+        pintarFondo(null);
+        $('faltante').hidden = true;
+        return vaciar($('formulario'));
+      }
+
+      pintarCabeza();
+      pintarFondo(r);
+      pintarFaltante(r);
+
+      vaciar($('formulario')).append(
+        bloqueLanzamiento(r),
+        bloqueArtistas(r),
+        bloqueEnlaces(r),
+        bloqueCreditos(r),
+        bloquePortada(r),
+      );
+    }
+
+    // ── el lanzamiento ──────────────────────────────────────────────────────
+
+    function bloqueLanzamiento(r) {
+      return bloque(
+        'Lanzamiento',
+        [
+          el('p', { html: 'El número de catálogo es opcional.' }),
+          el('p', { html: 'La fecha aparece en los créditos.' }),
+          el('p', { html: 'Oculto: se guarda, pero no aparece en el sitio.' }),
+        ],
+        campo('Título', el('input', {
+          type: 'text', id: 'campoAlbum', value: r.album ?? '',
+          oninput: (e) => fijar('album', e.target.value),
+        })),
+        el('div', { clase: 'fila' },
+          campo('Nº catálogo', entrada('catalog', { id: 'campoCatalogo' })),
+          campo('Fecha', el('input', {
+            type: 'date', id: 'campoFecha', value: r.date ?? '',
+            oninput: (e) => fijar('date', e.target.value),
+          })),
+        ),
+        el('label', { clase: 'casilla', style: 'margin-top:0.5rem' },
+          el('input', {
+            type: 'checkbox',
+            checked: r.visible !== false,
+            onchange: (e) => fijar('visible', e.target.checked),
+          }),
+          'Visible en el sitio',
+        ),
+      );
+    }
+
+    // ── artistas: se crean aquí o no se crean ───────────────────────────────
+
+    function bloqueArtistas(r) {
+      const nombre = nombresDe();
+      const puestos = r.artists ?? [];
+
+      const buscador = buscadorDeArtistas({
+        todos: leer().artists,
+        puestos,
+        alElegir: (slug) => fijar('artists', [...puestos, slug], { repintar: true }),
+        alCrear: (texto) => crearArtista(texto),
+      });
+      buscador.querySelector('input').id = 'campoArtistas';
+
+      return bloque(
+        'Artistas',
+        [
+          el('p', { html: 'Busca para filtrar. Escribe un nombre nuevo para crearlo.' }),
+          el('p', { html: 'Edita un nombre desde su ficha.' }),
+        ],
+        el('div', { clase: 'chips' },
+          ...puestos.map((slug) =>
+            el('span', { clase: `chip ${nombre.has(slug) ? '' : 'malo'}` },
+              el('button', {
+                type: 'button', title: 'Corregir el nombre',
+                onclick: () => renombrarArtista(slug),
+              }, nombre.get(slug) ?? slug),
+              el('button', {
+                type: 'button', clase: 'quitar', title: 'Quitar',
+                onclick: () => fijar('artists', puestos.filter((x) => x !== slug), { repintar: true }),
+              }, '×'),
+            ),
+          ),
+        ),
+        buscador,
+      );
+    }
+
+    /** Un artista nuevo, creado desde el nombre escrito en la barra. */
+    function crearArtista(texto) {
+      const nombre = texto.trim();
+      if (!nombre) return;
+
+      const { artists } = leer();
+      const busca = nombre.toLowerCase();
+      // Aun viniendo del botón de crear, se comprueba: la barra compara sin
+      // tildes y podría dejar pasar una grafía que aquí sí se reconoce.
+      const encontrado = artists.find(
+        (a) =>
+          a.display.toLowerCase() === busca ||
+          a.slug === slugificar(nombre) ||
+          (a.aliases ?? []).some((x) => x.toLowerCase() === busca),
+      );
+
+      let slug = encontrado?.slug;
+      if (!slug) {
+        slug = slugLibre(nombre, new Set(artists.map((a) => a.slug)));
+        tocar({ artists: [...artists, { slug, display: nombre }] });
+      }
+
+      const puestos = release()?.artists ?? [];
+      if (puestos.includes(slug)) return pintarFormulario();
+      fijar('artists', [...puestos, slug], { repintar: true });
+    }
+
+    /**
+     * Renombrar es cambiar cómo se escribe, en todas partes a la vez.
+     *
+     * La grafía vieja se guarda como alias sin preguntar. No es un detalle:
+     * es lo único que hace que el importador de Bandcamp reconozca a alguien
+     * que ya está en vez de crear un duplicado — y no hay ninguna razón para
+     * que quien está corrigiendo una tilde tenga que enterarse de eso.
+     */
+    function renombrarArtista(slug) {
+      const { artists } = leer();
+      const a = artists.find((x) => x.slug === slug);
+      if (!a) return;
+
+      const nuevo = prompt('¿Cómo se escribe?', a.display)?.trim();
+      if (!nuevo || nuevo === a.display) return;
+
+      const alias = [...new Set([...(a.aliases ?? []), a.display])].filter((x) => x !== nuevo);
+      tocar({
+        artists: artists.map((x) => (x.slug === slug ? { ...x, display: nuevo, aliases: alias } : x)),
+      });
+      pintarLista();
+      pintarFormulario();
+    }
+
+    // ── carátula y links ────────────────────────────────────────────────────
+
+    function bloqueEnlaces(r) {
+      const vista = el('img', {
+        clase: 'miniatura', style: 'width:3.5rem; height:3.5rem',
+        src: cover(r.bcImageId, 6), alt: '',
+      });
+
+      return bloque(
+        'Carátula y links',
+        [
+          el('p', { html: 'La carátula se importa de Bandcamp. También puedes pegar su código.' }),
+          el('p', { html: 'Añade los enlaces de compra y escucha.' }),
+        ],
+        el('div', { clase: 'fila' },
+          campo('Código de la carátula', el('input', {
+            type: 'text', id: 'campoCaratula', value: r.bcImageId ?? '', placeholder: 'a750972864',
+            oninput: (e) => { const v = e.target.value.trim(); vista.src = cover(v, 6); fijar('bcImageId', v); },
+          })),
+          el('div', { style: 'flex:0 0 auto' }, vista),
+        ),
+        campo('Link para comprar', entrada('purchaseUrl', { type: 'url', id: 'campoComprar', placeholder: 'https://…bandcamp.com/album/…' })),
+        campo('Link para escuchar', entrada('listenUrl', { type: 'url', id: 'campoEscuchar', placeholder: 'https://linktr.ee/…' })),
+      );
+    }
+
+    // ── créditos: el bloque de texto, como siempre se escribió ──────────────
+
+    function bloqueCreditos(r) {
+      const fecha = r.date
+        ? new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+            .format(new Date(`${r.date}T00:00:00Z`))
+        : 'July 3, 2026';
+
+      // Un release que todavía no pasó por aquí puede traer su última línea
+      // en `note`, que es donde vivía antes. Se muestra en su sitio —al final
+      // del bloque— y a la primera edición queda guardada donde va.
+      const juntos = [...(r.credits ?? []), ...analizar(r.note ?? '').creditos];
+
+      const area = el('textarea', {
+        id: 'campoCreditos',
+        rows: 8,
+        spellcheck: 'false',
+        placeholder: 'Rol__ Nombre',
+        value: escribirCreditos(juntos),
+        oninput: (e) => {
+          const { creditos, fecha: pegada } = analizar(e.target.value);
+          // Si alguien pega el bloque entero con su `Released__` adentro y
+          // aquí no había fecha, se aprovecha. Si ya había, manda la de arriba:
+          // dos fechas que se contradicen es peor que una sola.
+          if (pegada && !release()?.date) {
+            const d = new Date(pegada);
+            if (!Number.isNaN(d.getTime())) fijar('date', d.toISOString().slice(0, 10), { repintar: true });
+          }
+          fijar('credits', creditos);
+          if (release()?.note) fijar('note', '');
+        },
+      });
+
+      return bloque(
+        'Créditos',
+        [
+          el('p', { html: 'Un crédito por línea: <code>Mastering__ Beau Thomas</code>.' }),
+          el('p', { html: `La fecha se añade desde el campo Fecha: <code>Released__ ${fecha}</code>.` }),
+        ],
+        area,
+      );
+    }
+
+    // ── el material de la portada, que vive con su release ──────────────────
+
+    function bloquePortada(r) {
+      const aviso = el('p', { clase: 'parte', hidden: true, style: 'margin:0.6rem 0 0' });
+      const subidor = hacerSubidor({ actual: release, fijar, aviso });
+      const poster = montarPoster({ actual: release, fijar, aviso, subidor });
+
+      return bloque(
+        'Material de portada',
+        [
+          el('p', { html: 'Arte propio reemplaza la carátula.' }),
+          el('p', { html: 'Video y póster son opcionales.' }),
+          el('p', { html: 'En la grieta, <code>*</code> separa ambos grupos.' }),
+        ],
+        campoArte(r, subidor),
+        campoVideo(subidor, poster),
+        poster.nodo,
+        campo('Texto de la grieta', el('input', {
+          type: 'text', value: r.home?.texto ?? '',
+          placeholder: franjaPorDefecto(r),
+          oninput: (e) => fijar('home.texto', e.target.value),
+        })),
+        aviso,
+      );
+    }
+
+    /**
+     * El video, y el póster que lo sigue.
+     *
+     * El póster se destapa solo cuando hay video: al subir uno, con los cinco
+     * cuadros ya sacados del archivo que está en la mano; y al escribir la ruta
+     * a mano, con el botón para sacarlos del que ya está subido.
+     */
+    function campoVideo(subidor, poster) {
+      const nodo = subidor('Video', 'home.video.mp4', 'video', 'video/mp4,video/webm', {
+        id: 'campoVideo',
+        alElegir: (file) => poster.desdeArchivo(file),
+      });
+      nodo.addEventListener('input', () => poster.revisar());
+      return nodo;
+    }
+
+    /**
+     * El arte de portada, con lo que va a salir si nadie sube nada.
+     *
+     * La carátula de Bandcamp es el arte por defecto y no hay que copiarla a
+     * ninguna parte: el sitio la usa sola. Este campo existe para el caso
+     * contrario —una imagen hecha para la portada, que a pantalla completa se
+     * ve distinta— y por eso la miniatura dice de dónde sale la que hay.
+     */
+    function campoArte(r, subidor) {
+      const nodo = subidor('Arte de portada', 'home.arte', 'home', 'image/*', { id: 'campoArtePortada' });
+      const propio = Boolean(r.home?.arte);
+
+      nodo.append(
+        el('div', { clase: 'muestra' },
+          el('img', {
+            clase: 'miniatura',
+            src: propio ? urlDeMedia(r.home.arte) : cover(r.bcImageId, 6),
+            alt: '',
+          }),
+          el('small', { clase: 'pie' }, propio ? 'arte propio' : 'la carátula de Bandcamp'),
+        ),
+      );
+      return nodo;
+    }
+
+    /** Lo que va a salir en la franja si nadie escribe nada. */
+    function franjaPorDefecto(r) {
+      const nombre = nombresDe();
+      const quien = (r.artists ?? []).map((a) => nombre.get(a) ?? a).join(' & ');
+      return [r.album, quien].filter(Boolean).join('*') || 'Título*Artista';
+    }
+
+    const urlDeMedia = (ruta) => (/^https?:/.test(ruta) ? ruta : `/${String(ruta).replace(/^\//, '')}`);
+
+    // ── crear, borrar ───────────────────────────────────────────────────────
+
+    const menu = $('menuNuevo');
+    const cerrarMenu = () => {
+      menu.hidden = true;
+      $('abrirNuevo').setAttribute('aria-expanded', 'false');
+    };
+
+    $('abrirNuevo').addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.hidden = !menu.hidden;
+      $('abrirNuevo').setAttribute('aria-expanded', String(!menu.hidden));
+    });
+    addEventListener('click', (e) => { if (!menu.contains(e.target)) cerrarMenu(); });
+    addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarMenu(); });
+
+    $('nuevo').addEventListener('click', () => {
+      cerrarMenu();
+      $('cajaImport').hidden = true;
+
+      const { releases } = leer();
+      const id = slugLibre('nuevo-lanzamiento', new Set(releases.map((r) => r.id)));
+
+      tocar({
+        releases: [
+          {
+            id, catalog: '', album: '',
+            artists: [], date: new Date().toISOString().slice(0, 10),
+            bcImageId: '', purchaseUrl: '', listenUrl: '',
+            credits: [], order: 0,
+            // Nace oculto: casi siempre es un anuncio, y hacerlo visible antes
+            // de tener carátula lo mete roto al catálogo.
+            visible: false,
+          },
+          ...releases,
+        ].map((r, i) => ({ ...r, order: i + 1 })),
+      });
+
+      elegir(id);
+      const campoAlbum = $('campoAlbum');
+      campoAlbum?.focus();
+      campoAlbum?.scrollIntoView({ block: 'center' });
+    });
+
+    $('borrar').addEventListener('click', () => {
+      const r = release();
+      if (!r) return;
+      if (!confirm(`¿Borrar "${r.album || 'este lanzamiento'}"? Se quitará del sitio al guardar.`)) return;
+      const borrado = structuredClone(r);
+      tocar({ releases: leer().releases.filter((x) => x.id !== r.id) });
+      elegir(null);
+      const aviso = $('parteBorrado');
+      parte(aviso, { tono: 'ojo', texto: `«${borrado.album || 'Este lanzamiento'}» se quitará al guardar.` });
+      aviso.append(' ');
+      aviso.append(el('button', {
+        type: 'button', clase: 'como-link',
+        onclick: () => {
+          tocar({ releases: [borrado, ...leer().releases].map((x, i) => ({ ...x, order: i + 1 })) });
+          parte(aviso, {});
+          elegir(borrado.id);
+        },
+      }, 'Deshacer'));
+    });
+
+    // ── traer de Bandcamp ───────────────────────────────────────────────────
+
+    $('abrirImport').addEventListener('click', () => {
+      cerrarMenu();
+      $('cajaImport').hidden = false;
+      $('bcUrl').focus();
+    });
+
+    $('importar').addEventListener('click', async () => {
+      const url = $('bcUrl').value.trim();
+      if (!url) return;
+      const boton = $('importar');
+      boton.disabled = true;
+      parte($('parteImport'), { texto: 'Leyendo Bandcamp…' });
+
+      try {
+        const res = await fetch('/api/importar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+        if (res.status === 401) return (location.href = '/entrar?volver=/catalogo');
+        const datos = await res.json();
+        if (!res.ok) return parte($('parteImport'), { tono: 'mal', texto: datos.error });
+
+        const { releases, artists } = leer();
+        const nuevos = [...releases];
+        for (const traido of datos.releases) {
+          const i = nuevos.findIndex((r) => r.id === traido.id);
+          // Un release que ya está no se pisa entero: se le respetan los
+          // campos que Bandcamp no sabe —el linktree, el material del home,
+          // el orden— y se le actualiza el resto.
+          if (i >= 0) nuevos[i] = { ...traido, ...conservar(nuevos[i]) };
+          else nuevos.unshift(traido);
+        }
+
+        // Los artistas que Bandcamp nombró y aquí no existen se crean sin
+        // preguntar: preguntarlo es pedirle a alguien que decida sobre una
+        // llave interna que el studio prometió no mostrarle.
+        const tomados = new Set(artists.map((a) => a.slug));
+        const estrenados = (datos.faltantes ?? []).filter(([slug]) => !tomados.has(slug));
+        const conArtistas = estrenados.length
+          ? [...artists, ...estrenados.map(([slug, display]) => ({ slug, display }))]
+          : artists;
+
+        tocar({ releases: nuevos.map((r, i) => ({ ...r, order: i + 1 })), artists: conArtistas });
+
+        parte($('parteImport'), {
+          tono: 'bien',
+          texto: `${datos.releases.length} lanzamiento(s) importado(s)${estrenados.length ? ` · ${estrenados.length} artista(s) creado(s)` : ''}.`,
+        });
+
+        $('bcUrl').value = '';
+        elegir(datos.releases[0]?.id ?? activo);
+      } catch (e) {
+        parte($('parteImport'), { tono: 'mal', texto: e.message });
+      } finally {
+        boton.disabled = false;
+      }
+    });
+
+    const conservar = ({ listenUrl, home, visible, order }) => ({
+      ...(listenUrl ? { listenUrl } : null),
+      ...(home ? { home } : null),
+      ...(visible != null ? { visible } : null),
+      ...(order != null ? { order } : null),
+    });
+
+    // ── la ayuda de la sección ──────────────────────────────────────────────
+
+    $('ayudaCatalogo').addEventListener('click', (e) => {
+      const caja = $('textoCatalogo');
+      caja.hidden = !caja.hidden;
+      e.currentTarget.setAttribute('aria-expanded', String(!caja.hidden));
+    });
+
+    // ── guardar, y qué hacer si el servidor dice que no ─────────────────────
+
+    montarBarra({
+      alFallar(errores) {
+        const i = errores.map(indiceDelError).find((n) => n != null);
+        if (i == null) return;
+        const culpable = leer().releases[i];
+        if (culpable && culpable.id !== activo) elegir(culpable.id);
+        // La franja de arriba ya enumera lo que falta y lleva a cada campo.
+        $('obra')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+    });
+
+    // ── arranque ────────────────────────────────────────────────────────────
+
+    if (arranque.desfasado) {
+      parte($('parteDesfase'), {
+        tono: 'ojo',
+        texto:
+          'Hay una versión más reciente. Tu copia local sigue disponible.',
+      });
+      $('parteDesfase').append(' ');
+      $('parteDesfase').append(
+        el('button', { type: 'button', clase: 'como-link', onclick: () => { recuperarBorrador(); location.reload(); } }, 'Recuperar mi copia'),
+        document.createTextNode(' · '),
+        el('button', { type: 'button', clase: 'como-link', onclick: () => { descartarBorrador(); parte($('parteDesfase'), {}); } }, 'Descartar mi copia'),
+      );
+    }
+
+    document.body.dataset.vista = activo ? 'obra' : 'lista';
+    pintarLista();
+    pintarFormulario();
+  </script>
+</Marco>

@@ -1,0 +1,131 @@
+---
+/**
+ * La previsualización en vivo.
+ *
+ * No es una maqueta: son **los widgets del sitio**, el mismo `ttx.js` que se
+ * pega en Cargo, montados sobre el borrador que hay en esta pestaña. Por eso
+ * el panel vive en este repo y no aparte — es lo único que permite ver un
+ * lanzamiento entero antes de commitearlo.
+ *
+ * El truco es de una línea: el bundle lee sus datos con `fetch` desde la
+ * carpeta que le diga `data-ttx-datos`, así que aquí se le cambia el `fetch`
+ * por debajo y se le contesta con el borrador. El widget no se entera y no
+ * tiene que enterarse: cualquier gancho que le añadiéramos para esto sería
+ * código de panel viviendo dentro del sitio.
+ *
+ * Se abre en una ventana aparte (`target="ttx-vista"`) y no en un `iframe` del
+ * formulario, porque el home y el About se juzgan a pantalla completa y con
+ * la mano puesta encima.
+ */
+export const prerender = false;
+
+const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchParams.get('w'))
+  ? Astro.url.searchParams.get('w')
+  : 'home';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Vista · {cual}</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html, body { margin: 0; height: 100%; background: #d8d5cf; color: #000;
+        font-family: ui-sans-serif, system-ui, sans-serif; overscroll-behavior: none; }
+
+      /* La barra de Cargo, imitada — la que el video no invade. Igual que en
+         las previews del repo: está para juzgar proporciones, no es el nav. */
+      .chrome { position: fixed; inset: auto 0 0 0; z-index: 3; display: flex;
+        justify-content: space-between; align-items: center; height: 1.6rem;
+        padding: 0 0.6rem; background: #fff; border-top: 1px solid rgba(0,0,0,0.22);
+        font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+      .chrome b { font-weight: 700; }
+      .chrome a { color: inherit; text-decoration: none; }
+      .chrome a[aria-current] { font-weight: 700; }
+
+      .sello { position: fixed; top: 0; left: 0; z-index: 4; padding: 0.3rem 0.6rem;
+        background: #000; color: #fff; font: 400 10px/1 ui-monospace, monospace;
+        text-transform: uppercase; letter-spacing: 0.06em; }
+      .sello.viejo { background: #a16207; }
+    </style>
+  </head>
+  <body>
+    <span class="sello" id="sello">borrador</span>
+
+    <!-- El mismo placeholder que se pega en Cargo, con las mismas variables de
+         calibración. `--ttx-nav-h` deja abajo el hueco de la barra. -->
+    <div data-ttx={cual} data-catalogo="/vista?w=catalogo" style="--ttx-nav-h: 1.6rem"></div>
+
+    <div class="chrome">
+      <span>2026 © Todos los izquierdos públicos</span>
+      <span>
+        <a href="/vista?w=home" aria-current={cual === 'home' ? 'true' : null}>Home</a> ·
+        <a href="/vista?w=catalogo" aria-current={cual === 'catalogo' ? 'true' : null}>Catálogo</a> ·
+        <a href="/vista?w=about" aria-current={cual === 'about' ? 'true' : null}>About</a>
+        · <a href="/vista?w=blog" aria-current={cual === 'blog' ? 'true' : null}>Blog</a>
+      </span>
+      <span>Menu: About Catalog Merca Blog</span>
+    </div>
+
+    <!-- Antes del bundle, sin módulos y sin esperar: el widget arranca en
+         cuanto se evalúa `ttx.js`, así que el `fetch` ya tiene que estar
+         cambiado cuando eso pase. -->
+    <script is:inline>
+      (() => {
+        // Del espejo en `localStorage`, no del `sessionStorage` de esta
+        // ventana: el segundo es una copia congelada del momento en que el
+        // navegador abrió la pestaña, y se quedaba vieja en cuanto se tocaba
+        // algo al otro lado. Ver `lib/borrador.js:ESPEJO`.
+        const LLAVE = 'ttx-borrador-vista';
+        let borrador = null;
+        try {
+          borrador = JSON.parse(localStorage.getItem(LLAVE) || 'null');
+        } catch { /* un borrador ilegible es como no tener ninguno */ }
+
+        const sello = document.getElementById('sello');
+        if (!borrador) {
+          sello.textContent = 'sin borrador · datos publicados';
+          sello.classList.add('viejo');
+          return; // sin borrador, que lea `data/` como cualquiera
+        }
+        const sucio = ['releases', 'artists', 'home', 'about', 'blog'].some(
+          (a) => borrador.base?.[a] !== undefined && JSON.stringify(borrador[a] ?? null) !== borrador.base[a],
+        );
+        sello.textContent = sucio ? 'borrador · sin guardar' : 'borrador · igual al repo';
+
+        const DEL_BORRADOR = {
+          'releases.json': () => borrador.releases,
+          'artists.json': () => borrador.artists,
+          'home.json': () => borrador.home,
+          'about.json': () => borrador.about,
+          'blog.json': () => borrador.blog,
+        };
+
+        const original = window.fetch.bind(window);
+        window.fetch = (entrada, opciones) => {
+          const url = String(entrada?.url ?? entrada);
+          const archivo = url.split('/').pop()?.split('?')[0];
+          const dar = DEL_BORRADOR[archivo];
+
+          // Solo se intercepta lo que pide del propio `data/`: el resto
+          // —material, cualquier cosa de fuera— sigue su camino.
+          if (!dar || !url.includes('/data/')) return original(entrada, opciones);
+
+          const valor = dar();
+          if (valor == null) return original(entrada, opciones);
+
+          return Promise.resolve(
+            new Response(JSON.stringify(valor), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' },
+            }),
+          );
+        };
+      })();
+    </script>
+
+    <script is:inline src="/ttx.js" data-ttx-datos="/data/" defer></script>
+  </body>
+</html>
