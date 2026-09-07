@@ -1,10 +1,46 @@
 {
-  "highlight": { "article": "crack-magazine-colombian-label", "image": "", "imageAlt": "" },
-  "ticker": { "label": "LAST NEWS", "text": "The Colombian label is leading a Latin American dance movement where diasporic traditions merge with UK bass and techno. But with recognition often comes tokenisation – and they’re resisting.", "url": "" },
+  "highlight": {
+    "article": "crack-magazine-colombian-label",
+    "image": "",
+    "imageAlt": ""
+  },
+  "ticker": {
+    "label": "LAST NEWS",
+    "text": "The Colombian label is leading a Latin American dance movement where diasporic traditions merge with UK bass and techno. But with recognition often comes tokenisation – and they’re resisting.",
+    "url": ""
+  },
   "items": [
-    { "id": "crack-magazine-colombian-label", "title": "CRACK MAGAZINE", "text": "The Colombian label is leading a Latin American dance movement where diasporic traditions merge with UK bass and techno. But with recognition often comes tokenisation – and they’re resisting.", "url": "", "order": 1, "visible": true },
-    { "id": "mixmag-changa-tuki", "title": "MIXMAG MAGAZINE __ READ", "text": "In the decades following the birth of Caracas’ raptor house/changa tuki scene, two pioneers have been central to its story, yet despite their journeys being so intertwined, they have never played together.", "url": "", "order": 2, "visible": true },
-    { "id": "resident-advisor-pyrexia", "title": "RESIDENT ADVISOR", "text": "Ehua and Flore announce collaborative EP on TraTraTrax, Pyrexia. The first collaboration between the two artists based in London and Lyon respectively.", "url": "", "order": 3, "visible": true },
-    { "id": "pitchfork-nick-leon", "title": "PITCHFORK", "text": "Nick León: A Tropical Entropy. The Miami DJ-producer caps his remarkable ascent over the past few years.", "url": "", "order": 4, "visible": true }
+    {
+      "id": "crack-magazine-colombian-label",
+      "title": "CRACK MAGAZINE",
+      "text": "The Colombian label is leading a Latin American dance movement where diasporic traditions merge with UK bass and techno. But with recognition often comes tokenisation – and they’re resisting.",
+      "url": "",
+      "order": 1,
+      "visible": true
+    },
+    {
+      "id": "mixmag-changa-tuki",
+      "title": "MIXMAG MAGAZINE __ READ",
+      "text": "In the decades following the birth of Caracas’ raptor house/changa tuki scene, two pioneers have been central to its story, yet despite their journeys being so intertwined, they have never played together.",
+      "url": "",
+      "order": 2,
+      "visible": true
+    },
+    {
+      "id": "resident-advisor-pyrexia",
+      "title": "RESIDENT ADVISOR",
+      "text": "Ehua and Flore announce collaborative EP on TraTraTrax, Pyrexia. The first collaboration between the two artists based in London and Lyon respectively.",
+      "url": "",
+      "order": 3,
+      "visible": true
+    },
+    {
+      "id": "pitchfork-nick-leon",
+      "title": "PITCHFORK",
+      "text": "Nick León: A Tropical Entropy. The Miami DJ-producer caps his remarkable ascent over the past few years.",
+      "url": "",
+      "order": 4,
+      "visible": true
+    }
   ]
 }
