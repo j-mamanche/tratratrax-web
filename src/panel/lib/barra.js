@@ -265,9 +265,13 @@ export function montarBarra({ alFallar } = {}) {
     }
 
     const errores = resultado.errores ?? [];
-    conflictos = errores.length ? errores : (resultado.error ? [resultado.error] : []);
+    // Un 422 trae campos concretos por corregir. Un 500, una sesión vencida
+    // o una caída temporal de GitHub no son conflictos del contenido y no se
+    // deben presentar como si la persona tuviera algo que editar.
+    conflictos = errores;
     refrescar();
-    abrirDetalle();
+    if (errores.length) abrirDetalle();
+    else cerrarDetalle();
     parte(aviso, {
       tono: resultado.choque ? 'ojo' : 'mal',
       texto: resultado.error,

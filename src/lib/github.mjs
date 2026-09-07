@@ -97,7 +97,9 @@ async function pedir(cfg, ruta, opciones = {}) {
     throw new Choque(mensaje);
   }
 
-  throw new Error(`GitHub ${res.status}: ${mensaje}`);
+  // La ruta no contiene secretos y hace posible saber qué archivo o acción
+  // rechazó GitHub sin tener que adivinarlo desde el navegador.
+  throw new Error(`GitHub ${res.status} en ${ruta}: ${mensaje}`);
 }
 
 /**
