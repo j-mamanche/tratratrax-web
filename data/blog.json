@@ -1,46 +1,21 @@
 {
-  "highlight": {
-    "article": "crack-magazine-colombian-label",
-    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPhi9f_8AKckNT2yiZDFDHCyFvEsXOmZxSFBEO1rZQJvFvdVHcjOJzQjs&s=10",
-    "imageAlt": ""
-  },
-  "ticker": {
-    "label": "LAST NEWS",
-    "text": "The Colombian label is leading a Latin American dance movement where diasporic traditions merge with UK bass and techno. But with recognition often comes tokenisation – and they’re resisting.",
-    "url": ""
-  },
+  "highlight": { "article": "crack-magazine-keep-it-moving", "image": "https://crackmagazine.net/wp-content/uploads/2023/10/Issue-149-Cover-Web-scaled.jpg", "imageAlt": "Portada del número 149 de Crack Magazine con TraTraTrax" },
+  "ticker": { "label": "PRENSA", "text": "Crack Magazine llevó a TraTraTrax a la portada de su número 149 y publicó el perfil «Keep It Moving» en noviembre de 2023.", "url": "https://crackmagazine.net/article/profiles/tra-tra-trax/" },
   "items": [
-    {
-      "id": "crack-magazine-colombian-label",
-      "title": "CRACK MAGAZINE",
-      "text": "The Colombian label is leading a Latin American dance movement where diasporic traditions merge with UK bass and techno. But with recognition often comes tokenisation – and they’re resisting.",
-      "url": "https://www.youtube.com/watch?v=XYQnkBkwnFE&list=PLv3TTBr1W_9tppikBxAE_G6qjWdBljBHJ&index=847",
-      "order": 1,
-      "visible": true
-    },
-    {
-      "id": "mixmag-changa-tuki",
-      "title": "MIXMAG MAGAZINE __ READ",
-      "text": "In the decades following the birth of Caracas’ raptor house/changa tuki scene, two pioneers have been central to its story, yet despite their journeys being so intertwined, they have never played together.",
-      "url": "",
-      "order": 2,
-      "visible": true
-    },
-    {
-      "id": "resident-advisor-pyrexia",
-      "title": "RESIDENT ADVISOR",
-      "text": "Ehua and Flore announce collaborative EP on TraTraTrax, Pyrexia. The first collaboration between the two artists based in London and Lyon respectively.",
-      "url": "https://weirdbaile.bandcamp.com/album/collected-rips-2004-2024",
-      "order": 3,
-      "visible": true
-    },
-    {
-      "id": "pitchfork-nick-leon",
-      "title": "PITCHFORK",
-      "text": "Nick León: A Tropical Entropy. The Miami DJ-producer caps his remarkable ascent over the past few years.",
-      "url": "",
-      "order": 4,
-      "visible": true
-    }
+    { "id": "crack-magazine-keep-it-moving", "title": "CRACK MAGAZINE — Keep It Moving (2023)", "text": "Perfil de portada sobre Nyksan, Verraco y DJ Lomalinda: el medio sitúa al sello colombiano en una conversación global sobre música de club latinoamericana.", "url": "https://crackmagazine.net/article/profiles/tra-tra-trax/", "order": 10, "visible": true },
+    { "id": "crack-magazine-ambie-ton", "title": "CRACK MAGAZINE — Ambie-Tón (2024)", "text": "Crack anunció el sublabel ambient Ambie-Tón y su primer lanzamiento: Ruido y Flor, un EP de seis temas de Ezmeralda.", "url": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/", "order": 8, "visible": true },
+    { "id": "crack-magazine-xstasis-best-2022", "title": "CRACK MAGAZINE — Best Songs of 2022", "text": "Crack incluyó «Xtasis» de Nick León feat. DJ Babatr, editada por TraTraTrax, entre sus 25 mejores canciones de 2022.", "url": "https://crackmagazine.net/article/list-article/best-songs-2022/", "order": 11, "visible": true },
+    { "id": "crack-magazine-bikini-best-2024", "title": "CRACK MAGAZINE — Best Tracks of 2024", "text": "«Bikini», de Nick León y Erika de Casier para TraTraTrax, fue seleccionada por Crack entre las 25 mejores canciones de 2024.", "url": "https://crackmagazine.net/article/list-article/best-tracks-2024/", "order": 4, "visible": true },
+    { "id": "crack-magazine-mzansi-bass", "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)", "text": "Crack presentó Mzansi Bass, sampler de TraTraTrax comisariado por Shannen SP con artistas de la escena club sudafricana.", "url": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/", "order": 1, "visible": true },
+    { "id": "resident-advisor-pyrexia", "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)", "text": "Resident Advisor anunció Pyrexia, el EP colaborativo de Ehua y Flore para TraTraTrax, con remezclas de dBridge y Martyn.", "url": "https://ra.co/news/84991", "order": 3, "visible": true },
+    { "id": "resident-advisor-doctor-jeep-mecha", "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)", "text": "RA reseñó Mecha de Doctor Jeep para TraTraTrax y destacó su uso de voces de baile funk sobre música de club percusiva.", "url": "https://ra.co/reviews/36152", "order": 7, "visible": true },
+    { "id": "pitchfork-nick-leon-xtasis", "title": "PITCHFORK — Nick León: Xtasis (2022)", "text": "Pitchfork reseñó «Xtasis» con DJ Babatr como adelanto del EP de Nick León para TraTraTrax.", "url": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/", "order": 14, "visible": true },
+    { "id": "pitchfork-lechuga-zafiro", "title": "PITCHFORK — Lechuga Zafiro (2024)", "text": "Pitchfork recomendó Desde los Oídos de un Sapo de Lechuga Zafiro y señaló que era su debut en TraTraTrax.", "url": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/", "order": 6, "visible": true },
+    { "id": "mixmag-verraco-profile", "title": "MIXMAG — Verraco profile (2024)", "text": "Mixmag perfiló a Verraco y describió a TraTraTrax, que codirige con Nyksan y DJ Lomalinda, como una fuerza global de la música de club.", "url": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia", "order": 5, "visible": true },
+    { "id": "mixmag-shannen-sp", "title": "MIXMAG — The Mix 114: Shannen SP (2026)", "text": "Mixmag entrevistó a Shannen SP sobre Mzansi Bass, su compilación para TraTraTrax conectada con sonidos de club de Sudáfrica.", "url": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno", "order": 2, "visible": true },
+    { "id": "dj-mag-no-pare-sigue-sigue", "title": "DJ MAG — no pare, sigue sigue (2022)", "text": "DJ Mag cubrió no pare, sigue sigue, la décima y entonces mayor compilación de TraTraTrax, con 16 temas.", "url": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila", "order": 13, "visible": true },
+    { "id": "dj-mag-no-pare-sigue-sigue-2", "title": "DJ MAG — no pare, sigue sigue 2 (2024)", "text": "DJ Mag anunció no pare, sigue sigue 2: 18 pistas y un elenco internacional, en un puente propuesto por el sello entre Sudamérica y el Reino Unido.", "url": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more", "order": 9, "visible": true },
+    { "id": "dj-mag-nick-leon-xtasis", "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)", "text": "DJ Mag estrenó «Xtasis» y documentó el EP de Nick León para TraTraTrax, con participaciones de DJ Babatr, Pearson Sound y Doctor Jeep.", "url": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr", "order": 15, "visible": true },
+    { "id": "bandcamp-daily-no-pare-sigue-sigue", "title": "BANDCAMP DAILY — Essential Releases (2022)", "text": "Bandcamp Daily eligió no pare, sigue sigue como lanzamiento esencial y resaltó su reunión de productores de la diáspora latina.", "url": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022", "order": 12, "visible": true }
   ]
 }

@@ -165,17 +165,30 @@ window.addEventListener('load', function () {
   const HOLD_TIME = 1500;
 
   reveal.addEventListener("mouseenter", function () {
+    if (window.__ttxSuppressLogoHoverUntilLeave) return;
     if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
     reveal.classList.add("is-open");
   });
 
   reveal.addEventListener("mouseleave", function () {
     if (closeTimer) clearTimeout(closeTimer);
+    // Cargo navega por AJAX: al llegar al home el cursor puede seguir encima
+    // del logo. No reabrimos el reveal hasta que el cursor salga una vez.
+    window.__ttxSuppressLogoHoverUntilLeave = false;
     closeTimer = setTimeout(function () {
       reveal.classList.remove("is-open");
       closeTimer = null;
     }, HOLD_TIME);
   });
+
+  const logoLink = reveal.querySelector(".logo-mark[href]");
+  if (logoLink) {
+    logoLink.addEventListener("click", function () {
+      window.__ttxSuppressLogoHoverUntilLeave = true;
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      reveal.classList.remove("is-open");
+    });
+  }
 })();
 </script>
 

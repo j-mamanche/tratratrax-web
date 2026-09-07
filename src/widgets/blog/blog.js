@@ -11,7 +11,12 @@ async function cargarBlog() {
   return res.json();
 }
 function enlace(item) {
-  return elemento(item.url ? 'a' : 'span', item.url ? { href: item.url, target: '_blank', rel: 'noopener noreferrer' } : {}, item.title);
+  return elemento(item.url ? 'a' : 'span', item.url ? { href: item.url, target: '_blank', rel: 'noopener noreferrer' } : {},
+    item.title,
+    elemento('span', { class: 'ttx-blog-read', 'aria-hidden': 'true' },
+      elemento('span', { class: 'ttx-blog-read-line' }, '__'),
+      elemento('span', { class: 'ttx-blog-read-word' }, 'READ'))
+  );
 }
 function tarjeta(item, highlight = false) {
   return elemento('article', { class: `ttx-blog-card${highlight ? ' ttx-blog-highlight-copy' : ''}` },
