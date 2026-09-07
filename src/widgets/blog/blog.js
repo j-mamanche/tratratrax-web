@@ -15,7 +15,10 @@ function enlace(item) {
 }
 function tarjeta(item, highlight = false) {
   return elemento('article', { class: `ttx-blog-card${highlight ? ' ttx-blog-highlight-copy' : ''}` },
-    elemento(highlight ? 'h1' : 'b', { class: 'ttx-blog-title' }, enlace(item)), item.text ? elemento('p', {}, item.text) : null);
+    // El highlight es una tarjeta editorial, no el título principal de la
+    // página. Usa la misma jerarquía y la misma escala que el archivo para
+    // que Cargo no le aplique su h1 global de 4rem.
+    elemento('b', { class: 'ttx-blog-title' }, enlace(item)), item.text ? elemento('p', {}, item.text) : null);
 }
 
 // El color no se desvanece: al salir queda exactamente RASTRO ms y se apaga

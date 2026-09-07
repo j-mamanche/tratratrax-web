@@ -42,6 +42,10 @@
   overflow: visible !important;
 }
 
+/* Respaldo para navegadores que no implementen :has(). El widget aplica el
+   mismo desbloqueo como estilo temporal en cada ancestro y lo revierte al
+   salir de la landing. */
+
 /* La primera visita de cañas se gana el nav: al principio no intercepta el
    corte, y entra después de los diez segundos que controla canas.js. Fuera de
    la landing estas reglas no existen y Cargo conserva su nav normal. */
@@ -54,6 +58,15 @@ html[data-ttx-canas-activa] :is([id='L3482832595'], [id='N1901077103']).page {
 html[data-ttx-canas-activa][data-ttx-canas-nav-visible]
   :is([id='L3482832595'], [id='N1901077103']).page {
   opacity: 1;
+}
+
+/* La página fija de Cargo cubre el viewport entero aunque el nav sólo ocupa
+   una franja al pie. Si recibe eventos, sus zonas transparentes se comen los
+   cortes de las cañas. La página deja pasar el puntero y sólo los controles
+   reales vuelven a ser interactivos cuando el nav ya está visible. */
+html[data-ttx-canas-activa][data-ttx-canas-nav-visible]
+  :is([id='L3482832595'], [id='N1901077103']).page
+  :is(a, button, input, select, textarea, [href], [role='button']) {
   pointer-events: auto;
 }
 

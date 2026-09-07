@@ -28,12 +28,25 @@ registrar('canas', async (host) => {
     class: 'ttx-canas-hoja', src: urlMedia('media/canas/machete.png'), alt: '',
   }));
   host.replaceChildren(lienzo, machete);
+  const marco = liberarMarcoDeCargo(host);
   const nav = controlarNavDeEntrada(host);
 
-  const [fondo, ...imagenes] = await Promise.all([
-    cargar('fondo.png'), ...capas.map(([archivo]) => cargar(archivo)),
-  ]);
-  const contexto = lienzo.getContext('2d', { alpha: false });
+  let recursos;
+  try {
+    recursos = await Promise.all([
+      cargar('fondo.png'), ...capas.map(([archivo]) => cargar(archivo)),
+    ]);
+  } catch (error) {
+    // Si una imagen falla, no dejamos el marco de Cargo ni la nav alterados.
+    marco.restaurar();
+    nav.destruir();
+    throw error;
+  }
+  const [fondo, ...imagenes] = recursos;
+  // Posterizar lee los píxeles al terminar cada cuadro. Declararlo desde la
+  // creación evita el aviso de Canvas2D y reserva una superficie adecuada para
+  // lecturas frecuentes; sigue siendo opaca porque la escena no lleva alfa.
+  const contexto = lienzo.getContext('2d', { alpha: false, willReadFrequently: true });
   const estado = imagenes.map((imagen, indice) => ({
     imagen, alfa: crearMapaAlfa(imagen), baseY: 0, indice,
   }));
@@ -212,12 +225,47 @@ registrar('canas', async (host) => {
       host.removeEventListener('pointermove', mover);
       host.removeEventListener('pointerdown', cortar);
       host.removeEventListener('ttx:canas-reiniciar', reiniciar);
+      marco.restaurar();
       nav.destruir();
       clearTimeout(golpe);
       if (raf) cancelAnimationFrame(raf);
     },
   };
 });
+
+/* Cargo anima sus páginas dentro de varias envolturas. En algunas entradas
+   esas envolturas retienen `overflow: hidden` durante (y a veces después de)
+   la transición AJAX. Un hijo fixed no puede salir de ese recorte y termina
+   mostrándose solo hasta la altura de la página. Abrimos únicamente la cadena
+   de ancestros de esta escena y restauramos cada estilo al desmontarla. */
+function liberarMarcoDeCargo(host) {
+  const cambios = [];
+
+  for (let nodo = host.parentElement; nodo && nodo !== document.documentElement; nodo = nodo.parentElement) {
+    for (const propiedad of ['overflow', 'overflow-x', 'overflow-y', 'clip-path']) {
+      cambios.push({
+        nodo,
+        propiedad,
+        valor: nodo.style.getPropertyValue(propiedad),
+        prioridad: nodo.style.getPropertyPriority(propiedad),
+      });
+      nodo.style.setProperty(
+        propiedad,
+        propiedad === 'clip-path' ? 'none' : 'visible',
+        'important',
+      );
+    }
+  }
+
+  return {
+    restaurar() {
+      cambios.forEach(({ nodo, propiedad, valor, prioridad }) => {
+        if (valor) nodo.style.setProperty(propiedad, valor, prioridad);
+        else nodo.style.removeProperty(propiedad);
+      });
+    },
+  };
+}
 
 /* La regla de la entrada vive aquí —junto con el evento que la dispara— y no
    en una página de Cargo. Así sobrevive a que Cargo reemplace la escena por
