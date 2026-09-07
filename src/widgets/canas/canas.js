@@ -28,6 +28,7 @@ registrar('canas', async (host) => {
     class: 'ttx-canas-hoja', src: urlMedia('media/canas/machete.png'), alt: '',
   }));
   host.replaceChildren(lienzo, machete);
+  const nav = controlarNavDeEntrada(host);
 
   const [fondo, ...imagenes] = await Promise.all([
     cargar('fondo.png'), ...capas.map(([archivo]) => cargar(archivo)),
@@ -142,8 +143,13 @@ registrar('canas', async (host) => {
 
   function colocarMachete() {
     // El punto de corte vive dentro de la hoja, más cerca de su centro que de
-    // la punta. El giro, en cambio, conserva el pivote físico del mango.
-    machete.style.transform = `translate3d(${machetePos.x}px, ${machetePos.y}px, 0) translate(-28%, -28%)`;
+    // la punta. El giro, en cambio, conserva el pivote físico del mango. El
+    // puntero viene en coordenadas de viewport; el machete es hijo del host,
+    // así que se convierte una vez a coordenadas locales antes de moverlo.
+    const caja = metrica?.caja ?? host.getBoundingClientRect();
+    const x = machetePos.x - caja.left;
+    const y = machetePos.y - caja.top;
+    machete.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-28%, -28%)`;
   }
 
   function puntoEscena(x, y) {
@@ -206,11 +212,72 @@ registrar('canas', async (host) => {
       host.removeEventListener('pointermove', mover);
       host.removeEventListener('pointerdown', cortar);
       host.removeEventListener('ttx:canas-reiniciar', reiniciar);
+      nav.destruir();
       clearTimeout(golpe);
       if (raf) cancelAnimationFrame(raf);
     },
   };
 });
+
+/* La regla de la entrada vive aquí —junto con el evento que la dispara— y no
+   en una página de Cargo. Así sobrevive a que Cargo reemplace la escena por
+   AJAX y no depende de que alguien duplique un cuarto script global.
+
+   Primera visita: el primer corte inicia la entrada de 10 s y entonces aparece
+   el nav. Visitas posteriores: aparece al montar. El flag persiste por
+   navegador, nunca por sesión de Cargo. */
+function controlarNavDeEntrada(host) {
+  const raiz = document.documentElement;
+  const clave = 'ttx-canas-nav-v1';
+  const duenio = {};
+  let espera = 0;
+
+  raiz.__ttxCanasNav = duenio;
+  raiz.dataset.ttxCanasActiva = '';
+
+  function yaVisto() {
+    try {
+      return localStorage.getItem(clave) === 'visto';
+    } catch {
+      return false;
+    }
+  }
+
+  function guardarVisita() {
+    try {
+      localStorage.setItem(clave, 'visto');
+    } catch {}
+  }
+
+  function mostrar() {
+    clearTimeout(espera);
+    espera = 0;
+    delete host.dataset.canasNavEntrando;
+    host.dataset.canasNavListo = '';
+    raiz.dataset.ttxCanasNavVisible = '';
+    guardarVisita();
+  }
+
+  function iniciarCuenta() {
+    if (yaVisto() || espera) return;
+    host.dataset.canasNavEntrando = '';
+    espera = window.setTimeout(mostrar, 10_000);
+  }
+
+  host.addEventListener('ttx:canas-primera-interaccion', iniciarCuenta);
+  if (yaVisto()) mostrar();
+
+  return {
+    destruir() {
+      clearTimeout(espera);
+      host.removeEventListener('ttx:canas-primera-interaccion', iniciarCuenta);
+      if (raiz.__ttxCanasNav !== duenio) return;
+      delete raiz.__ttxCanasNav;
+      delete raiz.dataset.ttxCanasActiva;
+      delete raiz.dataset.ttxCanasNavVisible;
+    },
+  };
+}
 
 function cargar(archivo) {
   return new Promise((resolve, reject) => {

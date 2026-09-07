@@ -12,7 +12,8 @@
   right: auto !important;
   bottom: auto !important;
   left: 50% !important;
-  z-index: 9999;
+  /* La escena queda por debajo de la bandera (9998) y del nav (9999). */
+  z-index: 9997;
   display: block;
   width: 100vw !important;
   max-width: none !important;
@@ -31,6 +32,31 @@
 
 [data-ttx='canas'][data-canas-activo] { cursor: none; }
 
+/* Cargo puede encerrar una página en capas con `overflow: hidden` mientras
+   hace la transición AJAX. Un `fixed` dentro de esa pila queda recortado a la
+   altura de la página y aparece el rectángulo verde de la captura. Solo la
+   página que contiene la entrada abre esas capas. */
+.page:has([data-ttx='canas']),
+.page:has([data-ttx='canas']) .page-content,
+.page:has([data-ttx='canas']) .page-layout {
+  overflow: visible !important;
+}
+
+/* La primera visita de cañas se gana el nav: al principio no intercepta el
+   corte, y entra después de los diez segundos que controla canas.js. Fuera de
+   la landing estas reglas no existen y Cargo conserva su nav normal. */
+html[data-ttx-canas-activa] :is([id='L3482832595'], [id='N1901077103']).page {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+
+html[data-ttx-canas-activa][data-ttx-canas-nav-visible]
+  :is([id='L3482832595'], [id='N1901077103']).page {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 [data-ttx='canas'] .ttx-canas-lienzo {
   display: block;
   width: 100%;
@@ -40,7 +66,11 @@
 }
 
 [data-ttx='canas'] .ttx-canas-machete {
-  position: fixed;
+  /* El host lleva transform para salir del marco de Cargo. `fixed` tomaría
+     ese host transformado como containing block y sumaría el desplazamiento
+     una segunda vez; absoluto + coordenadas locales mantiene la hoja bajo la
+     mano tanto en Cargo como en el preview. */
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 1;

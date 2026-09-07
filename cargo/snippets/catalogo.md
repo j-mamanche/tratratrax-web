@@ -7,7 +7,7 @@ Dos pegadas, y una de ellas solo se hace una vez en la vida del sitio.
 `Settings → Edit HTML → Global`, al final del `<head>`:
 
 ```html
-<script src="https://j-mamanche.github.io/tratratrax-web/ttx.js?v=2" defer></script>
+<script src="https://j-mamanche.github.io/tratratrax-web/ttx.js?v=3" defer></script>
 ```
 
 Eso es todo. El CSS va **dentro** del `ttx.js` y el script lo inyecta al
