@@ -1,5 +1,30 @@
 [
   {
+    "id": "collected-rips-2004-2024",
+    "catalog": "",
+    "album": "Collected rips 2004-2024",
+    "artists": [
+      "weird-baile"
+    ],
+    "date": "2026-10-16",
+    "bcImageId": "a3798891092",
+    "purchaseUrl": "https://weirdbaile.bandcamp.com/album/collected-rips-2004-2024",
+    "listenUrl": "",
+    "credits": [
+      {
+        "role": "Artwork",
+        "name": "Silvana Aponte"
+      },
+      {
+        "role": "Mastering",
+        "name": "Beau Thomas at Ten Eight Seven Mastering"
+      }
+    ],
+    "note": "All NRG produced in Rio de Janeiro, Belo Horizonte & São Paulo",
+    "order": 1,
+    "visible": true
+  },
+  {
     "id": "killing-mariposas",
     "catalog": "",
     "album": "Killing Mariposas",
@@ -7,11 +32,42 @@
       "luca-duran"
     ],
     "date": "2026-09-18",
-    "bcImageId": "",
-    "purchaseUrl": "",
+    "bcImageId": "a0019723017",
+    "purchaseUrl": "https://lucaduran.bandcamp.com/album/killing-mariposas",
     "listenUrl": "",
-    "credits": [],
-    "order": 0,
+    "credits": [
+      {
+        "texto": "All NRG programmed across Jamaica, Dominican Republic, UK, Mexico, Colombia, US, Korea, South Africa & Poland."
+      },
+      {
+        "role": "Mixing (1,8,9)",
+        "name": "James Rand"
+      },
+      {
+        "role": "Mixing (2,3,4,5,6,7)",
+        "name": "Remo Studer"
+      },
+      {
+        "role": "Artwork",
+        "name": "Jean-Vincent Simonet"
+      },
+      {
+        "role": "Layout",
+        "name": "Silvana Aponte"
+      },
+      {
+        "role": "Mastering",
+        "name": "Beau Thomas at Ten Eight Seven Mastering"
+      },
+      {
+        "role": "Executive Producer",
+        "name": "Kevin Rodriguez"
+      },
+      {
+        "texto": "Supported by the Swiss Arts Council Pro Helvetia, Stadt Zürich Kultur and Kanton Zürich / Fachstelle Kultur"
+      }
+    ],
+    "order": 2,
     "visible": false,
     "home": {
       "arte": "media/killing-mariposas.jpg",
@@ -43,7 +99,7 @@
         "name": "Beau Thomas"
       }
     ],
-    "order": 1,
+    "order": 3,
     "visible": true
   },
   {
@@ -66,7 +122,7 @@
         "texto": "All NRG programmed by Ehua, Flore, dBridge, Martyn between London, Lyon, Phuket, and Washington D.C."
       }
     ],
-    "order": 2,
+    "order": 4,
     "visible": true
   },
   {
@@ -93,7 +149,7 @@
         "texto": "All NRG programmed by 1OO1O, WOST, DNZA between Mexico D.F and Bogotá"
       }
     ],
-    "order": 3,
+    "order": 5,
     "visible": true
   },
   {
@@ -124,7 +180,7 @@
         "texto": "All NRG programmed by LWS, WOST & DJ Yirvin between Edinburgh, Bogotá and Caracas."
       }
     ],
-    "order": 4,
+    "order": 6,
     "visible": true
   },
   {
@@ -152,7 +208,7 @@
         "name": "J Guzmán"
       }
     ],
-    "order": 5,
+    "order": 7,
     "visible": true
   },
   {
@@ -180,7 +236,7 @@
         "name": "Caterina Haddad"
       }
     ],
-    "order": 6,
+    "order": 8,
     "visible": true
   },
   {
@@ -207,7 +263,7 @@
         "texto": "*Call Super & Parris remix mastered by Beau Thomas"
       }
     ],
-    "order": 7,
+    "order": 9,
     "visible": true
   },
   {
@@ -234,7 +290,7 @@
         "texto": "*Convextion remix is available only on Bandcamp"
       }
     ],
-    "order": 8,
+    "order": 10,
     "visible": true
   },
   {
@@ -267,7 +323,7 @@
         "name": "Phillip Windly Kim"
       }
     ],
-    "order": 9,
+    "order": 11,
     "visible": true
   },
   {
@@ -301,7 +357,7 @@
         "texto": "Bikini Mastered by Rashad Becker"
       }
     ],
-    "order": 10,
+    "order": 12,
     "visible": true
   },
   {
@@ -332,7 +388,7 @@
         "texto": "All NRG programmed by artistas que nos traman mucho"
       }
     ],
-    "order": 11,
+    "order": 13,
     "visible": true
   },
   {
@@ -363,7 +419,7 @@
         "texto": "Design layout by Jimena Madero"
       }
     ],
-    "order": 12,
+    "order": 14,
     "visible": true
   },
   {
@@ -388,7 +444,7 @@
         "name": "Seph"
       }
     ],
-    "order": 13,
+    "order": 15,
     "visible": true
   },
   {
@@ -423,7 +479,7 @@
         "texto": "Artwork by Ezra Miller"
       }
     ],
-    "order": 14,
+    "order": 16,
     "visible": true
   },
   {
@@ -447,7 +503,7 @@
         "name": "Cmdp"
       }
     ],
-    "order": 15,
+    "order": 17,
     "visible": true
   },
   {
@@ -472,7 +528,7 @@
         "name": "Seph"
       }
     ],
-    "order": 16,
+    "order": 18,
     "visible": true
   },
   {
@@ -499,7 +555,7 @@
         "texto": "** Shipping costs have got a bit crazy recently and we know times are tough so we looked into it and cheaper shipping is available. If you want to opt for the more affordable service, please put a note in the order form when checking out and we’ll get in touch. Please note however it can take up to four weeks outside of Europe (within Europe, it’s seven working days), and does not come with tracking so shipping is entirely at your own risk."
       }
     ],
-    "order": 17,
+    "order": 19,
     "visible": true
   },
   {
@@ -523,7 +579,7 @@
         "name": "Seph"
       }
     ],
-    "order": 18,
+    "order": 20,
     "visible": true
   },
   {
@@ -550,7 +606,7 @@
         "texto": "All NRG programmed by sound designers from Latino América, África and Europa."
       }
     ],
-    "order": 19,
+    "order": 21,
     "visible": true
   },
   {
@@ -577,7 +633,7 @@
         "texto": "All NRG programmed by Luca Durán, Parco Palaz, Perko & Laksa between Zurich, Copenhagen and London | 2023."
       }
     ],
-    "order": 20,
+    "order": 22,
     "visible": true
   },
   {
@@ -604,7 +660,7 @@
         "texto": "All NRG programmed by Badsista, DJ Marfox & Batu between Sao Paulo, Lisboa & Bristol | 2022 – 2023."
       }
     ],
-    "order": 21,
+    "order": 23,
     "visible": true
   },
   {
@@ -631,7 +687,7 @@
         "texto": "All NRG programmed by 3Phaz, Amazondotcom, E-Saggila, ZULI & OMAAR, between El Cairo, Montreal, el Estado de México & Los Ángeles 2022 – 2023."
       }
     ],
-    "order": 22,
+    "order": 24,
     "visible": true
   },
   {
@@ -658,7 +714,7 @@
         "texto": "All NRG programmed by Doctor Jeep, Aquarian, Hodge & Sam Binga between NYC, Berlin & Bristol 2022 – 2023"
       }
     ],
-    "order": 23,
+    "order": 25,
     "visible": true
   },
   {
@@ -685,7 +741,7 @@
         "texto": "All NRG programmed by Tomás Urquieta, re:ni, Rhyw and Siu Mata & Amor Satyr between NYC, Berlin, London and Paris 2021 – 2022"
       }
     ],
-    "order": 24,
+    "order": 26,
     "visible": true
   },
   {
@@ -712,7 +768,7 @@
         "texto": "All NRG programmed by latinxs + diáspora sudaca 2021 – 2022"
       }
     ],
-    "order": 25,
+    "order": 27,
     "visible": true
   },
   {
@@ -739,7 +795,7 @@
         "texto": "All NRG programmed by Quixosis, Mike Parker, Cando & Flore between Quito, Buffalo, Bristol & Lyon 2021 – 2022"
       }
     ],
-    "order": 26,
+    "order": 28,
     "visible": true
   },
   {
@@ -766,7 +822,7 @@
         "texto": "All NRG programmed by Nick León, DJ Babatr, Pearson Sound & Doctor Jeep between Miami, Caracas, NY, London 2021 – 2022"
       }
     ],
-    "order": 27,
+    "order": 29,
     "visible": true
   },
   {
@@ -794,7 +850,7 @@
         "texto": "All NRG programmed by Dengue Dengue Dengue, Prisma, DJ Python, Verraco between Berlin, New York & Medallo 2021 – 2022 |  www.tratratrax.com"
       }
     ],
-    "order": 28,
+    "order": 30,
     "visible": true
   },
   {
@@ -822,7 +878,7 @@
         "texto": "All NRG programmed by PVSSY, Entrañas, Lechuga Zafiro, Menzi between Sur América & Sur África, 2021 – 2022 |  www.insurgentes.co"
       }
     ],
-    "order": 29,
+    "order": 31,
     "visible": true
   },
   {
@@ -849,7 +905,7 @@
         "texto": "All nrg programmed by Nicola Cruz, Isabella Lovestory and Ehua between Quito, Montreal and London. Additional keys on 'O sea, sí te quiero' by Juan Diego Illescas"
       }
     ],
-    "order": 30,
+    "order": 32,
     "visible": true
   },
   {
@@ -876,7 +932,7 @@
         "texto": "Programmed by Nick León, Henzo, Kelman Duran, Maral between USA, UK & Sur América, 2021"
       }
     ],
-    "order": 31,
+    "order": 33,
     "visible": true
   },
   {
@@ -903,7 +959,7 @@
         "texto": "All NRG programmed by Luca Durán, Parco Palaz, Badsista, Ikonika between Europe & Sur América, 2021 |  www.insurgentes.co"
       }
     ],
-    "order": 32,
+    "order": 34,
     "visible": true
   },
   {
@@ -930,7 +986,7 @@
         "texto": "Programmed by OCTUBRXLIBRV + Florentino + AYA between Colombia & UK, 2020 — 2021 |  www.insurgentes.co"
       }
     ],
-    "order": 33,
+    "order": 35,
     "visible": true
   },
   {
@@ -958,7 +1014,7 @@
         "texto": "Programed by Bitter Babe x Nick León + Simo Cell between Miami, Bogotá & París, 2020"
       }
     ],
-    "order": 34,
+    "order": 36,
     "visible": true
   },
   {
@@ -985,7 +1041,7 @@
         "texto": "All energy programmed by DJ Pai en la Loma del Chocho, 2019 - 2020 |  www.insurgentes.co"
       }
     ],
-    "order": 35,
+    "order": 37,
     "visible": true
   }
 ]
