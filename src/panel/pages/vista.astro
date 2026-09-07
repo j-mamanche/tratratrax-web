@@ -32,8 +32,12 @@ const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchPara
     <title>Vista · {cual}</title>
     <link rel="icon" href="data:," />
     <style>
+      /* La fuente es la misma que declara Cargo para bodycopy. Así la vista
+         del Studio no cambia de métrica al pasar del borrador al sitio. */
+      @font-face { font-family: 'Diatype Variable'; font-style: normal; font-weight: 200 1000;
+        src: url('https://type.cargo.site/files/Cargo-DiatypePlusVariable.woff2') format('woff2-variations'); }
       html, body { margin: 0; height: 100%; background: #d8d5cf; color: #000;
-        font-family: ui-sans-serif, system-ui, sans-serif; overscroll-behavior: none; }
+        font-family: 'Diatype Variable', ui-sans-serif, system-ui, sans-serif; overscroll-behavior: none; }
 
       /* La barra de Cargo, imitada — la que el video no invade. Igual que en
          las previews del repo: está para juzgar proporciones, no es el nav. */
