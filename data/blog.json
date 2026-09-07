@@ -1,7 +1,7 @@
 {
   "highlight": {
     "article": "crack-magazine-colombian-label",
-    "image": "",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPhi9f_8AKckNT2yiZDFDHCyFvEsXOmZxSFBEO1rZQJvFvdVHcjOJzQjs&s=10",
     "imageAlt": ""
   },
   "ticker": {
@@ -14,7 +14,7 @@
       "id": "crack-magazine-colombian-label",
       "title": "CRACK MAGAZINE",
       "text": "The Colombian label is leading a Latin American dance movement where diasporic traditions merge with UK bass and techno. But with recognition often comes tokenisation – and they’re resisting.",
-      "url": "",
+      "url": "https://www.youtube.com/watch?v=XYQnkBkwnFE&list=PLv3TTBr1W_9tppikBxAE_G6qjWdBljBHJ&index=847",
       "order": 1,
       "visible": true
     },
@@ -30,7 +30,7 @@
       "id": "resident-advisor-pyrexia",
       "title": "RESIDENT ADVISOR",
       "text": "Ehua and Flore announce collaborative EP on TraTraTrax, Pyrexia. The first collaboration between the two artists based in London and Lyon respectively.",
-      "url": "",
+      "url": "https://weirdbaile.bandcamp.com/album/collected-rips-2004-2024",
       "order": 3,
       "visible": true
     },
