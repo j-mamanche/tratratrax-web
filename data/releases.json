@@ -68,7 +68,7 @@
       }
     ],
     "order": 2,
-    "visible": false,
+    "visible": true,
     "home": {
       "arte": "media/killing-mariposas.jpg",
       "video": {
