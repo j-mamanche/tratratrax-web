@@ -11,3 +11,7 @@ dist/
 public/
 dist-panel/
 .netlify/
+
+# Caché de Python
+__pycache__/
+*.pyc

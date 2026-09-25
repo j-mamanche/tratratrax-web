@@ -1,0 +1,163 @@
+{
+  "observado_en": "Cargo 3 > TraTraTrax > Pages, tras crear Set y recargar, 2026-09-24 (America/Bogota)",
+  "metodo": "Panel Pages autenticado: filas data-id/data-parent; tags leídos en clic derecho > Settings. Slugs de páginas publicadas contrastados con publicado/*.json. El editor no ofreció un archivo exportable del borrador.",
+  "carpetas": [
+    {
+      "id": "W2894131921",
+      "titulo": "Productos de Merca",
+      "padre": "root",
+      "hijos": [],
+      "publicado": false
+    }
+  ],
+  "orden_raiz": [
+    "W2894131921",
+    "H0731431535",
+    "X0596556527",
+    "O1289033983",
+    "H0993208634",
+    "T2595752217",
+    "Z4026822794",
+    "L3482832595",
+    "N1901077103",
+    "O1466699627",
+    "H3597552387",
+    "J2539233791",
+    "F3336995256",
+    "Q1000282418",
+    "Y3826516247"
+  ],
+  "paginas": [
+    {
+      "id": "H0731431535",
+      "titulo": "BEACH TOWEL \"AÑAÑAY\"",
+      "padre": "root",
+      "slug": "beach-towel-añañay",
+      "tags_editor": [
+        "merch",
+        "few-units"
+      ],
+      "overlay": true
+    },
+    {
+      "id": "X0596556527",
+      "titulo": "TEE CLÁSICA TRA",
+      "padre": "root",
+      "slug": "tee-clásica-tra-1",
+      "tags_editor": [
+        "merch",
+        "few-units"
+      ],
+      "overlay": true,
+      "nota": "Existe en editor y no aparece en la grilla pública de cuatro; su contenido está en construcción."
+    },
+    {
+      "id": "O1289033983",
+      "titulo": "TEE CLÁSICA TRA",
+      "padre": "root",
+      "slug": "tee-clásica-tra",
+      "tags_editor": [
+        "merch",
+        "out-of-stock"
+      ],
+      "overlay": true
+    },
+    {
+      "id": "H0993208634",
+      "titulo": "\"Perreando y Llorando\" Scarf",
+      "padre": "root",
+      "slug": "perreando-y-llorando-scarf",
+      "tags_editor": [
+        "merch",
+        "few-units"
+      ],
+      "overlay": true
+    },
+    {
+      "id": "T2595752217",
+      "titulo": "\"Memoria\" Special Edition Cassette",
+      "padre": "root",
+      "slug": "memoria-special-edition-cassette",
+      "tags_editor": [
+        "merch",
+        "in-stock"
+      ],
+      "overlay": true
+    },
+    {
+      "id": "Z4026822794",
+      "titulo": "Merca",
+      "padre": "root",
+      "slug": "merca",
+      "tags_publicados": [],
+      "overlay": true
+    },
+    {
+      "id": "L3482832595",
+      "titulo": "Nav (Desktop)",
+      "padre": "root",
+      "slug": "nav-(desktop)",
+      "tags_publicados": [],
+      "pinned": true
+    },
+    {
+      "id": "N1901077103",
+      "titulo": "Nav (Mobile)",
+      "padre": "root",
+      "slug": "nav-(mobile)",
+      "tags_publicados": [],
+      "pinned": true
+    },
+    {
+      "id": "O1466699627",
+      "titulo": "Home",
+      "padre": "root",
+      "slug": "home",
+      "tags_publicados": []
+    },
+    {
+      "id": "H3597552387",
+      "titulo": "Landing",
+      "padre": "root",
+      "slug": "landing",
+      "tags_publicados": [],
+      "homepage": true
+    },
+    {
+      "id": "J2539233791",
+      "titulo": "About",
+      "padre": "root",
+      "slug": "about",
+      "tags_publicados": []
+    },
+    {
+      "id": "F3336995256",
+      "titulo": "Catalog",
+      "padre": "root",
+      "slug": "catalog",
+      "tags_publicados": []
+    },
+    {
+      "id": "Q1000282418",
+      "titulo": "Blog",
+      "padre": "root",
+      "slug": "blog",
+      "tags_publicados": []
+    },
+    {
+      "id": "Y3826516247",
+      "titulo": "Blog copy",
+      "padre": "root",
+      "slug": null,
+      "tags_editor": null,
+      "nota": "Solo visible en editor; no se encontró en el estado publicado."
+    }
+  ],
+  "observaciones": [
+    "El panel no muestra ningún Set/carpeta; los 14 data-parent observados son root.",
+    "El estado publicado guardado por separado contiene 12 páginas. X0596556527 y Y3826516247 son adicionales del editor.",
+    "Los tags del editor se comprobaron individualmente en las cinco páginas de producto. En otras páginas se anotan los tags publicados y no se presupone que el borrador sea idéntico.",
+    "La ruta de X0596556527 procede del hash mostrado en la vista del editor; no se verificó como URL pública.",
+    "Tras recargar el editor, el Set W2894131921 persistió y los cinco productos continuaron con data-parent=root; no se hizo ningún movimiento."
+  ]
+}
