@@ -9,6 +9,13 @@
   contain: paint;
 }
 
+/* Cargo puede dejar altura o padding en los wrappers de la página. El marco
+   siempre se limita al espacio visible que queda hasta el nav. */
+[data-ttx='catalogo'] {
+  max-height: calc(100svh - var(--ttx-nav-h));
+  overflow: hidden;
+}
+
 /* ── El carril ────────────────────────────────────────────────────────
    El gesto de dedo con inercia, el trackpad de dos dedos y la scrollbar
    oculta son nativos. El JS solo agrega arrastre con mouse, rueda y
@@ -231,6 +238,14 @@
 [data-ttx='catalogo'] .ttx-enlace:hover,
 [data-ttx='catalogo'] .ttx-enlace:focus-visible {
   text-decoration-thickness: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-ttx='catalogo'] :is(.ttx-etiqueta, .ttx-cover):hover,
+  [data-ttx='catalogo'] a[href]:hover,
+  [data-ttx='catalogo'] a[href]:hover * {
+    cursor: url('https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png') 16 0, pointer !important;
+  }
 }
 
 /* ── Teléfono: el carril se para ──────────────────────────────────────

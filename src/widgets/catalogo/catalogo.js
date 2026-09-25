@@ -54,6 +54,7 @@ registrar('catalogo', async (host) => {
 
   const reflejo = espejo(visor, carril, visores);
   const soltarScroll = hscroll(carril);
+  const soltarAlto = medirAltoVisible(host);
   const soltarMedidas = medirItems(host, carril);
   const soltarCentro = seguirCentro(host, carril);
   const soltarHash = seguirHash(host, carril);
@@ -83,6 +84,7 @@ registrar('catalogo', async (host) => {
   return {
     destruir() {
       reflejo.destruir();
+      soltarAlto();
       soltarScroll();
       soltarMedidas();
       soltarCentro();
@@ -92,6 +94,37 @@ registrar('catalogo', async (host) => {
 });
 
 // ── DOM de un release ───────────────────────────────────────────────────
+
+/* Cargo puede situar el placeholder unos píxeles debajo del borde del visor.
+   Medimos ese desplazamiento para que el marco termine antes del nav sin
+   crear scroll en la página; el scroll queda dentro del carril. */
+function medirAltoVisible(host) {
+  const visor = window.visualViewport;
+  let pendiente = 0;
+  const medir = () => {
+    pendiente = 0;
+    if (!host.isConnected) return;
+    const css = getComputedStyle(host);
+    const piso = (visor?.offsetTop ?? 0) + (visor?.height ?? window.innerHeight);
+    const nav = parseFloat(css.getPropertyValue('--ttx-nav-h')) || 0;
+    const relleno = parseFloat(css.paddingTop) + parseFloat(css.paddingBottom);
+    const alto = Math.max(0, piso - host.getBoundingClientRect().top - relleno);
+    // paddingBottom ya incluye el nav. El tope evita superar 100svh aunque
+    // Cargo desplace el placeholder fuera del borde superior.
+    host.style.setProperty('--ttx-alto', `${Math.min(alto, window.innerHeight - nav)}px`);
+  };
+  const agendar = () => { if (!pendiente) pendiente = requestAnimationFrame(medir); };
+  window.addEventListener('resize', agendar);
+  visor?.addEventListener('resize', agendar);
+  visor?.addEventListener('scroll', agendar);
+  medir();
+  return () => {
+    window.removeEventListener('resize', agendar);
+    visor?.removeEventListener('resize', agendar);
+    visor?.removeEventListener('scroll', agendar);
+    cancelAnimationFrame(pendiente);
+  };
+}
 
 function crearItem(r, indiceArtistas, sufijo) {
   const idPanel = `ttx-panel-${sufijo}`;

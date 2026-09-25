@@ -124,9 +124,8 @@ deforma lo que pasa por él, **el hueco es donde cabe lo que no estaba dicho**.
    deja los tres emblemas en pantalla a la vez, en tres sitios, apagándose en el
    orden en que se soltaron. **El ritmo de la mano es lo que compone**; la
    página no elige nada.
-4. **El santo es el link.** El nombre solo invoca; el que enlaza es el emblema:
-   clic en el Divino Niño abre el Instagram de Nyksan. Un link que hay que
-   cazar, donde le da la gana.
+4. **El nombre y el santo son links.** Clic en cualquiera de los dos abre el
+   Instagram del DJ; pasar la mano por el nombre sigue invocando el emblema.
 
 **El GIF no se reinicia nunca.** Los tres emblemas están puestos desde que carga
 la página —apagados— y encenderlos es quitarles una opacidad, nunca volver a
@@ -407,9 +406,8 @@ accidente distinto y ninguna se leería como el mismo emblema.
 - **No se ilumina solo.** Sin destello de ocio, sin loop, sin luz. En teléfono
   tampoco: aquí no hay nada que avisar.
 - **No hay tercera banda.** El visor se esconde; el About es banda y campo.
-- **El nombre no es el link** y por eso no va subrayado, y por eso tampoco se
-  distingue del resto de su grupo. El peso separa campos, no anuncia que algo se
-  pueda tocar. Un link que hay que cazar no se señala — el link es el emblema.
+- **El nombre no va subrayado**, aunque es un link. Conserva la tipografía del
+  grupo y también se puede abrir con teclado.
 - **Las redes y el correo tampoco se señalan.** Son links de verdad, esos sí, y
   van en la misma tinta y sin subrayado que todo lo demás. Lo que los anuncia es
   que hubo que abrir la grieta para verlos.

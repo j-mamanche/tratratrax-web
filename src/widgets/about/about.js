@@ -72,8 +72,8 @@ import './about.css';
 //     Lo único que se le quitó es el derecho a cortarse contra el borde. Lo que
 //     sí es fijo es que **el sitio se sortea al aparecer, nunca mientras se
 //     ve**.
-//   - **El santo es el link**, no el nombre. El nombre solo invoca; clic en el
-//     emblema lleva al Instagram de ese DJ. Un link que hay que cazar.
+//   - El nombre y el santo enlazan al Instagram del DJ. El nombre también
+//     invoca el emblema al pasar la mano o recibir foco.
 //
 // Opciones que acepta el placeholder de Cargo:
 //   <div data-ttx="about"></div>
@@ -457,7 +457,7 @@ function crearCampo({ texto, clase }) {
 
 /**
  * El grupo de los nombres: un solo `<span>` con el peso del grupo y los tres
- * `<button>` adentro, separados por la barra. El peso lo hereda cada botón del
+ * enlaces adentro, separados por la barra. El peso lo hereda cada enlace del
  * span que los envuelve, así que ninguno lo lleva escrito.
  */
 function crearNombres({ clase }, estados) {
@@ -625,19 +625,14 @@ function crearEstado(dj, { campo, vida, menos }) {
 }
 
 /**
- * El disparador. Un `<button>`, no un `<span>`: el teclado y el lector de
- * pantalla salen gratis y con el `aria-*` correcto.
- *
- * El texto oculto es la única pista de que hay un link en camino. Para quien no
- * ve la pantalla, un emblema que aparece en una posición aleatoria es un link
- * que se materializó sin avisar; decirlo aquí es lo mínimo honesto.
+ * El nombre es un enlace directo y también invoca el emblema. Así el clic y
+ * el teclado pueden abrir Instagram sin tener que perseguir la imagen.
  */
 function crearBoton(dj) {
   return elemento(
-    'button',
-    { class: 'ttx-about-nombre', type: 'button' },
+    'a',
+    { class: 'ttx-about-nombre', href: dj.instagram, target: '_blank', rel: 'noopener noreferrer' },
     dj.nombre,
-    elemento('span', { class: 'ttx-oculto' }, ' — reveals the emblem that links to Instagram'),
   );
 }
 

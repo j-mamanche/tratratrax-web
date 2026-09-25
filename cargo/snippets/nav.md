@@ -100,6 +100,25 @@ lista. El lema sigue en regular.
 	z-index: 9999 !important;
 }
 
+/* La vitrina y las fichas de Merca son overlays de Cargo. Al abrirse deben
+   cubrir también la barra fijada. */
+body:has(.overlay-content.overlay-open) [id="L3482832595"].page,
+body:has(.overlay-content.overlay-open) [id="N1901077103"].page {
+  z-index: 1 !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [id="L3482832595"] .nav-links a[href]:hover,
+  [id="N1901077103"] .nav-links a[href]:hover {
+    cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer !important;
+  }
+
+  [id="L3482832595"] .nav-logo media-item.linked[href]:hover,
+  [id="N1901077103"] .nav-logo media-item.linked[href]:hover {
+    --image-link-cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer;
+  }
+}
+
 [id="L3482832595"] .page-content {
 	align-items: flex-end;
 	/* Eje exterior del nav: 1rem en desktop. Home/About/Blog suman
@@ -1158,7 +1177,7 @@ limitada al logo, y el texto no cambia de tamaño con la ventana.
 [id="N1901077103"] .page-layout { align-items: flex-end; }
 
 /* Evita que el rem fluido de Cargo cambie el tamaño del menú. */
-[id="N1901077103"] bodycopy { font-size: 11.33px; }
+[id="N1901077103"] bodycopy { font-size: 12px; }
 
 [id="N1901077103"] column-set {
   display: flex;
@@ -1167,7 +1186,7 @@ limitada al logo, y el texto no cambia de tamaño con la ventana.
   align-items: flex-end;
   justify-content: space-between;
   gap: .5rem;
-  font-size: 11.33px;
+  font-size: 12px;
 }
 
 [id="N1901077103"] column-set > column-unit {
@@ -1185,6 +1204,7 @@ limitada al logo, y el texto no cambia de tamaño con la ventana.
 
 [id="N1901077103"] column-set > column-unit[slot="1"] {
   flex: 0 0 auto;
+  margin-right: 0; /* Cargo añade 8px al último column-unit visible. */
 }
 
 /* Cargo puede reconstruir un tercer slot vacío al guardar el column-set. */
@@ -1242,7 +1262,7 @@ limitada al logo, y el texto no cambia de tamaño con la ventana.
 
 [id="N1901077103"] .nav-links {
   display: flex;
-  font-size: 11.33px;
+  font-size: 12px;
   justify-content: flex-end;
   align-items: flex-end;
   gap: .28em;
@@ -1252,7 +1272,7 @@ limitada al logo, y el texto no cambia de tamaño con la ventana.
 
 [id="N1901077103"] .nav-links a {
   display: inline-block;
-  font-size: 11.33px;
+  font-size: 12px;
   color: var(--nav-ink-strong);
   text-decoration: none;
   border-bottom: 0;

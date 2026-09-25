@@ -164,17 +164,19 @@ function medirBlogMovil(host, highlight, grieta) {
     let inicioNav = fondo;
     let hayNav = false;
     for (const pieza of document.querySelectorAll(navSelector)) {
-      hayNav = true;
       const caja = pieza.getBoundingClientRect();
-      if (caja.width && caja.height && caja.bottom > techo && caja.top < fondo) inicioNav = Math.min(inicioNav, caja.top);
+      if (caja.width && caja.height && caja.bottom > techo && caja.top < fondo) {
+        hayNav = true;
+        inicioNav = Math.min(inicioNav, caja.top);
+      }
     }
     const nav = hayNav ? Math.max(0, fondo - inicioNav) : (parseFloat(getComputedStyle(host).getPropertyValue('--ttx-nav-h')) || 0);
-    host.style.setProperty('--ttx-blog-visible-h', `${alto}px`);
+    host.style.setProperty('--ttx-blog-visible-h', `${Math.max(0, alto - nav)}px`);
     host.style.setProperty('--ttx-blog-nav-real-h', `${nav}px`);
     // Si las dos zonas superiores dejan menos de un área táctil utilizable,
     // la página completa recupera su scroll y no queda un archivo atrapado.
     host.classList.toggle('ttx-blog-sin-encaje',
-      alto - highlight.getBoundingClientRect().height - grieta.getBoundingClientRect().height - 32 < 112);
+      alto - nav - highlight.getBoundingClientRect().height - grieta.getBoundingClientRect().height - 32 < 112);
   };
   const agendar = () => { if (!pendiente) pendiente = requestAnimationFrame(medir); };
   const observador = new ResizeObserver(agendar);
