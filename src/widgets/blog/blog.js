@@ -33,11 +33,13 @@ function rastroHover(elementos, rastro = 800) {
   const ac = new AbortController();
   const timers = new WeakMap();
   for (const el of elementos) {
-    el.addEventListener('pointerenter', () => {
+    el.addEventListener('pointerenter', (e) => {
+      if (e.pointerType !== 'mouse') return;
       clearTimeout(timers.get(el));
       el.classList.add('ttx-hover-rastro');
     }, { signal: ac.signal });
-    el.addEventListener('pointerleave', () => {
+    el.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse') return;
       clearTimeout(timers.get(el));
       timers.set(el, setTimeout(() => el.classList.remove('ttx-hover-rastro'), rastro));
     }, { signal: ac.signal });
@@ -127,6 +129,13 @@ registrar('blog', async (host) => {
     : elemento('p', {}, 'Selecciona un highlight en el Studio.');
   const foto = elemento('div', { class: 'ttx-blog-highlight-image' }, media);
   const bloqueHighlight = elemento('section', { class: 'ttx-blog-highlight' }, copia, foto);
+  const enlaceHighlight = copia.querySelector('.ttx-blog-title a');
+  const revelarEnMovil = (e) => {
+    if (!matchMedia('(max-width:700px)').matches || bloqueHighlight.hasAttribute('data-revelado')) return;
+    e.preventDefault();
+    bloqueHighlight.setAttribute('data-revelado', '');
+  };
+  enlaceHighlight?.addEventListener('click', revelarEnMovil);
   const carriles = lanes.map((lane, i) => elemento('div', { class: `ttx-blog-lane ttx-blog-lane--${i + 1}`, tabindex: '0' }, ...lane.map((x) => tarjeta(x))));
   const historia = elemento('section', { class: 'ttx-blog-history', 'aria-label': 'Archivo del blog' }, ...carriles);
   const archivoMovil = elemento('section', { class: 'ttx-blog-history ttx-blog-history--movil', 'aria-label': 'Archivo del blog', tabindex: '0' }, ...archivo.map((x) => tarjeta(x)));
@@ -147,7 +156,7 @@ registrar('blog', async (host) => {
   const soltarRastro = rastroHover(host.querySelectorAll('.ttx-blog-title'));
   const soltarMedidas = medirBlogMovil(host, bloqueHighlight, host.querySelector('.ttx-blog-ticker'));
 
-  return { destruir: () => { soltarTicker(); soltarRastro(); soltarMedidas(); } };
+  return { destruir: () => { enlaceHighlight?.removeEventListener('click', revelarEnMovil); soltarTicker(); soltarRastro(); soltarMedidas(); } };
 });
 
 function medirBlogMovil(host, highlight, grieta) {

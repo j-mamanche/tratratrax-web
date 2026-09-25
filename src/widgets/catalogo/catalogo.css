@@ -244,7 +244,7 @@
   [data-ttx='catalogo'] :is(.ttx-etiqueta, .ttx-cover):hover,
   [data-ttx='catalogo'] a[href]:hover,
   [data-ttx='catalogo'] a[href]:hover * {
-    cursor: url('https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png') 16 0, pointer !important;
+    cursor: url('https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png') 16 0, pointer !important;
   }
 }
 

@@ -499,6 +499,15 @@
   outline-offset: 2px;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  [data-ttx='about'] .ttx-about-nombre:is(:hover, :focus-visible),
+  [data-ttx='about'] .ttx-about-nombre:is(:hover, :focus-visible) *,
+  [data-ttx='about'] .ttx-about-emblema[href]:hover,
+  [data-ttx='about'] .ttx-about-emblema[href]:hover * {
+    cursor: url('https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png') 16 0, pointer !important;
+  }
+}
+
 /* ── Cuando la línea no cabe ──────────────────────────────────────────
    Un renglón único es una regla de pantalla ancha, no del texto. Abierta, la
    línea son unos ciento cincuenta caracteres en versalitas; por debajo de

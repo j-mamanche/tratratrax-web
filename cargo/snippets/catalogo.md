@@ -7,7 +7,7 @@ Dos pegadas, y una de ellas solo se hace una vez en la vida del sitio.
 `Settings → Edit HTML → Global`, al final del `<head>`:
 
 ```html
-<script src="https://j-mamanche.github.io/tratratrax-web/ttx.js?v=5" defer></script>
+<script src="https://j-mamanche.github.io/tratratrax-web/ttx.js?v=6" defer></script>
 ```
 
 Eso es todo. El CSS va **dentro** del `ttx.js` y el script lo inyecta al
@@ -20,7 +20,7 @@ podía revalidar uno y no el otro: quedaba corriendo el JS de una versión con
 el CSS de otra y la página se desmaquetaba. Pasó en vivo. Un solo archivo no
 se puede desincronizar consigo mismo.
 
-**Qué hace el `?v=5`:** rompe la caché. GitHub Pages cachea diez minutos;
+**Qué hace el `?v=6`:** rompe la caché. GitHub Pages cachea diez minutos;
 subir el número obliga a Cargo a pedir el archivo de nuevo en vez de esperar.
 Como ahora es un archivo solo, subirlo actualiza todo de golpe.
 

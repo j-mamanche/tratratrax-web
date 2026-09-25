@@ -109,13 +109,15 @@ body:has(.overlay-content.overlay-open) [id="N1901077103"].page {
 
 @media (hover: hover) and (pointer: fine) {
   [id="L3482832595"] .nav-links a[href]:hover,
-  [id="N1901077103"] .nav-links a[href]:hover {
-    cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer !important;
+  [id="L3482832595"] .nav-links a[href]:hover *,
+  [id="N1901077103"] .nav-links a[href]:hover,
+  [id="N1901077103"] .nav-links a[href]:hover * {
+    cursor: url("https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png") 16 0, pointer !important;
   }
 
   [id="L3482832595"] .nav-logo media-item.linked[href]:hover,
   [id="N1901077103"] .nav-logo media-item.linked[href]:hover {
-    --image-link-cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer;
+    --image-link-cursor: url("https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png") 16 0, pointer;
   }
 }
 
@@ -1758,11 +1760,11 @@ teclado conserva su outline y no necesita imagen de cursor.
 ```css
 @media (hover: hover) and (pointer: fine) {
   [data-ttx="home"] a.ttx-home-titulo[href]:not([aria-disabled="true"]):not([disabled]):hover {
-    cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer;
+    cursor: url("https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png") 16 0, pointer;
   }
 
   media-item.linked[href]:not([aria-disabled="true"]):not([disabled]):hover {
-    --image-link-cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer;
+    --image-link-cursor: url("https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png") 16 0, pointer;
   }
 }
 ```

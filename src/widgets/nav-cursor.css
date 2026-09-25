@@ -1,0 +1,14 @@
+/* El bundle global llega a Cargo en todas las páginas. El cursor del nav vive
+   aquí para cubrir las dos instancias que Cargo reconstruye al navegar. */
+@media (hover: hover) and (pointer: fine) {
+  html body :is([id='L3482832595'], [id='N1901077103']) .nav-links a[href]:hover,
+  html body :is([id='L3482832595'], [id='N1901077103']) .nav-links a[href]:hover * {
+    cursor: url('https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png') 16 0, pointer !important;
+  }
+
+  html body :is([id='L3482832595'], [id='N1901077103']) .nav-logo media-item.linked[href]:hover,
+  html body :is([id='L3482832595'], [id='N1901077103']) .nav-logo media-item.linked[href]:hover::part(media) {
+    cursor: url('https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png') 16 0, pointer !important;
+    --image-link-cursor: url('https://j-mamanche.github.io/tratratrax-web/media/cursor/machete.png') 16 0, pointer;
+  }
+}
