@@ -6,7 +6,6 @@ Uso: python3 cargo/capturar-publicado.py cargo/respaldo-AAAA-MM-DD/publicado
 
 import hashlib
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path

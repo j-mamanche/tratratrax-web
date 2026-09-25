@@ -52,8 +52,8 @@ Seis cosas que no son cosméticas:
   la gaveta, que tiene una lógica visual distinta de las otras tres páginas.
 
 El `<span data-glitch>` es lo único que rota. El `2026 ©` se queda quieto.
-El logo central enlaza a `home` mediante `rel="history"`; `scale="20%"`
-lo hace legible sin quitar espacio a las columnas laterales.
+El logo central enlaza a `home` mediante `rel="history"`. El CSS fija su ancho
+en vez de dejar que `scale="20%"` lo redimensione con la ventana.
 
 **El nav no usa juntas.** Los cuatro links se separan con un espacio normal,
 sin `__` ni alternancia de peso.
@@ -112,6 +112,11 @@ lista. El lema sigue en regular.
 	align-items: flex-end;
 }
 
+/* El texto del nav no hereda el rem fluido de Cargo. */
+[id="L3482832595"] bodycopy {
+	font-size: 13.3px;
+}
+
 /* — TODO AL PISO —
    El column-set estira las tres columnas a la misma altura; dentro de cada
    una el contenido se va abajo. Sin esto, el lema y el menú quedan colgando
@@ -120,12 +125,15 @@ lista. El lema sigue en regular.
 [id="L3482832595"] column-set {
 	display: flex;
 	align-items: stretch;
+	font-size: 13.3px;
 }
 
 [id="L3482832595"] column-set > column-unit {
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
+	flex: 1 1 0;
+	min-width: 0;
 }
 
 [id="L3482832595"] column-set > column-unit > * {
@@ -185,17 +193,22 @@ lista. El lema sigue en regular.
 	text-align: left;
 	color: var(--nav-ink);
 	transition: color 220ms ease;
+	font-size: 13.3px;
 }
 
 [id="L3482832595"] .nav-logo {
 	text-align: center;
 	line-height: 0; /* mata el descender del inline y lo apoya de verdad */
+	width: 70px;
+	margin-inline: auto;
 }
 
-/* Cargo escala el media-item con la columna. El límite evita que el logo
-   tape la última franja del catálogo en pantallas ultraanchas. */
+/* La marca conserva el tamaño anterior a 20% y no crece ni se encoge con
+   la ventana. Las tres columnas iguales mantienen su centro en el viewport. */
 [id="L3482832595"] .nav-logo media-item.linked {
-	max-width: min(calc(0.2 * var(--resize-parent-width, 100%)), 125px);
+	width: 70px;
+	min-width: 70px;
+	max-width: 70px;
 }
 
 /* El logo es un PNG blanco: para el modo negro se invierte. Si algún día el
@@ -209,6 +222,7 @@ lista. El lema sigue en regular.
 
 [id="L3482832595"] .nav-links {
 	display: flex;
+	font-size: 13.3px;
 	justify-content: flex-end;
 	align-items: flex-end;
 	/* Un espacio normal de esta fuente mide ~0.28em, y eso es exactamente lo que
@@ -248,6 +262,7 @@ lista. El lema sigue en regular.
    un destino, es dónde uno está. */
 [id="L3482832595"] .nav-links a {
 	display: inline-block;
+	font-size: 13.3px;
 	color: var(--nav-ink-strong);
 	text-decoration: none;
 	border-bottom: 0;
@@ -307,6 +322,7 @@ lista. El lema sigue en regular.
 [id="L3482832595"] [data-glitch] {
 	display: inline-block;
 	white-space: nowrap;
+	font-size: 13.3px;
 }
 
 /* En reposo el cursor no está. Aparece fijo mientras teclea, parpadea tres
@@ -1122,9 +1138,9 @@ Reemplaza el `<column-set>` entero:
 
 `mobile-stack="false"` permite mantener la fila. `.nav-logo` conserva el
 selector de la bandera y el `media-item` conserva el enlace `rel="history"`.
-El `scale="70%"` produce una caja de 79,8 × 34,0 px a 390 px de
-viewport; no se escala con el sobrante de la columna. El menú mide
-167,8 px en ese viewport. El logo queda a la izquierda y el menú a la derecha.
+El ancho fijo de 66,4 px deja la altura en unos 28,3 px: un 20 % menos que
+los 35,4 px medidos en el editor a 389 px de viewport. La caja de hover queda
+limitada al logo, y el texto no cambia de tamaño con la ventana.
 
 ### CSS de la página móvil
 
@@ -1141,6 +1157,9 @@ viewport; no se escala con el sobrante de la columna. El menú mide
 
 [id="N1901077103"] .page-layout { align-items: flex-end; }
 
+/* Evita que el rem fluido de Cargo cambie el tamaño del menú. */
+[id="N1901077103"] bodycopy { font-size: 11.33px; }
+
 [id="N1901077103"] column-set {
   display: flex;
   flex-direction: row;
@@ -1148,6 +1167,7 @@ viewport; no se escala con el sobrante de la columna. El menú mide
   align-items: flex-end;
   justify-content: space-between;
   gap: .5rem;
+  font-size: 11.33px;
 }
 
 [id="N1901077103"] column-set > column-unit {
@@ -1205,14 +1225,14 @@ viewport; no se escala con el sobrante de la columna. El menú mide
 [id="N1901077103"] .nav-logo {
   text-align: left;
   line-height: 0;
+  width: 66.4px;
 }
 
-/* A 768 px Cargo convierte el 70% en ~163 px; el límite conserva la
-   proporción del logo sin hacerlo invadir el contenido de la página. */
-@media (min-width: 500px) {
-  [id="N1901077103"] .nav-logo media-item.linked {
-    max-width: 100px;
-  }
+/* El logo y su zona de hover tienen siempre el mismo tamaño. */
+[id="N1901077103"] .nav-logo media-item.linked {
+  width: 66.4px;
+  min-width: 66.4px;
+  max-width: 66.4px;
 }
 
 [id="N1901077103"] media-item::part(media) {
@@ -1222,6 +1242,7 @@ viewport; no se escala con el sobrante de la columna. El menú mide
 
 [id="N1901077103"] .nav-links {
   display: flex;
+  font-size: 11.33px;
   justify-content: flex-end;
   align-items: flex-end;
   gap: .28em;
@@ -1231,6 +1252,7 @@ viewport; no se escala con el sobrante de la columna. El menú mide
 
 [id="N1901077103"] .nav-links a {
   display: inline-block;
+  font-size: 11.33px;
   color: var(--nav-ink-strong);
   text-decoration: none;
   border-bottom: 0;

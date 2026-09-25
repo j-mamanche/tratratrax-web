@@ -52,6 +52,9 @@
 		z-index: 9999 !important;
 	}
 
+	[id="L3482832595"] { font-size: 13.3px; }
+	[id="N1901077103"] { font-size: 11.33px; }
+
 	[id="L3482832595"] .page-content,
 	[id="N1901077103"] .page-content {
 		position: absolute;
@@ -67,12 +70,15 @@
 		width: 100%;
 		gap: 1rem;
 	}
+	[id="L3482832595"] column-set { font-size: 13.3px; }
+	[id="N1901077103"] column-set { font-size: 11.33px; }
 
 	column-set > column-unit {
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-end;
-		flex: 1;
+		flex: 1 1 0;
+		min-width: 0;
 	}
 
 	column-set > column-unit > * {
@@ -122,10 +128,14 @@
 		color: var(--nav-ink);
 		transition: color 220ms ease;
 	}
+	[id="L3482832595"] .nav-lema { font-size: 13.3px; }
+	[id="L3482832595"] [data-glitch] { font-size: 13.3px; }
 
-	.nav-logo {
+	[id="L3482832595"] .nav-logo {
 		text-align: center;
 		line-height: 0;
+		width: 70px;
+		margin-inline: auto;
 	}
 
 	.nav-links {
@@ -136,6 +146,10 @@
 		line-height: 1;
 		white-space: nowrap;
 	}
+	[id="L3482832595"] .nav-links { font-size: 13.3px; }
+	[id="N1901077103"] .nav-links { font-size: 11.33px; }
+	[id="L3482832595"] .nav-links a { font-size: 13.3px; }
+	[id="N1901077103"] .nav-links a { font-size: 11.33px; }
 
 	.nav-menu {
 		display: inline-block;
@@ -220,11 +234,14 @@
 	/* --- solo del preview --- */
 	.fake-logo {
 		display: inline-block;
-		width: 20%;
-		max-width: 125px;
 		height: auto;
 		filter: var(--nav-logo-filter);
 		transition: filter 220ms ease;
+	}
+	[id="L3482832595"] .fake-logo {
+		width: 70px;
+		min-width: 70px;
+		max-width: 70px;
 	}
 	.nav-logo a { display: block; width: 100%; }
 
@@ -252,7 +269,6 @@
 	}
 
 	@media (max-width: 819px) {
-		body { font-size: clamp(9px, 2.8vw, 13px); }
 		[id="L3482832595"] { display: none; }
 		[id="N1901077103"] { display: block; }
 		[id="N1901077103"] .page-content { padding: .75rem; }
@@ -264,8 +280,8 @@
 		}
 		[id="N1901077103"] column-set > column-unit { flex: 0 0 auto; width: auto; min-width: 0; }
 		[id="N1901077103"] column-set > column-unit[slot="0"] { flex: 1 1 0; }
-		[id="N1901077103"] .nav-logo { text-align: left; }
-		[id="N1901077103"] .fake-logo { width: 20.46vw; max-width: 100px; }
+		[id="N1901077103"] .nav-logo { text-align: left; width: 66.4px; }
+		[id="N1901077103"] .fake-logo { width: 66.4px; min-width: 66.4px; max-width: 66.4px; }
 		[id="N1901077103"] .nav-links a { color: var(--nav-ink-strong); }
 	}
 

@@ -158,6 +158,6 @@
     "El estado publicado guardado por separado contiene 12 páginas. X0596556527 y Y3826516247 son adicionales del editor.",
     "Los tags del editor se comprobaron individualmente en las cinco páginas de producto. En otras páginas se anotan los tags publicados y no se presupone que el borrador sea idéntico.",
     "La ruta de X0596556527 procede del hash mostrado en la vista del editor; no se verificó como URL pública.",
-    "Tras recargar el editor, el Set W2894131921 persistió y los cinco productos continuaron con data-parent=root; no se hizo ningún movimiento."
+    "Tras recargar el editor, el Set W2894131921 persistió y los cinco productos continuaron con data-parent=root. Una prueba reversible movió H0731431535 al Set: el editor cambió /pid/H3597552387#beach-towel-añañay por /pid/W2894131921#beach-towel-añañay. Se devolvió a root y la ruta previa quedó restaurada."
   ]
 }

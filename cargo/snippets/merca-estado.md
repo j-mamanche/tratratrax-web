@@ -18,4 +18,4 @@ Las discordancias son pendientes editoriales, no correcciones implícitas: `H099
 
 ## Organización
 
-El editor no tenía Set/carpeta para productos. Se creó **Productos de Merca** (`W2894131921`) vacío en el borrador. No se movieron fichas ni se publicó, porque el editor y la versión pública no coinciden y la comprobación pública exigida por tanda publicaría también páginas adicionales. La prueba de movimiento y la preservación de rutas quedan pendientes de un borrador aislado o una decisión editorial sobre esas páginas.
+El editor no tenía Set/carpeta para productos. Se creó **Productos de Merca** (`W2894131921`) vacío en el borrador. Se hizo una sola prueba reversible con `H0731431535`: el editor conservó ID y hash, pero cambió la ruta contenedora de `/pid/H3597552387#beach-towel-añañay` a `/pid/W2894131921#beach-towel-añañay`. Se devolvió a `root` y se comprobó la restauración tras recargar. No se publicó ni se movieron las demás fichas. La preservación de las URLs públicas y del comportamiento de overlays dentro del Set requiere prueba aislada y decisión editorial; mientras tanto, conservar las fichas en la raíz mantiene la ruta actual.
