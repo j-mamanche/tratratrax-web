@@ -1,6 +1,14 @@
 /* El catálogo: el carril horizontal y el acordeón.
    Todo cuelga de [data-ttx='catalogo']. */
 
+/* El reflejo filtrado tiene una pista tan larga como todos los discos. En
+   Chrome, su transform puede contribuir al scrollWidth de la página incluso
+   con overflow:hidden en el marco. Contener la pintura en este marco deja
+   intacto el scroll propio del carril y evita ese desborde exterior. */
+[data-ttx='catalogo'] .ttx-marco {
+  contain: paint;
+}
+
 /* ── El carril ────────────────────────────────────────────────────────
    El gesto de dedo con inercia, el trackpad de dos dedos y la scrollbar
    oculta son nativos. El JS solo agrega arrastre con mouse, rueda y

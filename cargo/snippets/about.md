@@ -11,12 +11,15 @@ Una sola línea en la página `about`. El loader global —el `<script>` del
 Con el recorte que ya usan el home y el catálogo, que es lo que se va a querer:
 
 ```html
-<div data-ttx="about" style="--ttx-margen: 6px; --ttx-nav-h: 18px"></div>
+<div data-ttx="about" style="--ttx-margen: calc(var(--ttx-eje-nav) * .5); --ttx-nav-h: 60px"></div>
 ```
 
 `--ttx-nav-h` es el hueco que se le reserva a la barra de Cargo. Si queda en
 cero, el pie de la página se mete debajo de esa barra — y ahora que los emblemas
 caen por toda la ventana, ahí es donde se pierden.
+
+`--ttx-eje-nav` mide `1rem` en escritorio y `.75rem` hasta 819px. El margen
+del widget aporta la mitad del eje; `.page-content` aporta la otra mitad.
 
 **El nav no se toca.** No hay copy que mover: la línea de los fundadores y sus
 Instagram existían en el nav del sitio viejo, no en el diseño vigente.

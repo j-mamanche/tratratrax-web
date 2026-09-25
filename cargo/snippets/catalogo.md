@@ -73,15 +73,17 @@ Para que el widget quede como una tarjeta flotando, con aire alrededor y
 sitio abajo para la barra de navegación:
 
 ```html
-<div data-ttx="catalogo" style="--ttx-margen: 10px; --ttx-nav-h: 1.6rem"></div>
+<div data-ttx="catalogo" style="--ttx-margen: var(--ttx-eje-nav); --ttx-nav-h: 60px"></div>
 ```
 
 Lo importante: **los dos salen del alto**. Poner aire arriba y a los lados
 sin descontarlo abajo es lo que hacía que la página scrolleara de más. Con
 esto no hay que tocar `--ttx-alto` a mano nunca.
 
-En `tratratrax.cargo.site/catalog`, Cargo deja unos 6px de aire arriba y 24
-abajo por su cuenta; `--ttx-margen: 6px; --ttx-nav-h: 18px` los absorbe.
+En `/catalog`, `.page-content` no añade padding horizontal. El recorte lateral
+usa todo `--ttx-eje-nav` (`1rem` en escritorio, `.75rem` hasta 819px) para dejar
+el marco en el eje del nav; los `60px` reservan el espacio inferior del
+placeholder publicado.
 
 Las esquinas van cuadradas y no hay variable para redondearlas: es una regla
 del diseño, no una calibración.

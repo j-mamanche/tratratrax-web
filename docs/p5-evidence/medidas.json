@@ -1,0 +1,308 @@
+[
+  {
+    "width": 320,
+    "height": 568,
+    "first": {
+      "host": {
+        "top": 0,
+        "bottom": 568,
+        "height": 568
+      },
+      "highlight": {
+        "top": 10,
+        "bottom": 170.0625,
+        "height": 160.0625
+      },
+      "ticker": {
+        "top": 195.0625,
+        "bottom": 219.71875,
+        "height": 24.65625
+      },
+      "archive": {
+        "top": 219.71875,
+        "bottom": 558,
+        "height": 338.28125
+      },
+      "nav": {
+        "top": 488,
+        "bottom": 568,
+        "height": 80
+      },
+      "font": "15.5px",
+      "cols": "140px 140px",
+      "scrollHeight": 1830,
+      "clientHeight": 338,
+      "first": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)__READ",
+      "last": "DJ MAG — Premiere: Nick León: Xtasis (2022)__READ",
+      "pageScroll": 568,
+      "viewport": 568,
+      "navPadding": "96px",
+      "overflow": false
+    },
+    "last": {
+      "scrollTop": 1492,
+      "lastTop": 212.125,
+      "lastBottom": 284,
+      "archiveBottom": 558,
+      "navTop": 488,
+      "highlightTop": 10,
+      "tickerTop": 195.0625,
+      "pageScroll": 0
+    }
+  },
+  {
+    "width": 320,
+    "height": 844,
+    "first": {
+      "host": {
+        "top": 0,
+        "bottom": 844,
+        "height": 844
+      },
+      "highlight": {
+        "top": 10,
+        "bottom": 170.0625,
+        "height": 160.0625
+      },
+      "ticker": {
+        "top": 195.0625,
+        "bottom": 219.71875,
+        "height": 24.65625
+      },
+      "archive": {
+        "top": 219.71875,
+        "bottom": 834,
+        "height": 614.28125
+      },
+      "nav": {
+        "top": 764,
+        "bottom": 844,
+        "height": 80
+      },
+      "font": "15.5px",
+      "cols": "140px 140px",
+      "scrollHeight": 1830,
+      "clientHeight": 614,
+      "first": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)__READ",
+      "last": "DJ MAG — Premiere: Nick León: Xtasis (2022)__READ",
+      "pageScroll": 844,
+      "viewport": 844,
+      "navPadding": "96px",
+      "overflow": false
+    },
+    "last": {
+      "scrollTop": 1216,
+      "lastTop": 488.125,
+      "lastBottom": 560,
+      "archiveBottom": 834,
+      "navTop": 764,
+      "highlightTop": 10,
+      "tickerTop": 195.0625,
+      "pageScroll": 0
+    }
+  },
+  {
+    "width": 375,
+    "height": 568,
+    "first": {
+      "host": {
+        "top": 0,
+        "bottom": 568,
+        "height": 568
+      },
+      "highlight": {
+        "top": 10,
+        "bottom": 150.1875,
+        "height": 140.1875
+      },
+      "ticker": {
+        "top": 175.1875,
+        "bottom": 199.84375,
+        "height": 24.65625
+      },
+      "archive": {
+        "top": 199.84375,
+        "bottom": 558,
+        "height": 358.15625
+      },
+      "nav": {
+        "top": 488,
+        "bottom": 568,
+        "height": 80
+      },
+      "font": "15.5px",
+      "cols": "167.5px 167.5px",
+      "scrollHeight": 1519,
+      "clientHeight": 358,
+      "first": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)__READ",
+      "last": "DJ MAG — Premiere: Nick León: Xtasis (2022)__READ",
+      "pageScroll": 568,
+      "viewport": 568,
+      "navPadding": "96px",
+      "overflow": false
+    },
+    "last": {
+      "scrollTop": 1161,
+      "lastTop": 266.71875,
+      "lastBottom": 320.625,
+      "archiveBottom": 558,
+      "navTop": 488,
+      "highlightTop": 10,
+      "tickerTop": 175.1875,
+      "pageScroll": 0
+    }
+  },
+  {
+    "width": 375,
+    "height": 844,
+    "first": {
+      "host": {
+        "top": 0,
+        "bottom": 844,
+        "height": 844
+      },
+      "highlight": {
+        "top": 10,
+        "bottom": 150.1875,
+        "height": 140.1875
+      },
+      "ticker": {
+        "top": 175.1875,
+        "bottom": 199.84375,
+        "height": 24.65625
+      },
+      "archive": {
+        "top": 199.84375,
+        "bottom": 834,
+        "height": 634.15625
+      },
+      "nav": {
+        "top": 764,
+        "bottom": 844,
+        "height": 80
+      },
+      "font": "15.5px",
+      "cols": "167.5px 167.5px",
+      "scrollHeight": 1519,
+      "clientHeight": 634,
+      "first": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)__READ",
+      "last": "DJ MAG — Premiere: Nick León: Xtasis (2022)__READ",
+      "pageScroll": 844,
+      "viewport": 844,
+      "navPadding": "96px",
+      "overflow": false
+    },
+    "last": {
+      "scrollTop": 885,
+      "lastTop": 542.71875,
+      "lastBottom": 596.625,
+      "archiveBottom": 834,
+      "navTop": 764,
+      "highlightTop": 10,
+      "tickerTop": 175.1875,
+      "pageScroll": 0
+    }
+  },
+  {
+    "width": 390,
+    "height": 568,
+    "first": {
+      "host": {
+        "top": 0,
+        "bottom": 568,
+        "height": 568
+      },
+      "highlight": {
+        "top": 10,
+        "bottom": 150.1875,
+        "height": 140.1875
+      },
+      "ticker": {
+        "top": 175.1875,
+        "bottom": 199.84375,
+        "height": 24.65625
+      },
+      "archive": {
+        "top": 199.84375,
+        "bottom": 558,
+        "height": 358.15625
+      },
+      "nav": {
+        "top": 488,
+        "bottom": 568,
+        "height": 80
+      },
+      "font": "15.5px",
+      "cols": "175px 175px",
+      "scrollHeight": 1500,
+      "clientHeight": 358,
+      "first": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)__READ",
+      "last": "DJ MAG — Premiere: Nick León: Xtasis (2022)__READ",
+      "pageScroll": 568,
+      "viewport": 568,
+      "navPadding": "96px",
+      "overflow": false
+    },
+    "last": {
+      "scrollTop": 1142,
+      "lastTop": 267.4375,
+      "lastBottom": 321.34375,
+      "archiveBottom": 558,
+      "navTop": 488,
+      "highlightTop": 10,
+      "tickerTop": 175.1875,
+      "pageScroll": 0
+    }
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "first": {
+      "host": {
+        "top": 0,
+        "bottom": 844,
+        "height": 844
+      },
+      "highlight": {
+        "top": 10,
+        "bottom": 150.1875,
+        "height": 140.1875
+      },
+      "ticker": {
+        "top": 175.1875,
+        "bottom": 199.84375,
+        "height": 24.65625
+      },
+      "archive": {
+        "top": 199.84375,
+        "bottom": 834,
+        "height": 634.15625
+      },
+      "nav": {
+        "top": 764,
+        "bottom": 844,
+        "height": 80
+      },
+      "font": "15.5px",
+      "cols": "175px 175px",
+      "scrollHeight": 1500,
+      "clientHeight": 634,
+      "first": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)__READ",
+      "last": "DJ MAG — Premiere: Nick León: Xtasis (2022)__READ",
+      "pageScroll": 844,
+      "viewport": 844,
+      "navPadding": "96px",
+      "overflow": false
+    },
+    "last": {
+      "scrollTop": 866,
+      "lastTop": 543.4375,
+      "lastBottom": 597.34375,
+      "archiveBottom": 834,
+      "navTop": 764,
+      "highlightTop": 10,
+      "tickerTop": 175.1875,
+      "pageScroll": 0
+    }
+  }
+]

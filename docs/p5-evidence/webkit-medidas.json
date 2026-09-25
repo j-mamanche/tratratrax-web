@@ -1,0 +1,62 @@
+[
+  {
+    "width": 320,
+    "height": 568,
+    "cards": 14,
+    "lastBottom": 461.40625,
+    "navTop": 488,
+    "archiveScroll": 1492,
+    "pageScroll": 568,
+    "fallback": false
+  },
+  {
+    "width": 320,
+    "height": 844,
+    "cards": 14,
+    "lastBottom": 737.40625,
+    "navTop": 764,
+    "archiveScroll": 1216,
+    "pageScroll": 844,
+    "fallback": false
+  },
+  {
+    "width": 375,
+    "height": 568,
+    "cards": 14,
+    "lastBottom": 461.484375,
+    "navTop": 488,
+    "archiveScroll": 1161,
+    "pageScroll": 568,
+    "fallback": false
+  },
+  {
+    "width": 375,
+    "height": 844,
+    "cards": 14,
+    "lastBottom": 737.484375,
+    "navTop": 764,
+    "archiveScroll": 885,
+    "pageScroll": 844,
+    "fallback": false
+  },
+  {
+    "width": 390,
+    "height": 568,
+    "cards": 14,
+    "lastBottom": 462.203125,
+    "navTop": 488,
+    "archiveScroll": 1142,
+    "pageScroll": 568,
+    "fallback": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "cards": 14,
+    "lastBottom": 738.203125,
+    "navTop": 764,
+    "archiveScroll": 866,
+    "pageScroll": 844,
+    "fallback": false
+  }
+]

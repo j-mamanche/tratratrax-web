@@ -3,8 +3,7 @@
      PREVIEW LOCAL DEL NAV — no se pega en Cargo.
      Sirve para calibrar el glitch, la separación del menú y el
      blanco/negro automático sin tocar el sitio en vivo. El HTML, el
-     CSS y los scripts son los mismos que están en nav.md; acá van con
-     <column-set> emulado por divs y el logo reemplazado por un cuadro,
+     CSS y los scripts siguen nav.md. El logo real se usa como PNG local
      porque los custom elements de Cargo no existen fuera de Cargo.
      El panel de arriba a la izquierda no existe en Cargo: es para
      probar fondos y el interruptor de página.
@@ -46,13 +45,15 @@
 	   que Cargo le escribe a toda página fijada. Sin `!important` el nav se
 	   queda en 399 y la bandera (9998) lo tapa entero — que es exactamente el
 	   error que este archivo no veía cuando el 9999 iba suelto. */
-	[id="L3482832595"] {
+	[id="L3482832595"],
+	[id="N1901077103"] {
 		position: fixed;
 		inset: 0;
 		z-index: 9999 !important;
 	}
 
-	[id="L3482832595"] .page-content {
+	[id="L3482832595"] .page-content,
+	[id="N1901077103"] .page-content {
 		position: absolute;
 		inset: 0;
 		display: flex;
@@ -110,7 +111,9 @@
 	}
 
 	[id="L3482832595"][data-bandera] :is(.nav-lema, .nav-links a),
-	[id="L3482832595"][data-bandera] .fake-logo {
+	[id="N1901077103"][data-bandera] .nav-links a,
+	[id="L3482832595"][data-bandera] .fake-logo,
+	[id="N1901077103"][data-bandera] .fake-logo {
 		transition: none;
 	}
 
@@ -217,11 +220,60 @@
 	/* --- solo del preview --- */
 	.fake-logo {
 		display: inline-block;
-		width: 15%;
-		aspect-ratio: 3 / 1;
-		background: #ffffff;
+		width: 20%;
+		max-width: 125px;
+		height: auto;
 		filter: var(--nav-logo-filter);
 		transition: filter 220ms ease;
+	}
+	.nav-logo a { display: block; width: 100%; }
+
+	[id="N1901077103"] { display: none; }
+
+	[id="N1901077103"],
+	[id="N1901077103"] [data-nav="white"] {
+		--nav-ink-strong: #fff;
+		--nav-logo-filter: none;
+	}
+	[id="N1901077103"][data-nav="black"],
+	[id="N1901077103"] [data-nav="black"] {
+		--nav-ink-strong: #000;
+		--nav-logo-filter: invert(1);
+	}
+	[id="N1901077103"][data-bandera="black"],
+	[id="N1901077103"][data-bandera="black"] [data-nav] {
+		--nav-ink-strong: #000;
+		--nav-logo-filter: invert(1);
+	}
+	[id="N1901077103"][data-bandera="white"],
+	[id="N1901077103"][data-bandera="white"] [data-nav] {
+		--nav-ink-strong: #fff;
+		--nav-logo-filter: none;
+	}
+
+	@media (max-width: 819px) {
+		body { font-size: clamp(9px, 2.8vw, 13px); }
+		[id="L3482832595"] { display: none; }
+		[id="N1901077103"] { display: block; }
+		[id="N1901077103"] .page-content { padding: .75rem; }
+		[id="N1901077103"] column-set {
+			flex-wrap: nowrap;
+			align-items: flex-end;
+			justify-content: space-between;
+			gap: .5rem;
+		}
+		[id="N1901077103"] column-set > column-unit { flex: 0 0 auto; width: auto; min-width: 0; }
+		[id="N1901077103"] column-set > column-unit[slot="0"] { flex: 1 1 0; }
+		[id="N1901077103"] .nav-logo { text-align: left; }
+		[id="N1901077103"] .fake-logo { width: 20.46vw; max-width: 100px; }
+		[id="N1901077103"] .nav-links a { color: var(--nav-ink-strong); }
+	}
+
+	/* Simula el cursor efectivo de los links y del media-item enlazado. */
+	@media (hover: hover) and (pointer: fine) {
+		:is(.nav-links a, .nav-logo a):hover {
+			cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer;
+		}
 	}
 
 	/* fondos de prueba */
@@ -269,8 +321,12 @@
      para que el preview mienta igual que el sitio. -->
 <div class="page" id="L3482832595" style="z-index: 399;"><div class="page-content">
 
-<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><span class="fake-logo"></span></div></column-unit><column-unit slot="2"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT" data-nav-highlight="about">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" data-nav-highlight="catalog" class="active">CATALOG</a><a href="blog" rel="history" data-label="BLOG" data-nav-highlight="blog">BLOG</a><a href="merca" rel="history" data-label="MERCA" data-nav-highlight="merca">MERCA</a></div></column-unit></column-set>
+<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><a href="home" rel="history" aria-label="TraTraTrax — Home"><img class="fake-logo" src="nav-logo.png" alt=""></a></div></column-unit><column-unit slot="2"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT" data-nav-highlight="about">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" data-nav-highlight="catalog" class="active">CATALOG</a><a href="blog" rel="history" data-label="BLOG" data-nav-highlight="blog">BLOG</a><a href="merca" rel="history" data-label="MERCA" data-nav-highlight="merca">MERCA</a></div></column-unit></column-set>
 
+</div></div>
+
+<div class="page" id="N1901077103" style="z-index: 399;"><div class="page-content">
+<column-set gutter="1" mobile-stack="false"><column-unit slot="0"><div class="nav-logo"><a href="home" rel="history" aria-label="TraTraTrax — Home"><img class="fake-logo" src="nav-logo.png" alt=""></a></div></column-unit><column-unit slot="1"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT" data-nav-highlight="about">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" data-nav-highlight="catalog" class="active">CATALOG</a><a href="blog" rel="history" data-label="BLOG" data-nav-highlight="blog">BLOG</a><a href="merca" rel="history" data-label="MERCA" data-nav-highlight="merca">MERCA</a></div></column-unit></column-set>
 </div></div>
 
 <div id="panel">
@@ -317,9 +373,7 @@
   var AWAY_MAX  = 30;    // cuántas veces mira antes de rendirse (30s)
   var WATCH_MS  = 3000;  // ronda de reparación
 
-  // En Cargo el nav de escritorio y el de móvil son dos páginas distintas, cada
-  // una con su id. Acá van todas las instancias; el lema se anima solo en las
-  // que tengan un [data-glitch], esta lista es para marcar la página activa.
+  // Ambos navs comparten página activa; el glitch solo lee desktop.
   var NAV_IDS = ["L3482832595", "N1901077103"];
   var NAV_SEL = '[id="' + NAV_IDS.join('"], [id="') + '"]';
 
@@ -396,16 +450,7 @@
     el.appendChild(ctl.track);
 
     function followCaret() {
-      var mobile = el.closest('[id="N1901077103"]');
-      if (!mobile || !document.contains(mobile) || reduce) {
-        ctl.track.style.transform = "";
-        return;
-      }
-
-      var overflow = Math.ceil(ctl.track.scrollWidth - el.clientWidth);
-      ctl.track.style.transform = overflow > 0
-        ? "translateX(" + (-overflow) + "px)"
-        : "";
+      ctl.track.style.transform = "";
     }
 
     // Un solo timer por lema: espera, borrado y tecleo se turnan.
@@ -588,7 +633,7 @@
   });
 
   function scan() {
-    var lemas = document.querySelectorAll("[data-glitch]");
+    var lemas = document.querySelectorAll('[id="L3482832595"] [data-glitch]');
     for (var i = 0; i < lemas.length; i++) initGlitch(lemas[i]);
 
     var navs = document.querySelectorAll(NAV_SEL);
@@ -1377,6 +1422,7 @@
 	var fondo = document.getElementById("fondo");
 	var content = fondo.querySelector(".page-content");
 	var nav = document.querySelector('[id="L3482832595"]');
+	var mobileNav = document.querySelector('[id="N1901077103"]');
 	var estado = document.getElementById("estado");
 
 	document.getElementById("panel").addEventListener("click", function (e) {
@@ -1409,10 +1455,11 @@
 	});
 
 	setInterval(function () {
+		var visibleNav = matchMedia("(max-width: 819px)").matches ? mobileNav : nav;
 		estado.textContent =
-			"nav: " + (nav.getAttribute("data-nav") || "—") +
-			"  ·  lema: " + (nav.querySelector(".nav-lema").getAttribute("data-nav") || "—") +
-			"  ·  menú: " + (nav.querySelector(".nav-links").getAttribute("data-nav") || "—");
+			"nav: " + (visibleNav.getAttribute("data-nav") || "—") +
+			"  ·  logo: " + (visibleNav.querySelector(".nav-logo").getAttribute("data-nav") || "—") +
+			"  ·  menú: " + (visibleNav.querySelector(".nav-links").getAttribute("data-nav") || "—");
 	}, 200);
 })();
 </script>

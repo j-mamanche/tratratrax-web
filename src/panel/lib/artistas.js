@@ -13,6 +13,7 @@
  */
 
 import { el } from './piezas.js';
+import { idioma } from './idioma.js';
 
 const normal = (s) =>
   String(s ?? '')
@@ -101,7 +102,7 @@ export function buscadorDeArtistas({ todos, puestos, alElegir, alCrear }) {
       (a) => normal(a.display) === normal(escrito) || (a.aliases ?? []).some((x) => normal(x) === normal(escrito)),
     );
     crear.hidden = !escrito || existe;
-    crear.replaceChildren(el('span', { clase: 'busca-mas' }, '+'), `Crear ${escrito}`);
+    crear.replaceChildren(el('span', { clase: 'busca-mas' }, '+'), idioma() === 'en' ? `Create ${escrito}` : `Crear ${escrito}`);
 
     lista.hidden = encontrados.length === 0;
     panel.hidden = false;

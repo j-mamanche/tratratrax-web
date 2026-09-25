@@ -14,8 +14,18 @@
 
 import { alCambiar, irA, leer, publicar, sucios } from './borrador.js';
 import { el, parte, vaciar } from './piezas.js';
+import { idioma, t, ui, traducirError } from './idioma.js';
+import { cambiosDelBorrador, destino, destinoError, textoCambio } from './cambios.js';
 
-const NOMBRES = { releases: 'el catálogo', artists: 'los artistas', home: 'el home', about: 'el about', blog: 'el blog' };
+const NOMBRES = {
+  es: { releases: 'el catálogo', artists: 'los artistas', home: 'el home', about: 'el about', blog: 'el blog' },
+  en: { releases: 'the catalog', artists: 'the artists', home: 'the home page', about: 'the about page', blog: 'the blog' },
+};
+const nombre = (archivo) => NOMBRES[idioma()][archivo] ?? archivo;
+const en = () => idioma() === 'en';
+const cantidad = (n, singular, plural) => `${n} ${n === 1 ? singular : plural}`;
+const cambiosTexto = (n) => en() ? `${cantidad(n, 'change', 'changes')} pending` : `${cantidad(n, 'cambio', 'cambios')} pendiente${n === 1 ? '' : 's'}`;
+const conflictosTexto = (n) => en() ? `${cantidad(n, 'conflict', 'conflicts')} to resolve` : `${cantidad(n, 'conflicto', 'conflictos')} por resolver`;
 
 /** `releases[12] "Gubbins": falta X` → `12`. Para poder saltar al culpable. */
 export function indiceDelError(mensaje) {
@@ -33,6 +43,7 @@ export function indiceDelError(mensaje) {
 export function montarBarra({ alFallar } = {}) {
   const boton = document.getElementById('guardar');
   const botonMovil = document.getElementById('guardarMovil');
+  const textoBotonMovil = botonMovil?.querySelector('span:last-child');
   const pie = document.getElementById('estadoBarra');
   const pieMovil = document.getElementById('estadoBarraMovil');
   const aviso = document.getElementById('parteBarra');
@@ -45,22 +56,20 @@ export function montarBarra({ alFallar } = {}) {
   let relojRevision = null;
   let relojCerrarDetalle = null;
 
-  const plural = (n, singular, pluralizado = `${singular}s`) => `${n} ${n === 1 ? singular : pluralizado}`;
-
   function pintarDetalle() {
-    const cambios = sucios();
+    const cambios = cambiosDelBorrador(leer());
     vaciar(detalle);
 
     if (conflictos.length) {
       detalle.append(
-        el('strong', { clase: 'detalle-titulo detalle-conflictos' }, `${plural(conflictos.length, 'conflicto')} por resolver`),
+        el('strong', { clase: 'detalle-titulo detalle-conflictos' }, conflictosTexto(conflictos.length)),
         el('ul', { clase: 'detalle-conflictos-lista' },
           conflictos.map((mensaje) =>
             el('li', {}, el('button', {
               type: 'button',
               clase: 'detalle-conflicto',
               onclick: () => irAlConflicto(mensaje),
-            }, mensaje)),
+            }, traducirError(mensaje))),
           ),
         ),
       );
@@ -68,9 +77,11 @@ export function montarBarra({ alFallar } = {}) {
 
     if (cambios.length) {
       detalle.append(
-        el('strong', { clase: 'detalle-titulo' }, `${plural(cambios.length, 'cambio')} pendiente${cambios.length === 1 ? '' : 's'}`),
+        el('strong', { clase: 'detalle-titulo' }, cambiosTexto(cambios.length)),
         el('ul', { clase: 'detalle-cambios-lista' },
-          cambios.map((archivo) => el('li', {}, NOMBRES[archivo] ?? archivo)),
+          cambios.map((cambio) => el('li', {}, el('a', {
+            clase: 'detalle-cambio', href: destino({ ...cambio, release: cambio.tipo === 'artists' ? leer().releases?.find((r) => r.artists?.includes(cambio.id))?.id : undefined }),
+          }, textoCambio(cambio, en())))),
         ),
       );
     }
@@ -80,6 +91,7 @@ export function montarBarra({ alFallar } = {}) {
     clearTimeout(relojCerrarDetalle);
     detalle.hidden = false;
     pie.setAttribute('aria-expanded', 'true');
+    pieMovil?.setAttribute('aria-expanded', 'true');
     pintarDetalle();
   }
 
@@ -87,6 +99,7 @@ export function montarBarra({ alFallar } = {}) {
     clearTimeout(relojCerrarDetalle);
     detalle.hidden = true;
     pie.setAttribute('aria-expanded', 'false');
+    pieMovil?.setAttribute('aria-expanded', 'false');
   }
 
   // El panel está separado visualmente del botón. Dejamos una fracción de
@@ -97,25 +110,8 @@ export function montarBarra({ alFallar } = {}) {
   }
 
   function irAlConflicto(mensaje) {
-    const indice = indiceDelError(mensaje);
-    if (indice != null) {
-      const release = leer().releases?.[indice];
-      if (release?.id) {
-        sessionStorage.setItem('ttx-conflicto-objetivo', mensaje);
-        irA(`/catalogo?id=${encodeURIComponent(release.id)}`);
-        return;
-      }
-    }
-    if (/^blog\b/i.test(mensaje)) {
-      sessionStorage.setItem('ttx-conflicto-objetivo', mensaje);
-      irA('/blog');
-      return;
-    }
-    if (/^home\.json/i.test(mensaje)) {
-      sessionStorage.setItem('ttx-conflicto-objetivo', mensaje);
-      irA('/home');
-      return;
-    }
+    const ruta = destinoError(mensaje, leer());
+    if (ruta) { irA(ruta); return; }
     alFallar?.([mensaje]);
   }
 
@@ -155,16 +151,16 @@ export function montarBarra({ alFallar } = {}) {
 
   function refrescar() {
     if (guardando) return;
-    const cuantos = sucios().length;
+    const cuantos = cambiosDelBorrador(leer()).length;
     boton.disabled = cuantos === 0;
     if (botonMovil) botonMovil.disabled = cuantos === 0;
-    const resumenCambios = cuantos ? `${plural(cuantos, 'cambio')} pendiente${cuantos === 1 ? '' : 's'}` : 'guardado';
-    pie.textContent = conflictos.length ? `${plural(conflictos.length, 'conflicto')} · ${resumenCambios}` : resumenCambios;
+    const resumenCambios = cuantos ? cambiosTexto(cuantos) : en() ? 'saved' : 'guardado';
+    pie.textContent = conflictos.length ? `${cantidad(conflictos.length, en() ? 'conflict' : 'conflicto', en() ? 'conflicts' : 'conflictos')} · ${resumenCambios}` : resumenCambios;
     const ayuda = conflictos.length
-      ? `No se puede guardar: ${plural(conflictos.length, 'conflicto')} por resolver. Haz clic para verlos e ir al campo que hay que corregir.`
+      ? en() ? `Cannot save: ${conflictosTexto(conflictos.length)}. Open the list to find the fields to correct.` : `No se puede guardar: ${conflictosTexto(conflictos.length)}. Haz clic para verlos e ir al campo que hay que corregir.`
       : cuantos
-        ? `${resumenCambios} en ${sucios().map((a) => NOMBRES[a] ?? a).join(', ')}. Haz clic para revisarlos o pulsa Guardar cambios para publicarlos.`
-        : 'No hay cambios pendientes.';
+        ? en() ? `${resumenCambios}. Open the list to review them or choose Save changes to publish.` : `${resumenCambios}. Abre la lista para revisarlos o pulsa Guardar cambios para publicarlos.`
+        : ui('No hay cambios pendientes.');
     // El texto vive en el popover propio, no en el tooltip nativo: ahí sí se
     // puede entrar, leer la lista y accionar cada conflicto.
     pie.title = '';
@@ -173,20 +169,30 @@ export function montarBarra({ alFallar } = {}) {
     pie.classList.toggle('pendiente', cuantos > 0 || conflictos.length > 0);
     if (pieMovil) {
       pieMovil.textContent = conflictos.length
-        ? `${plural(conflictos.length, 'conflicto')} por resolver`
-        : cuantos ? `${plural(cuantos, 'cambio')} sin guardar` : 'Guardado';
+        ? conflictosTexto(conflictos.length)
+        : cuantos ? en() ? cantidad(cuantos, 'unsaved change', 'unsaved changes') : `${cantidad(cuantos, 'cambio', 'cambios')} sin guardar` : ui('Guardado');
       pieMovil.classList.toggle('pendiente', cuantos > 0 || conflictos.length > 0);
+      pieMovil.disabled = pie.disabled;
+      pieMovil.setAttribute('aria-label', ayuda);
     }
     if (!detalle.hidden) pintarDetalle();
   }
 
   alCambiar(() => {
+    revision?.abort();
     conflictos = [];
     refrescar();
     programarRevision();
   });
   refrescar();
   programarRevision();
+  addEventListener('ttx:idioma', () => {
+    if (guardando) {
+      pie.textContent = ui('guardando…');
+      if (pieMovil) pieMovil.textContent = ui('Guardando…');
+      if (textoBotonMovil) textoBotonMovil.textContent = ui('Guardando…');
+    } else refrescar();
+  });
 
   const objetivo = sessionStorage.getItem('ttx-conflicto-objetivo');
   if (objetivo) {
@@ -197,8 +203,16 @@ export function montarBarra({ alFallar } = {}) {
   pie.addEventListener('click', () => {
     if (pie.disabled) return;
     const abierto = detalle.hidden;
+    if (abierto) { abrirDetalle(); detalle.querySelector('a, button')?.focus(); }
+    else cerrarDetalle();
+  });
+  pieMovil?.addEventListener('click', () => {
+    if (pieMovil.disabled) return;
+    const abierto = detalle.hidden;
     if (abierto) abrirDetalle();
     else cerrarDetalle();
+    document.getElementById('opcionesMovil')?.removeAttribute('open');
+    if (abierto) detalle.querySelector('a, button')?.focus();
   });
   pie.addEventListener('pointerenter', () => {
     if (!pie.disabled) abrirDetalle();
@@ -224,17 +238,17 @@ export function montarBarra({ alFallar } = {}) {
     boton.disabled = true;
     if (botonMovil) {
       botonMovil.disabled = true;
-      botonMovil.textContent = 'Guardando…';
+      textoBotonMovil.textContent = ui('Guardando…');
     }
-    pie.textContent = 'guardando…';
+    pie.textContent = ui('guardando…');
     pie.classList.remove('pendiente');
     if (pieMovil) {
-      pieMovil.textContent = 'Guardando…';
+      pieMovil.textContent = ui('Guardando…');
       pieMovil.classList.remove('pendiente');
     }
     parte(aviso, {});
 
-    const que = cambiados.map((a) => NOMBRES[a] ?? a).join(' y ');
+    const que = cambiados.map(nombre).join(en() ? ' and ' : ' y ');
     let resultado;
     try {
       resultado = await publicar(`Panel: ${que}`);
@@ -243,16 +257,19 @@ export function montarBarra({ alFallar } = {}) {
       // ejemplo, si se cae la red o el servidor reinicia—. Sin este cierre la
       // barra se queda en «guardando…» y parece que el botón no hizo nada.
       guardando = false;
-      if (botonMovil) botonMovil.textContent = 'Guardar cambios';
+      if (textoBotonMovil) textoBotonMovil.textContent = t('guardarCorto');
       refrescar();
       parte(aviso, {
         tono: 'mal',
-        texto: `No se pudo guardar: ${error?.message ?? 'fallo de conexión'}`,
+        texto: {
+          es: `No se pudo guardar: ${error?.message ?? 'fallo de conexión'}`,
+          en: `Could not save: ${traducirError(error?.message ?? 'fallo de conexión')}`,
+        },
       });
       return;
     }
     guardando = false;
-    if (botonMovil) botonMovil.textContent = 'Guardar cambios';
+    if (textoBotonMovil) textoBotonMovil.textContent = t('guardarCorto');
 
     if (resultado.ok) {
       conflictos = [];
@@ -260,6 +277,7 @@ export function montarBarra({ alFallar } = {}) {
       parte(aviso, { tono: 'bien', texto: 'Guardado. El sitio se actualizará en breve.' });
       detalle.hidden = true;
       pie.setAttribute('aria-expanded', 'false');
+      pieMovil?.setAttribute('aria-expanded', 'false');
       setTimeout(() => parte(aviso, {}), 6000);
       return;
     }

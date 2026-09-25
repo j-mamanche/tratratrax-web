@@ -38,7 +38,7 @@ const nombreActual = paginas.find(([href]) => href === actual)?.[1] ?? 'Seccione
              una ficha abierta encima. Vive en la barra y no en la ficha porque
              es donde ya se busca volver, y porque una ficha que empieza con un
              botón de irse empieza mal. -->
-        <button class="atras" id="volver" type="button" aria-label="Volver a la lista">‹</button>
+        <button class="atras" id="volver" type="button" aria-label="Volver a la lista" data-i18n-aria-label="volver">‹</button>
 
         <a class="marca" href="/catalogo">TraTraTrax <small>studio</small></a>
 
@@ -48,22 +48,22 @@ const nombreActual = paginas.find(([href]) => href === actual)?.[1] ?? 'Seccione
           ))}
         </nav>
 
-        <details class="barra-secciones">
-          <summary>Secciones <span>{nombreActual}</span></summary>
+        <details class="barra-secciones" id="seccionesMovil">
+          <summary><span class="barra-secciones-label" data-i18n="secciones">Secciones</span> <span class="barra-seccion-actual" data-i18n={actual.slice(1)}>{nombreActual}</span></summary>
           <nav class="barra-menu-caja">
             {paginas.map(([href, nombre]) => (
-              <a href={href} aria-current={actual === href ? 'page' : null}>{nombre}</a>
+              <a href={href} aria-current={actual === href ? 'page' : null} data-i18n={href.slice(1)}>{nombre}</a>
             ))}
           </nav>
         </details>
 
         <div class="barra-acciones">
-          <button class="boton barra-vista" id="verVista" type="button" aria-label="Vista previa" data-vista={actual.slice(1)}>
+          <button class="boton barra-vista" id="verVista" type="button" aria-label="Vista previa" data-i18n-aria-label="vista" data-vista={actual.slice(1)}>
             <span class="boton-icon" aria-hidden="true">◉</span><span class="largo" data-i18n="vista">Vista previa</span><span class="corto" data-i18n="vista">Vista previa</span>
           </button>
           <button class="estado" id="estadoBarra" type="button" aria-expanded="false" aria-controls="detalleCambios"></button>
           <button class="boton fuerte" id="guardar" type="button" disabled>
-            <span class="boton-icon" aria-hidden="true">↑</span><span class="largo" data-i18n="guardar">Guardar cambios</span><span class="corto">Guardar</span>
+            <span class="boton-icon" aria-hidden="true">↑</span><span class="largo" data-i18n="guardar">Guardar cambios</span><span class="corto" data-i18n="guardarCorto">Guardar</span>
           </button>
           <form method="post" action="/api/salir">
             <button class="boton callado" type="submit"><span data-i18n="salir">Salir</span> <span class="boton-icon" aria-hidden="true">↗</span></button>
@@ -72,16 +72,19 @@ const nombreActual = paginas.find(([href]) => href === actual)?.[1] ?? 'Seccione
 
         </div>
 
-        <details class="barra-opciones">
-          <summary>Opciones</summary>
+        <div class="barra-movil-acciones">
+          <button class="boton barra-vista-movil" id="verVistaMovil" type="button" aria-label="Vista previa" data-i18n-aria-label="vista"><span aria-hidden="true">◉</span><span class="barra-vista-texto" data-i18n="vista">Vista previa</span></button>
+          <button class="boton fuerte barra-guardar-movil" id="guardarMovil" type="button" disabled><span aria-hidden="true">↑</span><span data-i18n="guardarCorto">Guardar</span></button>
+        </div>
+
+        <details class="barra-opciones" id="opcionesMovil">
+          <summary aria-label="Opciones" data-i18n-aria-label="opciones"><span aria-hidden="true">⋯</span></summary>
           <div class="barra-menu-caja">
-            <button class="menu-barra-item" id="verVistaMovil" type="button">Vista previa</button>
-            <button class="menu-barra-item" id="guardarMovil" type="button">Guardar cambios</button>
-            <span class="menu-barra-etiqueta">Publicación</span>
-            <span class="menu-barra-estado" id="estadoBarraMovil">Guardado</span>
-            <button class="menu-barra-item" id="idiomaMovil" type="button">English</button>
+            <span class="menu-barra-etiqueta" data-i18n="publicacion">Publicación</span>
+            <button class="menu-barra-estado" id="estadoBarraMovil" type="button" aria-expanded="false" aria-controls="detalleCambios" disabled>Guardado</button>
+            <button class="menu-barra-item" id="idiomaMovil" type="button"><span aria-hidden="true">文</span><span>English</span></button>
             <form method="post" action="/api/salir">
-              <button class="menu-barra-item" type="submit" data-i18n="salir">Salir</button>
+              <button class="menu-barra-item" type="submit"><span aria-hidden="true">↗</span><span data-i18n="salir">Salir</span></button>
             </form>
           </div>
         </details>
@@ -109,36 +112,28 @@ const nombreActual = paginas.find(([href]) => href === actual)?.[1] ?? 'Seccione
       document.getElementById('verVistaMovil')?.addEventListener('click', () => document.getElementById('verVista')?.click());
       document.getElementById('guardarMovil')?.addEventListener('click', () => document.getElementById('guardar')?.click());
 
-      const abrirMenu = document.getElementById('abrirMenuBarra');
-      const menu = document.getElementById('menuBarra');
+      const menus = [document.getElementById('seccionesMovil'), document.getElementById('opcionesMovil')];
       const idiomaPrincipal = document.getElementById('idioma');
       const idiomaMovil = document.getElementById('idiomaMovil');
 
-      const pintarIdiomaMovil = () => {
-        if (idiomaMovil) idiomaMovil.textContent = idiomaPrincipal?.textContent === 'EN' ? 'English' : 'Español';
-      };
-      pintarIdiomaMovil();
-
-      const cerrarMenu = () => {
-        if (!menu || !abrirMenu) return;
-        menu.hidden = true;
-        abrirMenu.setAttribute('aria-expanded', 'false');
-      };
-
-      abrirMenu?.addEventListener('click', (event) => {
-        event.stopPropagation();
-        menu.hidden = !menu.hidden;
-        abrirMenu.setAttribute('aria-expanded', String(!menu.hidden));
-      });
+      const cerrarMenus = () => menus.forEach((menu) => { if (menu) menu.open = false; });
+      menus.forEach((menu) => menu?.addEventListener('toggle', () => {
+        if (menu.open) menus.filter((otro) => otro !== menu).forEach((otro) => { if (otro) otro.open = false; });
+      }));
       idiomaMovil?.addEventListener('click', () => {
         idiomaPrincipal?.click();
-        pintarIdiomaMovil();
-        cerrarMenu();
+        cerrarMenus();
       });
+      document.getElementById('estadoBarraMovil')?.addEventListener('click', () => {
+        cerrarMenus();
+        document.getElementById('estadoBarra')?.click();
+      });
+      document.getElementById('verVistaMovil')?.addEventListener('click', cerrarMenus);
+      document.getElementById('guardarMovil')?.addEventListener('click', cerrarMenus);
       addEventListener('click', (event) => {
-        if (menu && !menu.contains(event.target) && event.target !== abrirMenu) cerrarMenu();
+        if (!menus.some((menu) => menu?.contains(event.target))) cerrarMenus();
       });
-      addEventListener('keydown', (event) => { if (event.key === 'Escape') cerrarMenu(); });
+      addEventListener('keydown', (event) => { if (event.key === 'Escape') cerrarMenus(); });
     </script>
   </body>
 </html>

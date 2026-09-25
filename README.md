@@ -97,6 +97,16 @@ merca con él.
 
 Qué se pega y por qué: **[cargo/snippets/merca-estado.md](cargo/snippets/merca-estado.md)**.
 
+La operación comprobada en el editor, los tags y las verificaciones por ficha
+están en esa guía. El [índice de páginas de Cargo](cargo/INDICE-PAGINAS.md)
+separa el borrador de la versión pública; el respaldo fechado está en
+[`cargo/respaldo-2026-09-24/`](cargo/respaldo-2026-09-24/mapa-antes-despues.md).
+En el borrador hay cinco productos con `merch`, mientras la grilla publicada
+incluye cuatro. Se creó un Set vacío para organizarlos, sin mover páginas ni
+publicar el borrador. Antes de cambiar un tag de stock, el equipo debe
+confirmar el estado; el punto de la grilla, el rótulo de ficha y el control de
+compra requieren revisión individual.
+
 > **No hay preview de la merca.** Hubo un `/preview/merca.astro` que importaba
 > tres snippets que nunca se escribieron (`merca.css`, `merca-grid.html`,
 > `merca-item.html`), así que la ruta daba 500 y `npm run build` fallaba ahí.
@@ -211,8 +221,11 @@ tools/       Importador de Bandcamp y validador.
 cargo/       Espejo versionado de lo que vive dentro de Cargo.
 ```
 
-`cargo/` no es decoración: Cargo no tiene historial propio, así que este es el
-único backup de su HTML y CSS. Cada vez que se toque algo allá, se actualiza acá.
+`cargo/` no es decoración: conserva copias fechadas del estado publicado y
+registros del editor. Cada vez que se toque algo allá, se actualiza acá. El
+respaldo público se puede repetir con `python3 cargo/capturar-publicado.py
+cargo/respaldo-AAAA-MM-DD/publicado`; ese comando no exporta borradores del
+editor y no sustituye un inventario de Pages antes de reorganizar.
 
 ---
 

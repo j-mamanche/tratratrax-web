@@ -11,7 +11,8 @@
   /* El recorte. `--ttx-margen` es aire por los cuatro lados y `--ttx-nav-h`
      el espacio que se reserva **abajo** para la barra de navegación. Los dos
      entran en el alto: si no, poner aire arriba y a los lados solo empujaría
-     el widget y la página terminaría scrolleando de más. */
+     el widget y la página terminaría scrolleando de más. El margen no es un
+     gutter global: el borde visible suma el padding de Cargo y el del widget. */
   --ttx-margen: 0px;
   --ttx-nav-h: 0px;
   --ttx-alto: calc(100svh - var(--ttx-margen) * 2 - var(--ttx-nav-h));
@@ -90,6 +91,26 @@
      de blanco y no se vería el recorte. */
   padding: var(--ttx-margen);
   padding-bottom: calc(var(--ttx-margen) + var(--ttx-nav-h));
+}
+
+/* En estas cuatro páginas propias, el borde exterior del nav mide 1rem en
+   escritorio y .75rem cuando Cargo aplica su offset móvil. Home, About y Blog
+   ya reciben la mitad desde .page-content; Catalog no recibe padding allí.
+   La variable expresa ese eje medido, no un gutter para las demás páginas. */
+[data-ttx='home'],
+[data-ttx='about'],
+[data-ttx='catalogo'],
+[data-ttx='blog'] {
+  --ttx-eje-nav: 1rem;
+}
+
+@media (max-width: 819px) {
+  [data-ttx='home'],
+  [data-ttx='about'],
+  [data-ttx='catalogo'],
+  [data-ttx='blog'] {
+    --ttx-eje-nav: .75rem;
+  }
 }
 
 [data-ttx],

@@ -224,11 +224,14 @@ h1, h2, h3 { margin: 0; font-size: inherit; font-weight: inherit; }
 .detalle-cambios .detalle-conflictos-lista { padding-left:0; list-style:none; }
 .detalle-conflicto { width:100%; padding:0.4rem 0.45rem; border:0; border-left:2px solid var(--alarma); background:var(--superficie-2); color:inherit; font:400 12px/1.35 var(--sans); text-align:left; cursor:pointer; }
 .detalle-conflicto:hover { background:var(--superficie-3); }
+.detalle-cambios-lista { list-style:none; padding-left:0 !important; }
+.detalle-cambio { display:block; padding:0.4rem 0.45rem; color:inherit; font:400 12px/1.35 var(--sans); text-decoration:none; border-left:2px solid var(--acento); background:var(--superficie-2); }
+.detalle-cambio:hover, .detalle-cambio:focus-visible { background:var(--superficie-3); text-decoration:underline; }
 
 .barra-acciones .corto { display: none; }
 
 .barra-menu { display: none; }
-.barra-secciones, .barra-opciones { display:none; }
+.barra-secciones, .barra-opciones, .barra-movil-acciones { display:none; }
 
 .parte-barra {
   position: fixed;
@@ -1037,10 +1040,14 @@ code {
   .boton { min-height: 2.5rem; padding: 0.5rem 0.85rem; }
   /* En móvil hay dos decisiones claras: adónde ir y qué hacer. Los enlaces y
      acciones no compiten entre sí a lo ancho de una barra demasiado angosta. */
-  .barra { justify-content:space-between; gap:0.6rem; padding:0 0.75rem; }
+  .barra { justify-content:space-between; gap:0.5rem; padding:0 0.75rem; }
   .marca { display: none; }
   .barra-nav, .barra-acciones { display:none; }
-  .barra-secciones, .barra-opciones { position:relative; display:block; }
+  .barra-secciones, .barra-opciones { position:relative; display:block; flex:0 0 auto; }
+  .barra-movil-acciones { display:flex; align-items:center; gap:.35rem; margin-left:auto; min-width:0; }
+  .barra-movil-acciones .boton { min-height:2.5rem; padding:.45rem .6rem; font-size:12px; }
+  .barra-vista-movil { color:var(--tinta-2); }
+  .barra-vista-movil span:first-child, .barra-guardar-movil span:first-child { font-size:1.1em; }
   .barra-secciones summary, .barra-opciones summary {
     display:flex;
     align-items:center;
@@ -1071,7 +1078,11 @@ code {
   }
   .barra-secciones[open] summary, .barra-opciones[open] summary { border-color:var(--tinta); color:var(--tinta); }
   .barra-secciones[open] summary::after, .barra-opciones[open] summary::after { transform:rotate(180deg); }
-  .barra-secciones summary span { color:var(--tinta); }
+  .barra-secciones summary { max-width:12rem; }
+  .barra-secciones summary .barra-secciones-label { color:var(--tinta-3); font-weight:400; }
+  .barra-secciones summary .barra-seccion-actual { color:var(--tinta); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .barra-opciones summary { justify-content:center; width:2.5rem; padding:0; font-size:1.25rem; }
+  .barra-opciones summary::after { display:none; }
   .barra-menu-caja {
     position: absolute;
     z-index: 40;
@@ -1096,7 +1107,8 @@ code {
     font:400 13px/1 var(--sans);
     text-decoration:none;
   }
-  .barra-menu-caja a[aria-current], .barra-menu-caja a:hover { background:var(--superficie-2); color:var(--tinta); }
+  .barra-menu-caja a[aria-current] { background:var(--acento); color:#fff; font-weight:650; }
+  .barra-menu-caja a:hover:not([aria-current]) { background:var(--superficie-2); color:var(--tinta); }
   .menu-barra-etiqueta {
     padding: 0.35rem 0.45rem 0.1rem;
     font: 600 10px/1 var(--mono);
@@ -1105,13 +1117,23 @@ code {
     color: var(--tinta-3);
   }
   .menu-barra-estado {
+    width:100%;
     padding: 0.4rem 0.45rem 0.65rem;
     border-bottom: 1px solid var(--borde);
     font: 500 12px/1.2 var(--sans);
     color: var(--bien);
+    background:none;
+    border:0;
+    text-align:left;
+    cursor:pointer;
   }
+  .menu-barra-estado:disabled { cursor:default; }
+  .menu-barra-estado:not(:disabled):hover { background:var(--superficie-2); }
   .menu-barra-estado.pendiente { color: var(--aviso); }
   .menu-barra-item {
+    display:flex;
+    align-items:center;
+    gap:.65rem;
     width: 100%;
     min-height: 2.5rem;
     padding: 0.45rem;
@@ -1124,6 +1146,9 @@ code {
     cursor: pointer;
   }
   .menu-barra-item:hover { background: var(--superficie-2); color: var(--tinta); }
+  .menu-barra-item > span:first-child { display:inline-grid; place-items:center; width:1rem; font-size:15px; }
+  .menu-barra-item:disabled { opacity:.4; cursor:default; }
+  .barra summary:focus-visible, .barra button:focus-visible, .barra-menu-caja a:focus-visible { outline:2px solid var(--tinta); outline-offset:2px; }
   .detalle-cambios { right: 0.6rem; max-width: calc(100vw - 1.2rem); }
 
   .lista .fila-item { padding: 0.5rem 0.4rem; }
@@ -1137,8 +1162,11 @@ code {
 }
 
 @media (max-width: 26rem) {
-  .barra-nav a { padding: 0.4rem 0.45rem; font-size: 12px; }
-  .barra { gap: 0.4rem; }
+  .barra { gap:.3rem; padding-inline:.5rem; }
+  .barra-secciones summary { max-width:8.2rem; padding-inline:.4rem; }
+  .barra-secciones-label, .barra-vista-texto { display:none; }
+  .barra-movil-acciones { gap:.25rem; }
+  .barra-movil-acciones .boton { padding-inline:.45rem; }
 }
 
 @media (max-width: 22rem) {

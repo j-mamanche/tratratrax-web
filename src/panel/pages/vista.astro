@@ -66,11 +66,11 @@ const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchPara
       <span>2026 © Todos los izquierdos públicos</span>
       <span>
         <a href="/vista?w=home" aria-current={cual === 'home' ? 'true' : null}>Home</a> ·
-        <a href="/vista?w=catalogo" aria-current={cual === 'catalogo' ? 'true' : null}>Catálogo</a> ·
-        <a href="/vista?w=about" aria-current={cual === 'about' ? 'true' : null}>About</a>
+        <a href="/vista?w=catalogo" aria-current={cual === 'catalogo' ? 'true' : null} id="vistaCatalogoNav">Catálogo</a> ·
+        <a href="/vista?w=about" aria-current={cual === 'about' ? 'true' : null} id="vistaAboutNav">Sobre</a>
         · <a href="/vista?w=blog" aria-current={cual === 'blog' ? 'true' : null}>Blog</a>
       </span>
-      <span>Menu: About Catalog Merca Blog</span>
+      <span id="vistaMenu">Menú: Sobre Catálogo Tienda Blog</span>
     </div>
 
     <!-- Antes del bundle, sin módulos y sin esperar: el widget arranca en
@@ -89,15 +89,23 @@ const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchPara
         } catch { /* un borrador ilegible es como no tener ninguno */ }
 
         const sello = document.getElementById('sello');
+        const idioma = () => localStorage.getItem('ttx-idioma') === 'en' ? 'en' : 'es';
+        const pintarIdioma = () => {
+          const en = idioma() === 'en';
+          document.documentElement.lang = en ? 'en' : 'es';
+          document.title = `${en ? 'Preview' : 'Vista'} · ${cual}`;
+          document.getElementById('vistaCatalogoNav').textContent = en ? 'Catalog' : 'Catálogo';
+          document.getElementById('vistaAboutNav').textContent = en ? 'About' : 'Sobre';
+          document.getElementById('vistaMenu').textContent = en ? 'Menu: About Catalog Shop Blog' : 'Menú: Sobre Catálogo Tienda Blog';
+          if (!borrador) sello.textContent = en ? 'no draft · published data' : 'sin borrador · datos publicados';
+        };
+        pintarIdioma();
+        addEventListener('storage', (event) => { if (event.key === 'ttx-idioma') pintarIdioma(); });
         if (!borrador) {
-          sello.textContent = 'sin borrador · datos publicados';
           sello.classList.add('viejo');
           return; // sin borrador, que lea `data/` como cualquiera
         }
-        const sucio = ['releases', 'artists', 'home', 'about', 'blog'].some(
-          (a) => borrador.base?.[a] !== undefined && JSON.stringify(borrador[a] ?? null) !== borrador.base[a],
-        );
-        sello.textContent = sucio ? 'borrador · sin guardar' : 'borrador · igual al repo';
+        sello.textContent = 'borrador';
 
         const DEL_BORRADOR = {
           'releases.json': () => borrador.releases,

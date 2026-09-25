@@ -27,7 +27,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
     <div class="carril-seccion">
       <div class="carril-titulo">
         <span data-i18n="catalogo">Catálogo</span>
-        <button class="ayuda" type="button" id="ayudaCatalogo" aria-expanded="false" aria-label="Qué es el catálogo">?</button>
+        <button class="ayuda" type="button" id="ayudaCatalogo" aria-expanded="false" aria-label="Ayuda del catálogo" data-i18n-aria-label="ayudaCatalogoLabel">?</button>
         <span class="cuenta" id="cuenta"></span>
       </div>
 
@@ -41,7 +41,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>
         </button>
         <div class="menu" style="flex:0 0 auto">
-          <button class="boton fuerte" id="abrirNuevo" type="button" aria-expanded="false" aria-label="Añadir un lanzamiento"><span aria-hidden="true">+</span></button>
+          <button class="boton fuerte" id="abrirNuevo" type="button" aria-expanded="false" aria-label="Añadir un lanzamiento" data-i18n-aria-label="anadirLanzamiento"><span aria-hidden="true">+</span></button>
           <div class="menu-caja" id="menuNuevo" hidden>
             <button class="menu-item" id="nuevo" type="button" data-i18n="nuevo">Nuevo lanzamiento</button>
             <button class="menu-item" id="abrirImport" type="button" data-i18n="importarBandcamp">Importar de Bandcamp</button>
@@ -51,7 +51,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
 
       <div id="cajaImport" hidden>
         <div class="fila">
-          <input type="url" id="bcUrl" placeholder="https://tratratrax.bandcamp.com/album/…" />
+          <input type="url" id="bcUrl" placeholder="URL de álbum de Bandcamp" data-i18n-placeholder="bandcampUrl" />
           <button class="boton" id="importar" type="button" style="flex:0 0 auto"><span class="boton-icon" aria-hidden="true">↓</span> <span data-i18n="importar">Importar</span></button>
         </div>
         <p class="parte" id="parteImport" hidden style="margin-top:0.5rem"></p>
@@ -61,7 +61,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
     </div>
   </Fragment>
 
-  {!s.ok && <p class="parte mal">No se pudo leer el repo: {s.error}</p>}
+  {!s.ok && <p class="parte mal"><span data-i18n="errorRepo">No se pudo leer el repositorio:</span> {s.error}</p>}
 
   <p class="parte" id="parteDesfase" hidden></p>
   <p class="parte" id="parteBorrado" hidden></p>
@@ -79,13 +79,14 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
     <div id="formulario"></div>
   </div>
 
-  <p class="vacio" id="vacio">Selecciona o crea un lanzamiento.</p>
+  <p class="vacio" id="vacio" data-i18n="seleccionarLanzamiento">Selecciona o crea un lanzamiento.</p>
 
   <script is:inline type="application/json" id="modelo" set:html={JSON.stringify({
     releases: s.releases,
     artists: s.artists,
     home: s.home,
     about: s.about,
+    blog: s.blog,
     shas: s.shas,
     inicial,
   })} />
@@ -98,6 +99,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
     import { hacerSubidor } from '../lib/subidor.js';
     import { buscadorDeArtistas } from '../lib/artistas.js';
     import { montarPoster } from '../lib/poster.js';
+    import { ui, idioma } from '../lib/idioma.js';
     import { analizar, escribir as escribirCreditos } from '../../lib/creditos.mjs';
 
     const delServidor = leerIsla('modelo');
@@ -218,8 +220,8 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
       const lista = vaciar($('lista'));
       lista.classList.toggle('lista-cuadricula', vistaCatalogo === 'cuadricula');
       $('vistaCatalogo').setAttribute('aria-pressed', String(vistaCatalogo === 'cuadricula'));
-      $('vistaCatalogo').setAttribute('aria-label', vistaCatalogo === 'cuadricula' ? 'Ver catálogo en lista' : 'Ver catálogo en cuadrícula');
-      $('vistaCatalogo').title = vistaCatalogo === 'cuadricula' ? 'Ver lista' : 'Ver cuadrícula';
+      $('vistaCatalogo').setAttribute('aria-label', ui(vistaCatalogo === 'cuadricula' ? 'Ver catálogo en lista' : 'Ver catálogo en cuadrícula'));
+      $('vistaCatalogo').title = ui(vistaCatalogo === 'cuadricula' ? 'Ver lista' : 'Ver cuadrícula');
 
       lista.append(
         ...visibles.map((r) => {
@@ -231,7 +233,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
               'data-fila': r.id,
               clase: 'fila-item',
               'aria-current': r.id === activo ? 'true' : null,
-              'aria-label': [r.album || 'Sin título', artistas].filter(Boolean).join(' · '),
+              'aria-label': [r.album || ui('Sin título'), artistas].filter(Boolean).join(' · '),
               onclick: () => elegir(r.id),
             },
             // Sin arrastre mientras se busca: la lista filtrada no es el orden
@@ -244,7 +246,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
             vistaCatalogo === 'lista'
               ? el('div', { clase: 'fila-texto' },
                   el('b', {}, r.album || 'Sin título'),
-                  el('small', {}, [r.catalog, artistas, r.visible === false ? 'oculto' : null].filter(Boolean).join(' · ') || '—'),
+                  el('small', {}, [r.catalog, artistas, r.visible === false ? ui('oculto') : null].filter(Boolean).join(' · ') || '—'),
                 )
               : null,
           );
@@ -258,7 +260,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
       localStorage.setItem('ttx:catalogo-vista', vistaCatalogo);
       pintarLista();
     });
-    addEventListener('ttx:idioma', pintarLista);
+    addEventListener('ttx:idioma', () => { pintarLista(); pintarFormulario(); });
 
     arrastrable($('lista'), {
       alSoltar(desde, hasta) {
@@ -402,7 +404,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
         ),
         el('label', { clase: 'casilla', style: 'margin-top:0.5rem' },
           el('input', {
-            type: 'checkbox',
+            type: 'checkbox', id: 'campoVisible',
             checked: r.visible !== false,
             onchange: (e) => fijar('visible', e.target.checked),
           }),
@@ -489,7 +491,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
       const a = artists.find((x) => x.slug === slug);
       if (!a) return;
 
-      const nuevo = prompt('¿Cómo se escribe?', a.display)?.trim();
+      const nuevo = prompt(ui('¿Cómo se escribe?'), a.display)?.trim();
       if (!nuevo || nuevo === a.display) return;
 
       const alias = [...new Set([...(a.aliases ?? []), a.display])].filter((x) => x !== nuevo);
@@ -516,24 +518,19 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
         ],
         el('div', { clase: 'fila' },
           campo('Código de la carátula', el('input', {
-            type: 'text', id: 'campoCaratula', value: r.bcImageId ?? '', placeholder: 'a750972864',
+            type: 'text', id: 'campoCaratula', value: r.bcImageId ?? '', placeholder: 'ID de imagen de Bandcamp',
             oninput: (e) => { const v = e.target.value.trim(); vista.src = cover(v, 6); fijar('bcImageId', v); },
           })),
           el('div', { style: 'flex:0 0 auto' }, vista),
         ),
-        campo('Link para comprar', entrada('purchaseUrl', { type: 'url', id: 'campoComprar', placeholder: 'https://…bandcamp.com/album/…' })),
-        campo('Link para escuchar', entrada('listenUrl', { type: 'url', id: 'campoEscuchar', placeholder: 'https://linktr.ee/…' })),
+        campo('Link para comprar', entrada('purchaseUrl', { type: 'url', id: 'campoComprar', placeholder: 'URL de compra' })),
+        campo('Link para escuchar', entrada('listenUrl', { type: 'url', id: 'campoEscuchar', placeholder: 'URL para escuchar' })),
       );
     }
 
     // ── créditos: el bloque de texto, como siempre se escribió ──────────────
 
     function bloqueCreditos(r) {
-      const fecha = r.date
-        ? new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
-            .format(new Date(`${r.date}T00:00:00Z`))
-        : 'July 3, 2026';
-
       // Un release que todavía no pasó por aquí puede traer su última línea
       // en `note`, que es donde vivía antes. Se muestra en su sitio —al final
       // del bloque— y a la primera edición queda guardada donde va.
@@ -563,7 +560,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
         'Créditos',
         [
           el('p', { html: 'Un crédito por línea: <code>Mastering__ Beau Thomas</code>.' }),
-          el('p', { html: `La fecha se añade desde el campo Fecha: <code>Released__ ${fecha}</code>.` }),
+          el('p', { html: 'La fecha se añade desde el campo Fecha.' }),
         ],
         area,
       );
@@ -587,8 +584,8 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
         campoVideo(subidor, poster),
         poster.nodo,
         campo('Texto de la grieta', el('input', {
-          type: 'text', value: r.home?.texto ?? '',
-          placeholder: franjaPorDefecto(r),
+          type: 'text', id: 'campoTextoHome', value: r.home?.texto ?? '',
+          placeholder: 'Texto para la grieta',
           oninput: (e) => fijar('home.texto', e.target.value),
         })),
         aviso,
@@ -634,13 +631,6 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
         ),
       );
       return nodo;
-    }
-
-    /** Lo que va a salir en la franja si nadie escribe nada. */
-    function franjaPorDefecto(r) {
-      const nombre = nombresDe();
-      const quien = (r.artists ?? []).map((a) => nombre.get(a) ?? a).join(' & ');
-      return [r.album, quien].filter(Boolean).join('*') || 'Título*Artista';
     }
 
     const urlDeMedia = (ruta) => (/^https?:/.test(ruta) ? ruta : `/${String(ruta).replace(/^\//, '')}`);
@@ -692,12 +682,15 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
     $('borrar').addEventListener('click', () => {
       const r = release();
       if (!r) return;
-      if (!confirm(`¿Borrar "${r.album || 'este lanzamiento'}"? Se quitará del sitio al guardar.`)) return;
+      if (!confirm(idioma() === 'en' ? `Delete "${r.album || 'this release'}"? It will be removed from the site when you save.` : `¿Borrar "${r.album || 'este lanzamiento'}"? Se quitará del sitio al guardar.`)) return;
       const borrado = structuredClone(r);
       tocar({ releases: leer().releases.filter((x) => x.id !== r.id) });
       elegir(null);
       const aviso = $('parteBorrado');
-      parte(aviso, { tono: 'ojo', texto: `«${borrado.album || 'Este lanzamiento'}» se quitará al guardar.` });
+      parte(aviso, { tono: 'ojo', texto: {
+        es: `«${borrado.album || 'Este lanzamiento'}» se quitará al guardar.`,
+        en: `“${borrado.album || 'This release'}” will be removed when you save.`,
+      } });
       aviso.append(' ');
       aviso.append(el('button', {
         type: 'button', clase: 'como-link',
@@ -758,7 +751,10 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
 
         parte($('parteImport'), {
           tono: 'bien',
-          texto: `${datos.releases.length} lanzamiento(s) importado(s)${estrenados.length ? ` · ${estrenados.length} artista(s) creado(s)` : ''}.`,
+          texto: {
+            en: `${datos.releases.length} release${datos.releases.length === 1 ? '' : 's'} imported${estrenados.length ? ` · ${estrenados.length} artist${estrenados.length === 1 ? '' : 's'} created` : ''}.`,
+            es: `${datos.releases.length} lanzamiento${datos.releases.length === 1 ? '' : 's'} importado${datos.releases.length === 1 ? '' : 's'}${estrenados.length ? ` · ${estrenados.length} artista${estrenados.length === 1 ? '' : 's'} creado${estrenados.length === 1 ? '' : 's'}` : ''}.`,
+          },
         });
 
         $('bcUrl').value = '';
@@ -817,5 +813,16 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
     document.body.dataset.vista = activo ? 'obra' : 'lista';
     pintarLista();
     pintarFormulario();
+    const params = new URLSearchParams(location.search);
+    const ruta = params.get('campo');
+    if (params.has('eliminado') || params.has('contexto')) {
+      parte($('parteBorrado'), { tono: 'ojo', texto: params.get('contexto') || `Elemento eliminado o sin ficha propia: ${params.get('eliminado')}. Revisa el catálogo y las referencias del Home antes de guardar.` });
+      $('lista')?.scrollIntoView({ block: 'start' });
+    } else if (ruta) {
+      if (ruta === 'order') document.body.dataset.vista = 'lista';
+      const campos = { album:'campoAlbum', catalog:'campoCatalogo', date:'campoFecha', artists:'campoArtistas', bcImageId:'campoCaratula', purchaseUrl:'campoComprar', listenUrl:'campoEscuchar', credits:'campoCreditos', note:'campoCreditos', visible:'campoVisible', 'home.arte':'campoArtePortada', 'home.video.mp4':'campoVideo', 'home.video.poster':'campoVideo', 'home.texto':'campoTextoHome' };
+      const nodo = $(campos[ruta]) ?? (ruta === 'order' ? document.querySelector(`[data-fila="${CSS.escape(activo ?? '')}"]`) : null) ?? $('obra');
+      requestAnimationFrame(() => { nodo?.scrollIntoView({ block:'center' }); if (nodo instanceof HTMLElement) { if (!nodo.matches('input,textarea,button,select')) nodo.tabIndex = -1; nodo.focus({ preventScroll:true }); } });
+    }
   </script>
 </Marco>

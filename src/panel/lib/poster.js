@@ -15,6 +15,7 @@
 import { el, parte, vaciar } from './piezas.js';
 import { subir } from './material.js';
 import { sacarFotogramas, soltarFotogramas, comoArchivo } from './fotogramas.js';
+import { idioma } from './idioma.js';
 
 const reloj = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
@@ -68,7 +69,7 @@ export function montarPoster({ actual, fijar, aviso, subidor }) {
           el('button', {
             type: 'button',
             clase: 'fotograma',
-            title: `Poner el cuadro de ${reloj(f.segundo)}`,
+            title: idioma() === 'en' ? `Use frame at ${reloj(f.segundo)}` : `Poner el cuadro de ${reloj(f.segundo)}`,
             onclick: () => elegir(f),
           },
             el('img', { src: f.url, alt: '' }),
@@ -98,7 +99,7 @@ export function montarPoster({ actual, fijar, aviso, subidor }) {
       fijar('home.video.poster', ruta);
       const texto = campoRuta.querySelector('input[type="text"]');
       if (texto) texto.value = ruta;
-      parte(aviso, { tono: 'bien', texto: `póster: ${reloj(f.segundo)}` });
+      parte(aviso, { tono: 'bien', texto: { es: `póster: ${reloj(f.segundo)}`, en: `poster: ${reloj(f.segundo)}` } });
       marcar(f);
     } catch (e) {
       parte(aviso, { tono: 'mal', texto: e.message });

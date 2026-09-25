@@ -54,14 +54,73 @@ function ticker(t) {
   const run = () => elemento('span', { class: 'ttx-blog-ticker-run' }, elemento(t.url ? 'a' : 'span', t.url ? { href: t.url, target: '_blank', rel: 'noopener noreferrer' } : {}, t.text ?? ''));
   return elemento('section', { class: 'ttx-blog-ticker' },
     elemento('b', {}, t.label || 'LAST NEWS'),
-    elemento('div', { class: 'ttx-blog-ticker-window' }, elemento('div', { class: 'ttx-blog-ticker-track' }, run(), run())));
+    elemento('div', { class: 'ttx-blog-ticker-window' }, elemento('div', { class: 'ttx-blog-ticker-track' }, run())));
+}
+
+function activarTicker(host) {
+  const ventana = host.querySelector('.ttx-blog-ticker-window');
+  const pista = host.querySelector('.ttx-blog-ticker-track');
+  const original = pista.firstElementChild;
+  const movimientoReducido = matchMedia('(prefers-reduced-motion: reduce)');
+  let pendiente = 0;
+  let anchoAnterior = 0;
+  let velocidadAnterior = 0;
+  let datosCambiados = false;
+
+  const medir = () => {
+    pendiente = 0;
+    const ancho = original.getBoundingClientRect().width;
+    const ventanaAncho = ventana.getBoundingClientRect().width;
+    if (!ancho || !ventanaAncho) return;
+    if (datosCambiados) {
+      while (pista.children.length > 1) pista.lastElementChild.remove();
+      datosCambiados = false;
+    }
+    // Tras desplazar una repetición, las restantes todavía deben cubrir toda
+    // la ventana. El padding de la repetición forma parte de esta distancia.
+    const cantidad = movimientoReducido.matches ? 1 : Math.max(2, Math.ceil(ventanaAncho / ancho) + 1);
+    while (pista.children.length < cantidad) {
+      const copia = original.cloneNode(true);
+      copia.setAttribute('aria-hidden', 'true');
+      copia.querySelectorAll('a').forEach((a) => { a.tabIndex = -1; });
+      pista.append(copia);
+    }
+    while (pista.children.length > cantidad) pista.lastElementChild.remove();
+
+    // Velocidad ligada a la escala tipográfica, no al número de copias.
+    const velocidad = parseFloat(getComputedStyle(original).fontSize) * 1.2;
+    if (ancho !== anchoAnterior || velocidad !== velocidadAnterior) {
+      pista.style.setProperty('--ttx-blog-ticker-distance', `${ancho}px`);
+      pista.style.setProperty('--ttx-blog-ticker-duration', `${ancho / velocidad}s`);
+      anchoAnterior = ancho;
+      velocidadAnterior = velocidad;
+    }
+    if (!pista.hasAttribute('data-ready')) pista.setAttribute('data-ready', '');
+  };
+  const agendar = () => { if (!pendiente) pendiente = requestAnimationFrame(medir); };
+  const observador = new ResizeObserver(agendar);
+  observador.observe(ventana);
+  observador.observe(original);
+  const datos = new MutationObserver(() => { datosCambiados = true; agendar(); });
+  datos.observe(original, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['href', 'target', 'rel'] });
+  movimientoReducido.addEventListener('change', agendar);
+  agendar();
+  return () => {
+    observador.disconnect();
+    datos.disconnect();
+    movimientoReducido.removeEventListener('change', agendar);
+    cancelAnimationFrame(pendiente);
+  };
 }
 registrar('blog', async (host) => {
   const blog = await cargarBlog();
   const items = (blog.items ?? []).filter((x) => x.visible !== false).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   const highlight = items.find((x) => x.id === blog.highlight?.article) ?? items[0];
+  // El archivo móvil es un único flujo en orden editorial. Los carriles de
+  // escritorio se ocultan allí; el preview B solo cambia su presentación.
+  const archivo = items.filter((x) => x.id !== highlight?.id);
   const lanes = [[], [], []];
-  items.filter((x) => x.id !== highlight?.id).forEach((x, i) => lanes[i % 3].push(x));
+  archivo.forEach((x, i) => lanes[i % 3].push(x));
   const media = blog.highlight?.image ? elemento('img', { src: urlMedia(blog.highlight.image), alt: blog.highlight.imageAlt ?? '' }) : elemento('span', { class: 'ttx-blog-highlight-empty', 'aria-hidden': 'true' });
   const copia = highlight
     ? tarjeta(highlight, true)
@@ -69,11 +128,14 @@ registrar('blog', async (host) => {
   const foto = elemento('div', { class: 'ttx-blog-highlight-image' }, media);
   const bloqueHighlight = elemento('section', { class: 'ttx-blog-highlight' }, copia, foto);
   const carriles = lanes.map((lane, i) => elemento('div', { class: `ttx-blog-lane ttx-blog-lane--${i + 1}`, tabindex: '0' }, ...lane.map((x) => tarjeta(x))));
+  const historia = elemento('section', { class: 'ttx-blog-history', 'aria-label': 'Archivo del blog' }, ...carriles);
+  const archivoMovil = elemento('section', { class: 'ttx-blog-history ttx-blog-history--movil', 'aria-label': 'Archivo del blog', tabindex: '0' }, ...archivo.map((x) => tarjeta(x)));
 
   host.replaceChildren(
     bloqueHighlight,
     ticker(blog.ticker ?? {}),
-    elemento('section', { class: 'ttx-blog-history', 'aria-label': 'Archivo del blog' }, ...carriles)
+    historia,
+    archivoMovil
   );
 
   // La carga siempre abre el archivo por su comienzo. Los carriles conservan
@@ -81,18 +143,62 @@ registrar('blog', async (host) => {
   // primera tarjeta y no deja ninguna medio escondida detrás del ticker.
   carriles.forEach((carril) => { carril.scrollTop = 0; });
 
-  // La imagen no participa en decidir el alto del highlight: ese alto lo
-  // escribe el título y el texto. Medir la copia evita que una foto vertical
-  // agrande la fila o que una apaisada se recorte al aparecer al hover.
-  const medirHighlight = () => {
-    const alto = Math.ceil(copia.getBoundingClientRect().height);
-    foto.style.setProperty('--ttx-blog-highlight-h', `${alto}px`);
-  };
-  const observador = new ResizeObserver(medirHighlight);
-  observador.observe(copia);
-  requestAnimationFrame(medirHighlight);
-
+  const soltarTicker = activarTicker(host);
   const soltarRastro = rastroHover(host.querySelectorAll('.ttx-blog-title'));
+  const soltarMedidas = medirBlogMovil(host, bloqueHighlight, host.querySelector('.ttx-blog-ticker'));
 
-  return { destruir: () => { observador.disconnect(); soltarRastro(); } };
+  return { destruir: () => { soltarTicker(); soltarRastro(); soltarMedidas(); } };
 });
+
+function medirBlogMovil(host, highlight, grieta) {
+  const movil = matchMedia('(max-width: 700px)');
+  const visor = window.visualViewport;
+  const navSelector = '.chrome, [id="N1901077103"] :is(.nav-lema,.nav-logo,.nav-links), [id="L3482832595"] :is(.nav-lema,.nav-logo,.nav-links)';
+  let pendiente = 0;
+  const medir = () => {
+    pendiente = 0;
+    if (!movil.matches || !host.isConnected) return;
+    const techo = visor?.offsetTop ?? 0;
+    const fondo = techo + (visor?.height ?? innerHeight);
+    const alto = Math.max(0, fondo - host.getBoundingClientRect().top);
+    let inicioNav = fondo;
+    let hayNav = false;
+    for (const pieza of document.querySelectorAll(navSelector)) {
+      hayNav = true;
+      const caja = pieza.getBoundingClientRect();
+      if (caja.width && caja.height && caja.bottom > techo && caja.top < fondo) inicioNav = Math.min(inicioNav, caja.top);
+    }
+    const nav = hayNav ? Math.max(0, fondo - inicioNav) : (parseFloat(getComputedStyle(host).getPropertyValue('--ttx-nav-h')) || 0);
+    host.style.setProperty('--ttx-blog-visible-h', `${alto}px`);
+    host.style.setProperty('--ttx-blog-nav-real-h', `${nav}px`);
+    // Si las dos zonas superiores dejan menos de un área táctil utilizable,
+    // la página completa recupera su scroll y no queda un archivo atrapado.
+    host.classList.toggle('ttx-blog-sin-encaje',
+      alto - highlight.getBoundingClientRect().height - grieta.getBoundingClientRect().height - 32 < 112);
+  };
+  const agendar = () => { if (!pendiente) pendiente = requestAnimationFrame(medir); };
+  const observador = new ResizeObserver(agendar);
+  observador.observe(highlight);
+  observador.observe(grieta);
+  const navObserver = new MutationObserver((cambios) => {
+    if (cambios.some((c) => [...c.addedNodes, ...c.removedNodes].some((n) => n.nodeType === 1 && (n.matches?.('.chrome, [id="N1901077103"], [id="L3482832595"]') || n.querySelector?.('.chrome, [id="N1901077103"], [id="L3482832595"]'))))) agendar();
+  });
+  navObserver.observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('resize', agendar);
+  window.addEventListener('orientationchange', agendar);
+  visor?.addEventListener('resize', agendar);
+  visor?.addEventListener('scroll', agendar);
+  movil.addEventListener('change', agendar);
+  document.fonts?.ready.then(() => { if (host.isConnected) agendar(); });
+  agendar();
+  return () => {
+    observador.disconnect();
+    navObserver.disconnect();
+    window.removeEventListener('resize', agendar);
+    window.removeEventListener('orientationchange', agendar);
+    visor?.removeEventListener('resize', agendar);
+    visor?.removeEventListener('scroll', agendar);
+    movil.removeEventListener('change', agendar);
+    cancelAnimationFrame(pendiente);
+  };
+}

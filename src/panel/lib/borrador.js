@@ -43,6 +43,7 @@ export const ARCHIVOS = ['releases', 'artists', 'home', 'about', 'blog'];
 
 const oyentes = new Set();
 
+import { equivalente } from './cambios.js';
 const congelar = (valor) => JSON.stringify(valor ?? null);
 
 /** Lo que el servidor pintó en la página, o lo que quedó de la última vez. */
@@ -134,7 +135,7 @@ export function tocar(cambios) {
 /** Qué archivos difieren de como estaban al abrir. */
 export function sucios(estado = leer()) {
   const base = estado.base ?? {};
-  return ARCHIVOS.filter((a) => base[a] !== undefined && congelar(estado[a]) !== base[a]);
+  return ARCHIVOS.filter((a) => base[a] !== undefined && !equivalente(estado[a], JSON.parse(base[a])));
 }
 
 export const estaSucio = () => sucios().length > 0;

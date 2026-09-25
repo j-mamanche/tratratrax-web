@@ -13,6 +13,7 @@
 
 import { el, campo, parte } from './piezas.js';
 import { subir } from './material.js';
+import { idioma, ui } from './idioma.js';
 
 export function hacerSubidor({ actual, fijar, aviso }) {
   const leerRuta = (obj, ruta) => ruta.split('.').reduce((o, k) => o?.[k], obj);
@@ -28,7 +29,7 @@ export function hacerSubidor({ actual, fijar, aviso }) {
     const poner = (destino, dicho) => {
       texto.value = destino;
       fijar(ruta, destino);
-      parte(aviso, { tono: 'bien', texto: `${dicho}: ${destino}` });
+      parte(aviso, { tono: 'bien', texto: { es: `${dicho}: ${destino}`, en: `${ui(dicho)}: ${destino}` } });
     };
 
     if (id) texto.id = id;
@@ -45,7 +46,7 @@ export function hacerSubidor({ actual, fijar, aviso }) {
         if (!file) return;
 
         const base = `${actual().id}${sufijo ? `-${sufijo}` : ''}`;
-        parte(aviso, { texto: `Subiendo ${file.name}…` });
+        parte(aviso, { texto: { es: `Subiendo ${file.name}…`, en: `Uploading ${file.name}…` } });
 
         // Quien pidió el campo puede querer el archivo en la mano —el póster
         // se saca del mp4 que se acaba de elegir, y volver a bajarlo del repo
@@ -56,7 +57,7 @@ export function hacerSubidor({ actual, fijar, aviso }) {
           poner(await subir(file, base), 'listo');
         } catch (err) {
           if (!err.existe) return parte(aviso, { tono: 'mal', texto: err.message });
-          if (!confirm(`"${err.ruta}" ya existe. ¿Reemplazarlo?`)) {
+          if (!confirm(idioma() === 'en' ? `"${err.ruta}" already exists. Replace it?` : `"${err.ruta}" ya existe. ¿Reemplazarlo?`)) {
             return parte(aviso, { tono: 'ojo', texto: 'Sin cambios.' });
           }
           try {

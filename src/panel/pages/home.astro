@@ -25,10 +25,10 @@ const s = await estado();
 ---
 
 <Marco titulo="Home" actual="/home" sinCarril>
-  {!s.ok && <p class="parte mal">No se pudo leer el repo: {s.error}</p>}
+  {!s.ok && <p class="parte mal"><span data-i18n="errorRepo">No se pudo leer el repositorio:</span> {s.error}</p>}
 
   <div class="cabeza-home">
-    <div class="opciones" role="radiogroup" aria-label="Cómo se elige la portada">
+    <div class="opciones" role="radiogroup" aria-label="Cómo se elige la portada" data-i18n-aria-label="elegirPortada">
       <label class="opcion">
         <input type="radio" name="modo" value="fijo" id="modoFijo" />
         <b data-i18n="fijo">Fijo</b>
@@ -45,13 +45,13 @@ const s = await estado();
   <div id="pantalla"></div>
 
   <script is:inline type="application/json" id="modelo" set:html={JSON.stringify({
-    releases: s.releases, artists: s.artists, home: s.home, about: s.about, shas: s.shas,
+    releases: s.releases, artists: s.artists, home: s.home, about: s.about, blog: s.blog, shas: s.shas,
   })} />
 
   <script>
     import { abrir, leer, tocar, avisarAlSalir } from '../lib/borrador.js';
     import { montarBarra } from '../lib/barra.js';
-    import { t } from '../lib/idioma.js';
+    import { t, ui, idioma } from '../lib/idioma.js';
     import { el, bloque, campo, vaciar, leerIsla, parte } from '../lib/piezas.js';
     import { hacerSubidor } from '../lib/subidor.js';
     import { montarPoster } from '../lib/poster.js';
@@ -264,7 +264,7 @@ const s = await estado();
             }),
           ),
         );
-        cuenta.textContent = dentro.length ? `${dentro.length} disponibles` : 'No hay lanzamientos con imagen';
+        cuenta.textContent = dentro.length ? idioma() === 'en' ? `${dentro.length} available` : `${dentro.length} disponibles` : ui('No hay lanzamientos con imagen');
         return;
       }
 
@@ -280,8 +280,8 @@ const s = await estado();
         ),
       );
       cuenta.textContent = puede.length
-        ? `${dentro.size} de ${puede.length} marcados`
-        : 'No hay lanzamientos disponibles';
+        ? idioma() === 'en' ? `${dentro.size} of ${puede.length} selected` : `${dentro.size} de ${puede.length} marcados`
+        : ui('No hay lanzamientos disponibles');
     }
 
     /** Marca o desmarca un lanzamiento del aleatorio. */
@@ -323,8 +323,8 @@ const s = await estado();
         ? releases.filter((r) => r.id === h.release)
         : releases.filter((r) => marcados().has(r.id));
       const texto = modo === 'fijo'
-        ? elegidos[0]?.album || 'Sin lanzamiento seleccionado'
-        : `${elegidos.length} lanzamiento${elegidos.length === 1 ? '' : 's'} marcado${elegidos.length === 1 ? '' : 's'}`;
+        ? elegidos[0]?.album || ui('Sin lanzamiento seleccionado')
+        : idioma() === 'en' ? `${elegidos.length} release${elegidos.length === 1 ? '' : 's'} selected` : `${elegidos.length} lanzamiento${elegidos.length === 1 ? '' : 's'} marcado${elegidos.length === 1 ? '' : 's'}`;
       const accion = modo === 'fijo' ? 'Escoger otro lanzamiento' : 'Editar selección';
       const miniatura = modo === 'fijo' && arteDe(elegidos[0]);
 
@@ -333,7 +333,7 @@ const s = await estado();
           miniatura ? el('img', {
             clase: 'resumen-seleccion-miniatura',
             src: miniatura,
-            alt: `Carátula de ${elegidos[0].album || 'este lanzamiento'}`,
+            alt: idioma() === 'en' ? `Cover of ${elegidos[0].album || ui('este lanzamiento')}` : `Carátula de ${elegidos[0].album || 'este lanzamiento'}`,
             loading: 'lazy',
           }) : null,
           el('strong', {}, texto),
@@ -406,7 +406,7 @@ const s = await estado();
       video.addEventListener('input', () => poster.revisar());
 
       const caja = bloque(
-        `Material de ${r.album || 'este lanzamiento'}`,
+        idioma() === 'en' ? `Media for ${r.album || ui('este lanzamiento')}` : `Material de ${r.album || 'este lanzamiento'}`,
         [
           el('p', { html: 'Arte propio reemplaza la carátula.' }),
           el('p', { html: 'Video y póster son opcionales.' }),
@@ -417,7 +417,7 @@ const s = await estado();
         poster.nodo,
         campo('Texto de la grieta', el('input', {
           type: 'text', value: r.home?.texto ?? '',
-          placeholder: franjaPorDefecto(r),
+          placeholder: 'Texto para la grieta',
           oninput: (e) => fijarMaterial('home.texto', e.target.value),
         })),
         el('p', { style: 'margin:0.7rem 0 0' },
@@ -443,13 +443,19 @@ const s = await estado();
       return nodo;
     }
 
-    /** Lo que va a salir en la franja si nadie escribe nada. */
-    function franjaPorDefecto(r) {
-      const nombres = new Map(leer().artists.map((a) => [a.slug, a.display]));
-      const quien = (r.artists ?? []).map((a) => nombres.get(a) ?? a).join(' & ');
-      return [r.album, quien].filter(Boolean).join('*') || 'Título*Artista';
-    }
-
     pintar();
+    const campoDestino = new URLSearchParams(location.search).get('campo');
+    if (campoDestino) {
+      if (campoDestino === 'azar' || campoDestino === 'release') { selectorAbierto = true; pintar(); }
+      const nodo = campoDestino === 'modo' ? $('modoFijo')
+        : campoDestino === 'azar' ? $('rejilla')
+        : campoDestino === 'release' ? $('rejilla')
+        : $('pantalla');
+      requestAnimationFrame(() => {
+        nodo?.scrollIntoView({ block:'center' });
+        const foco = nodo?.matches('input,button,select,textarea') ? nodo : nodo?.querySelector('input,button,select,textarea');
+        foco?.focus({ preventScroll:true });
+      });
+    }
   </script>
 </Marco>

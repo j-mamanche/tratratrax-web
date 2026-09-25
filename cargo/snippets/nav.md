@@ -6,8 +6,8 @@ Los scripts van globales porque Cargo navega por AJAX y el nav se vuelve a
 pintar en cada cambio de página — si viven en la página, se mueren en la primera
 navegación. La bandera además tapa la página entera, que tampoco es del nav.
 
-El nav móvil es otra página de Cargo, `[id="N1901077103"]`: los mismos scripts la
-manejan, y lo que hay que hacer allá está en la sección 6.
+El nav móvil es otra página de Cargo, `[id="N1901077103"]`: comparte medición de
+tinta, página activa y bandera. Solo el lema de escritorio usa `data-glitch`.
 
 Antes de pegar en vivo: `cargo/snippets/nav-preview.html` es el mismo nav en un
 archivo suelto. Se abre con doble clic y sirve para calibrar tiempos sin tocar
@@ -24,7 +24,7 @@ que el sitio y la trampa del apilamiento se vea antes y no después.
 Reemplaza el `<column-set>` entero:
 
 ```html
-<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="zoomable" hash="Y3055296379683564288776637724874" limit-by="width" scale="15%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT" data-nav-highlight="about">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" data-nav-highlight="catalog">CATALOG</a><a href="blog" rel="history" data-label="BLOG" data-nav-highlight="blog">BLOG</a><a href="merca" rel="history" data-label="MERCA" data-nav-highlight="merca">MERCA</a></div></column-unit></column-set>
+<column-set gutter="1"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="linked" disable-zoom="true" hash="Y3055296379683564288776637724874" href="home" limit-by="width" rel="history" scale="20%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><a href="about" rel="history" data-label="ABOUT" data-nav-highlight="about">ABOUT</a><a href="catalog" rel="history" data-label="CATALOG" data-nav-highlight="catalog">CATALOG</a><a href="blog" rel="history" data-label="BLOG" data-nav-highlight="blog">BLOG</a><a href="merca" rel="history" data-label="MERCA" data-nav-highlight="merca">MERCA</a></div></column-unit></column-set>
 ```
 
 Seis cosas que no son cosméticas:
@@ -52,6 +52,8 @@ Seis cosas que no son cosméticas:
   la gaveta, que tiene una lógica visual distinta de las otras tres páginas.
 
 El `<span data-glitch>` es lo único que rota. El `2026 ©` se queda quieto.
+El logo central enlaza a `home` mediante `rel="history"`; `scale="20%"`
+lo hace legible sin quitar espacio a las columnas laterales.
 
 **El nav no usa juntas.** Los cuatro links se separan con un espacio normal,
 sin `__` ni alternancia de peso.
@@ -100,6 +102,9 @@ lista. El lema sigue en regular.
 
 [id="L3482832595"] .page-content {
 	align-items: flex-end;
+	/* Eje exterior del nav: 1rem en desktop. Home/About/Blog suman
+	   .5rem de .page-content y medio --ttx-eje-nav propio; Catalog
+	   suma 0 y --ttx-eje-nav completo. Cargo reduce estos rem en móvil. */
 	padding: 1rem;
 }
 
@@ -185,6 +190,12 @@ lista. El lema sigue en regular.
 [id="L3482832595"] .nav-logo {
 	text-align: center;
 	line-height: 0; /* mata el descender del inline y lo apoya de verdad */
+}
+
+/* Cargo escala el media-item con la columna. El límite evita que el logo
+   tape la última franja del catálogo en pantallas ultraanchas. */
+[id="L3482832595"] .nav-logo media-item.linked {
+	max-width: min(calc(0.2 * var(--resize-parent-width, 100%)), 125px);
 }
 
 /* El logo es un PNG blanco: para el modo negro se invierte. Si algún día el
@@ -359,9 +370,8 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
   var AWAY_MAX  = 30;    // cuántas veces mira antes de rendirse (30s)
   var WATCH_MS  = 3000;  // ronda de reparación
 
-  // En Cargo el nav de escritorio y el de móvil son dos páginas distintas, cada
-  // una con su id. Acá van todas las instancias; el lema se anima solo en las
-  // que tengan un [data-glitch], esta lista es para marcar la página activa.
+  // Las dos páginas comparten la marca de página activa. El glitch pertenece
+  // exclusivamente al nav de escritorio; nunca busca texto dentro del móvil.
   var NAV_IDS = ["L3482832595", "N1901077103"];
   var NAV_SEL = '[id="' + NAV_IDS.join('"], [id="') + '"]';
 
@@ -422,9 +432,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
     el.classList.remove("is-typing");
     el.classList.add("is-resting"); // parpadea al cargar y se apaga
 
-    // En móvil el lema comparte fila con el menú. El texto vive dentro de una
-    // pista que se puede correr sin mover el prefijo `2026 ©` ni partir la
-    // línea. En escritorio la pista queda siempre en translateX(0).
+    // La pista conserva la estructura del lema de escritorio.
     ctl.track = document.createElement("span");
     ctl.track.className = "glitch-track";
 
@@ -440,20 +448,8 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
     ctl.track.appendChild(caret);
     el.appendChild(ctl.track);
 
-    // Solo el nav móvil desplaza el lema. Se llama después de cada letra:
-    // cuando la frase pasa el ancho disponible, el cursor sigue entrando por
-    // la derecha en vez de empujar el menú a otra línea.
     function followCaret() {
-      var mobile = el.closest('[id="N1901077103"]');
-      if (!mobile || !document.contains(mobile) || reduce) {
-        ctl.track.style.transform = "";
-        return;
-      }
-
-      var overflow = Math.ceil(ctl.track.scrollWidth - el.clientWidth);
-      ctl.track.style.transform = overflow > 0
-        ? "translateX(" + (-overflow) + "px)"
-        : "";
+      ctl.track.style.transform = "";
     }
 
     // Un solo timer por lema: espera, borrado y tecleo se turnan.
@@ -638,7 +634,7 @@ de `ttx.js` ni de los widgets, ni del script de la sección 4.
   });
 
   function scan() {
-    var lemas = document.querySelectorAll("[data-glitch]");
+    var lemas = document.querySelectorAll('[id="L3482832595"] [data-glitch]');
     for (var i = 0; i < lemas.length; i++) initGlitch(lemas[i]);
 
     var navs = document.querySelectorAll(NAV_SEL);
@@ -1110,366 +1106,177 @@ puras imágenes es una línea de CSS.
 
 ## 6. La instancia móvil — `[id="N1901077103"]`
 
-El nav de móvil es **otra página** de Cargo, con su propio id, su propio HTML y
-su propio CSS. Los tres scripts ya la contemplan: cada uno tiene arriba la lista
-de instancias, y es lo único que hay que tocar para añadir una más.
+El logo pasa al extremo izquierdo de la única fila y sigue enlazando a `home`
+con navegación AJAX. Se elimina la antigua columna central para que haya **una
+sola copia visible**. Los cuatro enlaces conservan orden, `gap` y reserva de
+ancho. La marca de página activa, la tinta automática y la bandera siguen
+recorriendo ambos IDs; el glitch solo consulta el nav de escritorio (sección 3).
 
-```js
-var NAV_IDS = ["L3482832595", "N1901077103"];   // escritorio, móvil
-```
+### HTML de la página móvil
 
-Está en los scripts de las secciones 3 y 4, y tiene que decir lo mismo en los
-dos. El de la bandera (sección 7) lleva la misma lista escrita como selector, en
-`LOGO_SEL`: ahí el logo del móvil también invoca bandera.
-Con eso, cada instancia se mide y se pinta por su cuenta: la que esté escondida
-no tiene caja que medir, se salta sola y se queda con el color que traía hasta
-que reaparezca. Y ninguna se mide a sí misma ni a la otra, que en móvil están
-las dos en el documento, una encima de la otra.
-
-**El HTML del móvil usa las mismas clases**: `.nav-lema`, `.nav-logo`,
-`.nav-links` y el `<span data-glitch>`. Si allá se llaman distinto, hay que
-agregar esas clases a `PARTS` en el script de la sección 4 — es lo que se mide.
-
-**Tres cosas cambian respecto al escritorio**, y solo tres: la maquetación (dos
-filas en vez de tres columnas), el logo (es un link al home, no un zoom) y el
-reparto de columnas. Todo lo demás —los dos juegos de tinta, la
-bandera, los pesos, las reservas de ancho— es lo mismo con otro id.
-
-### El HTML
+Reemplaza el `<column-set>` entero:
 
 ```html
-<column-set gutter="1" mobile-stack="false"><column-unit slot="0"><div class="nav-lema">2026 © <span class="glitch" data-glitch>TODOS LOS IZQUIERDOS PÚBLICOS</span></div></column-unit><column-unit slot="1"><div class="nav-logo"><media-item class="linked" disable-zoom="true" hash="Y3055296379683564288776637724874" href="home" limit-by="width" rel="history" scale="40%"></media-item></div></column-unit><column-unit slot="2"><div class="nav-links"><a data-label="ABOUT" data-nav-highlight="about" href="about" rel="history">ABOUT</a><a data-label="CATALOG" data-nav-highlight="catalog" href="catalog" rel="history">CATALOG</a><a data-label="BLOG" data-nav-highlight="blog" href="blog" rel="history">BLOG</a><a data-label="MERCA" data-nav-highlight="merca" href="merca" rel="history">MERCA</a></div></column-unit></column-set>
+<column-set gutter="1" mobile-stack="false"><column-unit slot="0"><div class="nav-logo"><media-item class="linked" disable-zoom="true" hash="Y3055296379683564288776637724874" href="home" limit-by="width" rel="history" scale="70%"></media-item></div></column-unit><column-unit slot="1"><div class="nav-links"><a data-label="ABOUT" data-nav-highlight="about" href="about" rel="history">ABOUT</a><a data-label="CATALOG" data-nav-highlight="catalog" href="catalog" rel="history">CATALOG</a><a data-label="BLOG" data-nav-highlight="blog" href="blog" rel="history">BLOG</a><a data-label="MERCA" data-nav-highlight="merca" href="merca" rel="history">MERCA</a></div></column-unit></column-set>
 ```
 
-- **`mobile-stack="false"` no es opcional.** Es lo que le dice a Cargo que no
-  apile las tres columnas por su cuenta; si Cargo apila, el `flex-wrap` del CSS
-  no llega a mandar y las dos filas no se arman.
-- **El logo es un link, no un zoom.** `class="linked"` con `href="home"` y
-  `disable-zoom="true"`, y a `scale="40%"` en vez del 15% del escritorio, que va
-  `zoomable`. **Sigue invocando bandera**: `LOGO_SEL` (sección 7) cuelga de
-  `.nav-logo` —el div de afuera— y no del `media-item`, así que el toque muestra
-  la bandera y navega al home en el mismo gesto. Es exactamente lo que describe
-  `FLASH_DEDO`: se ve un instante y la página cambia debajo.
-- **Sin `MENU`.** El nav no lleva rótulo en ninguna de las dos instancias.
-- **El `<span data-glitch>` va limpio.** Si copias el nav del inspector te traes
-  `class="glitch is-resting"` y los dos `<span>` de adentro (`.glitch-text` y
-  `.glitch-caret`): eso lo escribe el script de la sección 3 en cada carga, no se
-  escribe a mano. Pegarlo de vuelta no rompe nada —el script vacía el nodo y lo
-  vuelve a armar— pero deja basura en el editor de Cargo.
+`mobile-stack="false"` permite mantener la fila. `.nav-logo` conserva el
+selector de la bandera y el `media-item` conserva el enlace `rel="history"`.
+El `scale="70%"` produce una caja de 79,8 × 34,0 px a 390 px de
+viewport; no se escala con el sobrante de la columna. El menú mide
+167,8 px en ese viewport. El logo queda a la izquierda y el menú a la derecha.
 
-### El CSS
+### CSS de la página móvil
 
 ```css
-/* ============================================================
-   CARGO — NAV MÓVIL  [id="N1901077103"]
-   El mismo sistema del nav de escritorio (sección 2) con otra
-   maquetación. Todo scopeado al id, como allá.
-   ============================================================ */
-
 [id="N1901077103"].page {
-	min-height: var(--viewport-height);
-}
-
-/* — EL NAV, ENCIMA DE LA BANDERA —
-   Lo mismo que en la sección 2 y por la misma razón. El `!important` no es
-   decorativo: Cargo le escribe `z-index: 399` **en el atributo style** a toda
-   página fijada, y un estilo en línea le gana a cualquier regla de la hoja.
-   Sin él esta declaración no llega nunca, el nav se queda en 399 y la bandera
-   (9998) lo tapa entero — medido en vivo, no deducido.
-
-   `position` no se pone: Cargo ya deja la página en `fixed` desde `.page.fixed`,
-   que pesa más que un selector de atributo. Un `position: relative` acá sería
-   una declaración muerta. */
-
-[id="N1901077103"].page {
-	z-index: 9999 !important;
+  min-height: var(--viewport-height);
+  z-index: 9999 !important; /* Cargo escribe z-index:399 inline */
 }
 
 [id="N1901077103"] .page-content {
-	align-items: flex-end;
-	padding: 1rem;
+  align-items: flex-end;
+  padding: 1rem; /* Cargo aplica mobile-padding-offset:.75 */
 }
 
-[id="N1901077103"] .page-layout {
-	align-items: flex-end;
-}
-
-/* — MÓVIL: DOS FILAS —
-   Fila 1: el logo, de borde a borde.
-   Fila 2: el lema a la izquierda, el menú a la derecha.
-   Requiere mobile-stack="false" en el column-set: si Cargo apila por su
-   cuenta, el flex-wrap de acá no llega a mandar. */
+[id="N1901077103"] .page-layout { align-items: flex-end; }
 
 [id="N1901077103"] column-set {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	align-items: flex-end;
-	justify-content: space-between;
-	row-gap: 0.75rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: .5rem;
 }
 
 [id="N1901077103"] column-set > column-unit {
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-	flex: 0 1 auto;
-	width: auto;
-	max-width: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: auto;
+  max-width: none;
+  min-width: 0;
 }
 
-/* Fila 1 — el logo se lleva la línea entera y la corta: lo que sigue baja. */
-[id="N1901077103"] column-set > column-unit[slot="1"] {
-	order: 0;
-	flex: 0 0 100%;
-	width: 100%;
-}
-
-/* Fila 2 — el lema es el que cede ancho; el menú no se comprime nunca. */
 [id="N1901077103"] column-set > column-unit[slot="0"] {
-	order: 1;
-	/* `flex-basis: auto` toma el ancho de toda la frase antes de que el
-	   recorte de `.nav-lema` entre a trabajar. Con base cero esta columna toma
-	   únicamente el sobrante después del menú y nunca lo manda a otra fila. */
-	flex: 1 1 0;
-	width: 0;
-	min-width: 0;
+  flex: 1 1 0;
 }
 
-[id="N1901077103"] column-set > column-unit[slot="2"] {
-	order: 2;
-	flex: 0 0 auto;
+[id="N1901077103"] column-set > column-unit[slot="1"] {
+  flex: 0 0 auto;
 }
 
-/* Solo el logo necesita estirarse para que el text-align: center signifique
-   algo; los otros dos se miden por su contenido. */
-[id="N1901077103"] column-set > column-unit[slot="1"] > * {
-	width: 100%;
+/* Cargo puede reconstruir un tercer slot vacío al guardar el column-set. */
+[id="N1901077103"] column-set > column-unit[slot="2"]:empty {
+  display: none;
 }
-
-/* — BLANCO O NEGRO —
-   El script de la sección 4 escribe data-nav="white" | "black" en el nav, y
-   también en cada pieza cuando la página parte el fondo en dos. Acá viven los
-   dos juegos de color y nada más: ningún otro sitio pinta el nav. */
 
 [id="N1901077103"],
 [id="N1901077103"] [data-nav="white"] {
-	--nav-ink: rgba(255, 255, 255, 0.85);  /* lema */
-	--nav-ink-strong: rgb(255, 255, 255);  /* menú */
-	--nav-logo-filter: none;               /* el logo ya viene blanco */
+  --nav-ink-strong: #fff;
+  --nav-logo-filter: none;
 }
 
 [id="N1901077103"][data-nav="black"],
 [id="N1901077103"] [data-nav="black"] {
-	--nav-ink: rgba(0, 0, 0, 0.85);
-	--nav-ink-strong: rgb(0, 0, 0);
-	--nav-logo-filter: invert(1);
+  --nav-ink-strong: #000;
+  --nav-logo-filter: invert(1);
 }
 
-/* — LA BANDERA MANDA —
-   El mismo bloque de la sección 2, con el mismo porqué: la tinta que trae
-   escrita la bandera gana sobre lo medido, y tiene que ganar también sobre lo
-   que el medidor le escribió a cada pieza —un selector de dos partes—, así que
-   este es de tres. Y sin transición: la bandera corta seco y la tinta tiene que
-   cortar con ella. */
-
+/* La bandera gana también sobre el data-nav de cada pieza. */
 [id="N1901077103"][data-bandera="black"],
 [id="N1901077103"][data-bandera="black"] [data-nav] {
-	--nav-ink: rgba(0, 0, 0, 0.85);
-	--nav-ink-strong: rgb(0, 0, 0);
-	--nav-logo-filter: invert(1);
+  --nav-ink-strong: #000;
+  --nav-logo-filter: invert(1);
 }
 
 [id="N1901077103"][data-bandera="white"],
 [id="N1901077103"][data-bandera="white"] [data-nav] {
-	--nav-ink: rgba(255, 255, 255, 0.85);
-	--nav-ink-strong: rgb(255, 255, 255);
-	--nav-logo-filter: none;
+  --nav-ink-strong: #fff;
+  --nav-logo-filter: none;
 }
 
-/* Sin `.nav-menu` en la lista: en móvil no hay rótulo. */
-[id="N1901077103"][data-bandera] :is(.nav-lema, .nav-links a),
+[id="N1901077103"][data-bandera] .nav-links a,
 [id="N1901077103"][data-bandera] media-item::part(media) {
-	transition: none;
-}
-
-[id="N1901077103"] .nav-lema {
-	display: flex;
-	align-items: flex-end;
-	min-width: 0;
-	overflow: hidden;
-	white-space: nowrap;
-	text-align: left;
-	color: var(--nav-ink);
-	transition: color 220ms ease;
+  transition: none;
 }
 
 [id="N1901077103"] .nav-logo {
-	text-align: center;
-	line-height: 0; /* mata el descender del inline y lo apoya de verdad */
+  text-align: left;
+  line-height: 0;
 }
 
-/* El logo es un PNG blanco: para el modo negro se invierte. Si algún día el
-   archivo cambia a negro, hay que intercambiar los dos valores del filtro. */
+/* A 768 px Cargo convierte el 70% en ~163 px; el límite conserva la
+   proporción del logo sin hacerlo invadir el contenido de la página. */
+@media (min-width: 500px) {
+  [id="N1901077103"] .nav-logo media-item.linked {
+    max-width: 100px;
+  }
+}
+
 [id="N1901077103"] media-item::part(media) {
-	filter: var(--nav-logo-filter);
-	transition: filter 220ms ease;
+  filter: var(--nav-logo-filter);
+  transition: filter 220ms ease;
 }
-
-/* — MENÚ DERECHO — */
 
 [id="N1901077103"] .nav-links {
-	display: flex;
-	justify-content: flex-end;
-	align-items: flex-end;
-	/* Un espacio normal de esta fuente mide ~0.28em, y eso es lo que va entre
-	   los links, igual que en el escritorio: se leen como frase y no como cuatro
-	   botones. Antes acá era 0.03em —casi tocándose—, que venía de cuando el
-	   menú era un bloque de texto. */
-	gap: 0.28em;
-	line-height: 1;
-	white-space: nowrap;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: .28em;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-/* **Las páginas a las que se puede ir van en negrilla; la que se está viendo,
-   no.** Es al revés de lo que uno haría, y es la idea: lo que pesa es lo que
-   queda por hacer. La activa se retira —regular y en itálica— porque ya no es
-   un destino, es dónde uno está. */
 [id="N1901077103"] .nav-links a {
-	display: inline-block;
-	color: var(--nav-ink-strong);
-	text-decoration: none;
-	border-bottom: 0;
-	font-weight: 700;
-	transition: color 220ms ease;
+  display: inline-block;
+  color: var(--nav-ink-strong);
+  text-decoration: none;
+  border-bottom: 0;
+  font-weight: 700;
+  transition: color 220ms ease;
 }
 
-/* Página activa: **itálica regular**, nunca subrayado. Cargo pone .active solo;
-   .is-active es el respaldo que pone el script si Cargo no marcó nada. En el
-   home no se marca ninguna: el home no está en la lista. */
 [id="N1901077103"] .nav-links a.active,
 [id="N1901077103"] .nav-links a.is-active {
-	font-style: italic;
-	font-weight: 400;
-	text-decoration: none;
+  font-style: italic;
+  font-weight: 400;
+  text-decoration: none;
 }
 
-/* Reserva de ancho, para que marcar la página activa no empuje a los otros
-   links. **Son dos y no una**: cada link puede estar en negrilla o en itálica
-   regular, y las dos miden distinto, así que cada uno reserva las dos y se
-   queda con la mayor. Bloques invisibles de altura cero: no se ven, no se
-   seleccionan, no se leen. */
 [id="N1901077103"] .nav-links a::before,
 [id="N1901077103"] .nav-links a::after {
-	content: attr(data-label);
-	display: block;
-	height: 0;
-	overflow: hidden;
-	visibility: hidden;
-	pointer-events: none;
+  content: attr(data-label);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 [id="N1901077103"] .nav-links a::before {
-	font-style: normal;
-	font-weight: 700;
+  font-style: normal;
+  font-weight: 700;
 }
 
 [id="N1901077103"] .nav-links a::after {
-	font-style: italic;
-	font-weight: 400;
+  font-style: italic;
+  font-weight: 400;
 }
 
-/* Mismos cuatro colores y mismo rastro de 1s que en el escritorio. */
 [id="N1901077103"] .nav-links a[data-nav-highlight]:is(:hover, :focus-visible, .ttx-hover-rastro) { transition: none !important; }
-[id="N1901077103"] .nav-links a[data-nav-highlight="about"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ffff01; color: #000000; }
-[id="N1901077103"] .nav-links a[data-nav-highlight="catalog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #0015ff; color: #ffffff; }
-[id="N1901077103"] .nav-links a[data-nav-highlight="blog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ff0000; color: #000000; }
-[id="N1901077103"] .nav-links a[data-nav-highlight="merca"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #b4ff9c; color: #000000; }
-
-/* — LEMA QUE SE HACKEA — */
-
-[id="N1901077103"] [data-glitch] {
-	display: block;
-	flex: 1 1 auto;
-	min-width: 0;
-	overflow: hidden;
-	white-space: nowrap;
-}
-
-/* La pista es más ancha que su ventana solo cuando hace falta. El script la
-   corre una letra a la vez al teclear; no hay marquee autónomo ni salto de
-   línea. */
-[id="N1901077103"] .glitch-track {
-	display: inline-block;
-	white-space: nowrap;
-	will-change: transform;
-}
-
-/* En reposo el cursor no está. Aparece fijo mientras teclea, parpadea tres
-   veces al terminar y se apaga: el `both` deja el último cuadro (opacidad 0)
-   puesto, así que no hace falta un timer en JS para esconderlo. */
-[id="N1901077103"] .glitch-caret::after {
-	content: "▌";
-	opacity: 0;
-}
-
-[id="N1901077103"] [data-glitch].is-typing .glitch-caret::after {
-	opacity: 1;
-}
-
-[id="N1901077103"] [data-glitch].is-resting .glitch-caret::after {
-	animation: ttx-caret 0.5s steps(1) 3 both;
-}
-
-/* Los mismos cuadros de la sección 2. Los `@keyframes` son globales y las dos
-   definiciones son idénticas, así que sobra una — pero cada página de Cargo
-   tiene que poder pararse sola, y si algún día se cambian los tiempos hay que
-   cambiarlos en las dos. */
-@keyframes ttx-caret {
-	0%, 49% { opacity: 1; }
-	50%, 100% { opacity: 0; }
-}
+[id="N1901077103"] .nav-links a[data-nav-highlight="about"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #ffff01; color: #000; }
+[id="N1901077103"] .nav-links a[data-nav-highlight="catalog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #0015ff; color: #fff; }
+[id="N1901077103"] .nav-links a[data-nav-highlight="blog"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #f00; color: #000; }
+[id="N1901077103"] .nav-links a[data-nav-highlight="merca"]:is(:hover, :focus-visible, .ttx-hover-rastro) { background: #b4ff9c; color: #000; }
 ```
 
-### Por qué en móvil no hay `MENU__`
-
-No cabe. Medido en el sitio en vivo, con la frase más larga del lema
-(`TODOS LOS IZQUIERDOS PÚBLICOS`) y con `MENU__` más el espacio normal entre
-links, la fila 2 se pasa **2 px** en los cuatro anchos que se probaron:
-
-```
-        lema  +  menú  =  total     caben
-430 px   216  +  197   =   413   >   411
-390 px   196  +  179   =   375   >   373
-360 px   181  +  165   =   346   >   344
-320 px   161  +  147   =   308   >   306
-```
-
-Los 2 px no son casualidad ni se arreglan con un teléfono más ancho: Cargo
-escala la fuente del nav con el viewport, así que la proporción es la misma en
-todos y siempre faltan los mismos 2 px. Sin el rótulo el menú mide 140 px a 390
-y sobran 37: el espacio normal entre los cuatro links —que es lo que los hace
-leerse como frase— sí entra cómodo, y es lo que quedó.
-
-**Si el rótulo se vuelve innegociable**, la única combinación que cabe es
-`MENU__` con el gap apretado de antes: el `.nav-menu` con su `::after` copiado
-de la sección 2 y `gap: 0.03em` en `.nav-links` (170 px a 390, sobran 7). El
-rótulo se lee y los cuatro links vuelven a ser un bloque. No hay una tercera.
-
-Con esa medida se cayó también el parche que había acá: un `margin-left: 0.05em`
-en el link que seguía al activo, que compensaba el aire que se come la negrilla
-cuando el `gap` es de 0.03em. Con el espacio normal y las dos reservas de ancho
-ya no hace falta.
-
-**El interruptor no se duplica.** `--nav-mode` lo pone la página de contenido,
-no el nav, así que el mismo valor manda sobre las dos instancias.
-
-Dos cosas menores del móvil:
-
-- Si las dos instancias tienen `data-glitch`, los dos lemas teclean a la vez,
-  cada uno con su ciclo y su frase. No se ve —solo una está en pantalla— y no
-  cuesta nada, pero si molesta, se le quita el `data-glitch` al que no se use.
-- `markActive` (la página activa en itálica) también recorre las dos.
+No hay `.nav-lema`, `[data-glitch]`, `.glitch-track` ni `@keyframes`
+propios en este CSS. La sección 3 busca explícitamente
+`[id="L3482832595"] [data-glitch]`, mientras `markActive` sigue recorriendo
+ambos navs tras cada navegación AJAX. El medidor de la sección 4 detecta
+`.nav-logo` y `.nav-links` que existen en esta nueva estructura.
 
 ---
 
@@ -1879,6 +1686,44 @@ completo, y en un teléfono eso recortaba por el lado largo: de
 Para cambiar el set: se toca el arte, se vuelve a sacar el cuadrado sin fondo y
 se ajusta esa bandera en la lista `BANDERAS` del script — el archivo, el
 `fondo` y la `tinta`. El LEEME de la carpeta trae de dónde salen los números.
+
+---
+
+## Cursor de enlaces — CSS global de Cargo
+
+Auditoría del publicado (24-09-2026): `a:hover` ya carga el machete en el
+nav, highlight de Blog, enlaces de About, compras de Catalog y texto enlazado
+de Merca. El carril de Catalog usa `grab`/`grabbing`; la etiqueta y carátula que
+abren un disco usan `pointer` y conservan esa semántica de control. Dos huecos
+reales: el título enlazado de Home conserva `pointer` porque su selector de
+widget gana a `a:hover`, y el `figure` del shadow DOM de `media-item.linked`
+usa `--image-link-cursor: pointer` (nav y fichas de Merca).
+
+El hash publicado `Z3149376184713067437113458768074` y el histórico
+`I2846370861133166636658288179402` devuelven ambos PNG de 36×38 px,
+755 bytes y SHA-256 idéntico
+`d69af007f99c46bd3d65a61620f520497cf8f2fa0bd553c542bc42f49272cdec`.
+Requieren la petición normal desde Cargo (con `Referer`); las descargas directas
+sin contexto devuelven 403. El dibujo efectivo ocupa 19×19 px desde x=17;
+`16 0` queda dentro del lienzo, junto al borde izquierdo del dibujo. Se usa
+el hash ya publicado y fallback `pointer`, útil si el navegador rechaza el PNG.
+
+Añadir al **CSS global**, debajo de la regla `a:hover` existente. No reemplaza
+el `grab` ni apunta a texto editable. Los selectores excluyen controles
+marcados como deshabilitados y se activan solo con hover fino; el foco de
+teclado conserva su outline y no necesita imagen de cursor.
+
+```css
+@media (hover: hover) and (pointer: fine) {
+  [data-ttx="home"] a.ttx-home-titulo[href]:not([aria-disabled="true"]):not([disabled]):hover {
+    cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer;
+  }
+
+  media-item.linked[href]:not([aria-disabled="true"]):not([disabled]):hover {
+    --image-link-cursor: url("https://freight.cargo.site/t/original/i/Z3149376184713067437113458768074/pointer-machete_5.png") 16 0, pointer;
+  }
+}
+```
 
 ---
 

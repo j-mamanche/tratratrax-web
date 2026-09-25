@@ -4,17 +4,25 @@
  * se usa.
  */
 
+import { ui, idioma, traducirError } from './idioma.js';
+import { UI_EN } from './textos.js';
+
 export function el(etiqueta, props = {}, ...hijos) {
   const nodo = document.createElement(etiqueta);
   for (const [k, v] of Object.entries(props ?? {})) {
     if (v == null || v === false) continue;
     if (k === 'clase') nodo.className = v;
-    else if (k === 'html') nodo.innerHTML = v;
+    else if (k === 'html') nodo.innerHTML = ui(v);
     else if (k.startsWith('on')) nodo.addEventListener(k.slice(2).toLowerCase(), v);
-    else if (k in nodo && k !== 'list') nodo[k] = v;
-    else nodo.setAttribute(k, v === true ? '' : v);
+    else if (k in nodo && k !== 'list') nodo[k] = ['title', 'placeholder', 'alt'].includes(k) ? ui(v) : v;
+    else nodo.setAttribute(k, v === true ? '' : k === 'aria-label' ? ui(v) : v);
   }
-  nodo.append(...hijos.flat().filter((h) => h != null && h !== false));
+  const contenido = hijos.flat().filter((h) => h != null && h !== false);
+  nodo.append(...contenido.map((h) => typeof h === 'string' ? ui(h) : h));
+  if (contenido.length === 1 && typeof contenido[0] === 'string' && UI_EN[contenido[0]]) {
+    nodo.dataset.uiEs = contenido[0];
+    nodo.dataset.uiEn = UI_EN[contenido[0]];
+  }
   return nodo;
 }
 
@@ -52,7 +60,7 @@ export function bloque(nombre, ayuda, ...hijos) {
         type: 'button',
         clase: 'ayuda',
         'aria-expanded': 'false',
-        'aria-label': `Qué es ${nombre}`,
+        'aria-label': idioma() === 'en' ? `Help for ${ui(nombre)}` : `Qué es ${nombre}`,
         onclick: (e) => {
           texto.hidden = !texto.hidden;
           e.currentTarget.setAttribute('aria-expanded', String(!texto.hidden));
@@ -74,8 +82,15 @@ export function parte(nodo, { tono, texto, lista = [] } = {}) {
   nodo.className = `parte ${tono ?? ''}`.trim();
   nodo.hidden = !texto && !lista.length;
   vaciar(nodo);
-  if (texto) nodo.append(el('strong', {}, texto));
-  if (lista.length) nodo.append(el('ul', {}, lista.map((t) => el('li', {}, t))));
+  const localizado = (valor, tag) => {
+    const par = typeof valor === 'object' ? valor : { es: valor, en: traducirError(valor) };
+    const item = el(tag, {}, idioma() === 'en' ? par.en : par.es);
+    item.dataset.uiEs = par.es;
+    item.dataset.uiEn = par.en;
+    return item;
+  };
+  if (texto) nodo.append(localizado(texto, 'strong'));
+  if (lista.length) nodo.append(el('ul', {}, lista.map((t) => localizado(t, 'li'))));
 }
 
 /** Los nombres de archivo y los identificadores internos salen de aquí. */

@@ -1,7 +1,8 @@
 <!-- ══════════════════════════════════════════════════════════════════════
      TAGS DE PÁGINA — el tag como fuente única
-     Va en Cargo: Settings → Edit HTML → **Global**. Una sola vez, para todo
-     el sitio.
+     Publicado en el HTML global de Cargo según el respaldo 2026-09-24.
+     Para editar: Settings → Edit HTML → Global. Comprobar la versión activa
+     antes de sustituirla por este archivo.
 
      Qué hace: le pone al `<div class="page" id="…">` las mismas clases
      `tag-<nombre-del-tag>` que Cargo ya le pone a los thumbnails del
@@ -13,7 +14,12 @@
      escribirlo otra vez a mano (`data-merca-stock`). Con esto el tag manda en
      los dos lados y `merca.css` no necesita el atributo:
 
-       .page.tag-out-of-stock  →  punto rojo, rótulo "Sold out", sin botón
+       .page.tag-out-of-stock  →  clase disponible para el CSS de esa ficha
+
+     Verificación 2026-09-24: las cuatro fichas públicas recibieron clases,
+     pero solo BEACH TOWEL H0731431535 tenía CSS local de rótulo basado en tag.
+     En otras fichas el texto y el botón siguen siendo independientes. En
+     particular O1289033983 muestra tag out-of-stock y botón "Buy €35".
 
      De dónde sale el dato: `window.store`, el store de Redux que el frontend
      de Cargo deja en `window` al arrancar. `getState().pages.byId[<id de la

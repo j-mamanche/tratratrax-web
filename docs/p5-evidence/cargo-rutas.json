@@ -1,0 +1,56 @@
+[
+  {
+    "width": 320,
+    "height": 568,
+    "direct": {
+      "cards": 14,
+      "lastBottom": 517.1875,
+      "navTop": 532.078125,
+      "padding": "45.2284px",
+      "scrollTop": 339,
+      "hostTop": 3.484375,
+      "hostBottom": 568,
+      "pageScroll": 571
+    },
+    "ajax": {
+      "cards": 14,
+      "scrollTop": 339
+    }
+  },
+  {
+    "width": 375,
+    "height": 568,
+    "direct": {
+      "cards": 14,
+      "lastBottom": 511.71875,
+      "navTop": 526.484375,
+      "padding": "51.1163px",
+      "scrollTop": 317,
+      "hostTop": 3.59375,
+      "hostBottom": 568,
+      "pageScroll": 572
+    },
+    "ajax": {
+      "cards": 14,
+      "scrollTop": 317
+    }
+  },
+  {
+    "width": 390,
+    "height": 568,
+    "direct": {
+      "cards": 14,
+      "lastBottom": 509.859375,
+      "navTop": 524.921875,
+      "padding": "52.759px",
+      "scrollTop": 312,
+      "hostTop": 3.625,
+      "hostBottom": 568,
+      "pageScroll": 572
+    },
+    "ajax": {
+      "cards": 14,
+      "scrollTop": 312
+    }
+  }
+]

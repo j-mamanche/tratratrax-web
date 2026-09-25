@@ -11,12 +11,15 @@ Una sola línea en la página de inicio. El loader global —el `<script>` del
 Con el recorte que ya usa el catálogo, que es lo que se va a querer:
 
 ```html
-<div data-ttx="home" style="--ttx-margen: 6px; --ttx-nav-h: 18px"></div>
+<div data-ttx="home" style="--ttx-margen: calc(var(--ttx-eje-nav) * .5); --ttx-nav-h: 60px"></div>
 ```
 
 `--ttx-nav-h` no es decorativo: es el hueco que se le reserva a la barra de
 Cargo, y donde termina la caja de abajo. Si queda en cero, la carátula —o el
 video, según el estado— se mete debajo de la barra.
+
+`--ttx-eje-nav` mide `1rem` en escritorio y `.75rem` hasta 819px. El margen
+del widget es la mitad porque `.page-content` aporta la otra mitad.
 
 ---
 

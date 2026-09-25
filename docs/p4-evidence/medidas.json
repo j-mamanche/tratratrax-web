@@ -1,0 +1,1214 @@
+[
+  {
+    "variant": "a",
+    "width": 320,
+    "height": 568,
+    "host": {
+      "top": 0,
+      "bottom": 488,
+      "height": 488
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 170.1,
+      "height": 160.1
+    },
+    "ticker": {
+      "top": 195.1,
+      "bottom": 219.7,
+      "height": 24.7
+    },
+    "archive": {
+      "top": 219.7,
+      "bottom": 478,
+      "height": 258.3
+    },
+    "nav": {
+      "top": 488,
+      "bottom": 568,
+      "height": 80
+    },
+    "scrollHeight": 1750,
+    "clientHeight": 258,
+    "pageScrollHeight": 568,
+    "font": "15.5px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 1492,
+      "lastTop": 212.1,
+      "lastBottom": 284,
+      "lastHeight": 71.9,
+      "archiveBottom": 478,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "b",
+    "width": 320,
+    "height": 568,
+    "host": {
+      "top": 0,
+      "bottom": 488,
+      "height": 488
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 182.3,
+      "height": 172.3
+    },
+    "ticker": {
+      "top": 207.3,
+      "bottom": 233.7,
+      "height": 26.4
+    },
+    "archive": {
+      "top": 233.7,
+      "bottom": 478,
+      "height": 244.3
+    },
+    "nav": {
+      "top": 488,
+      "bottom": 568,
+      "height": 80
+    },
+    "scrollHeight": 2429,
+    "clientHeight": 244,
+    "pageScrollHeight": 568,
+    "font": "20px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 2185,
+      "lastTop": 294.3,
+      "lastBottom": 340.6,
+      "lastHeight": 46.4,
+      "archiveBottom": 478,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "a",
+    "width": 320,
+    "height": 844,
+    "host": {
+      "top": 0,
+      "bottom": 764,
+      "height": 764
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 170.1,
+      "height": 160.1
+    },
+    "ticker": {
+      "top": 195.1,
+      "bottom": 219.7,
+      "height": 24.7
+    },
+    "archive": {
+      "top": 219.7,
+      "bottom": 754,
+      "height": 534.3
+    },
+    "nav": {
+      "top": 764,
+      "bottom": 844,
+      "height": 80
+    },
+    "scrollHeight": 1750,
+    "clientHeight": 534,
+    "pageScrollHeight": 844,
+    "font": "15.5px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 1216,
+      "lastTop": 488.1,
+      "lastBottom": 560,
+      "lastHeight": 71.9,
+      "archiveBottom": 754,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "b",
+    "width": 320,
+    "height": 844,
+    "host": {
+      "top": 0,
+      "bottom": 764,
+      "height": 764
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 182.3,
+      "height": 172.3
+    },
+    "ticker": {
+      "top": 207.3,
+      "bottom": 233.7,
+      "height": 26.4
+    },
+    "archive": {
+      "top": 233.7,
+      "bottom": 754,
+      "height": 520.3
+    },
+    "nav": {
+      "top": 764,
+      "bottom": 844,
+      "height": 80
+    },
+    "scrollHeight": 2429,
+    "clientHeight": 520,
+    "pageScrollHeight": 844,
+    "font": "20px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 1909,
+      "lastTop": 570.3,
+      "lastBottom": 616.6,
+      "lastHeight": 46.4,
+      "archiveBottom": 754,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "a",
+    "width": 375,
+    "height": 568,
+    "host": {
+      "top": 0,
+      "bottom": 488,
+      "height": 488
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 150.2,
+      "height": 140.2
+    },
+    "ticker": {
+      "top": 175.2,
+      "bottom": 199.8,
+      "height": 24.7
+    },
+    "archive": {
+      "top": 199.8,
+      "bottom": 478,
+      "height": 278.2
+    },
+    "nav": {
+      "top": 488,
+      "bottom": 568,
+      "height": 80
+    },
+    "scrollHeight": 1439,
+    "clientHeight": 278,
+    "pageScrollHeight": 568,
+    "font": "15.5px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 1161,
+      "lastTop": 266.7,
+      "lastBottom": 320.6,
+      "lastHeight": 53.9,
+      "archiveBottom": 478,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "b",
+    "width": 375,
+    "height": 568,
+    "host": {
+      "top": 0,
+      "bottom": 488,
+      "height": 488
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 160.8,
+      "height": 150.8
+    },
+    "ticker": {
+      "top": 185.8,
+      "bottom": 212.1,
+      "height": 26.4
+    },
+    "archive": {
+      "top": 212.1,
+      "bottom": 478,
+      "height": 265.9
+    },
+    "nav": {
+      "top": 488,
+      "bottom": 568,
+      "height": 80
+    },
+    "scrollHeight": 2275,
+    "clientHeight": 266,
+    "pageScrollHeight": 568,
+    "font": "20px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 2009,
+      "lastTop": 316.7,
+      "lastBottom": 363.1,
+      "lastHeight": 46.4,
+      "archiveBottom": 478,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "a",
+    "width": 375,
+    "height": 844,
+    "host": {
+      "top": 0,
+      "bottom": 764,
+      "height": 764
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 150.2,
+      "height": 140.2
+    },
+    "ticker": {
+      "top": 175.2,
+      "bottom": 199.8,
+      "height": 24.7
+    },
+    "archive": {
+      "top": 199.8,
+      "bottom": 754,
+      "height": 554.2
+    },
+    "nav": {
+      "top": 764,
+      "bottom": 844,
+      "height": 80
+    },
+    "scrollHeight": 1439,
+    "clientHeight": 554,
+    "pageScrollHeight": 844,
+    "font": "15.5px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 885,
+      "lastTop": 542.7,
+      "lastBottom": 596.6,
+      "lastHeight": 53.9,
+      "archiveBottom": 754,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "b",
+    "width": 375,
+    "height": 844,
+    "host": {
+      "top": 0,
+      "bottom": 764,
+      "height": 764
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 160.8,
+      "height": 150.8
+    },
+    "ticker": {
+      "top": 185.8,
+      "bottom": 212.1,
+      "height": 26.4
+    },
+    "archive": {
+      "top": 212.1,
+      "bottom": 754,
+      "height": 541.9
+    },
+    "nav": {
+      "top": 764,
+      "bottom": 844,
+      "height": 80
+    },
+    "scrollHeight": 2275,
+    "clientHeight": 542,
+    "pageScrollHeight": 844,
+    "font": "20px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 1733,
+      "lastTop": 592.7,
+      "lastBottom": 639.1,
+      "lastHeight": 46.4,
+      "archiveBottom": 754,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "a",
+    "width": 390,
+    "height": 568,
+    "host": {
+      "top": 0,
+      "bottom": 488,
+      "height": 488
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 150.2,
+      "height": 140.2
+    },
+    "ticker": {
+      "top": 175.2,
+      "bottom": 199.8,
+      "height": 24.7
+    },
+    "archive": {
+      "top": 199.8,
+      "bottom": 478,
+      "height": 278.2
+    },
+    "nav": {
+      "top": 488,
+      "bottom": 568,
+      "height": 80
+    },
+    "scrollHeight": 1420,
+    "clientHeight": 278,
+    "pageScrollHeight": 568,
+    "font": "15.5px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 1142,
+      "lastTop": 267.4,
+      "lastBottom": 321.3,
+      "lastHeight": 53.9,
+      "archiveBottom": 478,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "b",
+    "width": 390,
+    "height": 568,
+    "host": {
+      "top": 0,
+      "bottom": 488,
+      "height": 488
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 160.8,
+      "height": 150.8
+    },
+    "ticker": {
+      "top": 185.8,
+      "bottom": 212.1,
+      "height": 26.4
+    },
+    "archive": {
+      "top": 212.1,
+      "bottom": 478,
+      "height": 265.9
+    },
+    "nav": {
+      "top": 488,
+      "bottom": 568,
+      "height": 80
+    },
+    "scrollHeight": 2249,
+    "clientHeight": 266,
+    "pageScrollHeight": 568,
+    "font": "20px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 1983,
+      "lastTop": 316.4,
+      "lastBottom": 362.8,
+      "lastHeight": 46.4,
+      "archiveBottom": 478,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "a",
+    "width": 390,
+    "height": 844,
+    "host": {
+      "top": 0,
+      "bottom": 764,
+      "height": 764
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 150.2,
+      "height": 140.2
+    },
+    "ticker": {
+      "top": 175.2,
+      "bottom": 199.8,
+      "height": 24.7
+    },
+    "archive": {
+      "top": 199.8,
+      "bottom": 754,
+      "height": 554.2
+    },
+    "nav": {
+      "top": 764,
+      "bottom": 844,
+      "height": 80
+    },
+    "scrollHeight": 1420,
+    "clientHeight": 554,
+    "pageScrollHeight": 844,
+    "font": "15.5px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 866,
+      "lastTop": 543.4,
+      "lastBottom": 597.3,
+      "lastHeight": 53.9,
+      "archiveBottom": 754,
+      "windowScrollY": 0
+    }
+  },
+  {
+    "variant": "b",
+    "width": 390,
+    "height": 844,
+    "host": {
+      "top": 0,
+      "bottom": 764,
+      "height": 764
+    },
+    "highlight": {
+      "top": 10,
+      "bottom": 160.8,
+      "height": 150.8
+    },
+    "ticker": {
+      "top": 185.8,
+      "bottom": 212.1,
+      "height": 26.4
+    },
+    "archive": {
+      "top": 212.1,
+      "bottom": 754,
+      "height": 541.9
+    },
+    "nav": {
+      "top": 764,
+      "bottom": 844,
+      "height": 80
+    },
+    "scrollHeight": 2249,
+    "clientHeight": 542,
+    "pageScrollHeight": 844,
+    "font": "20px",
+    "links": [
+      {
+        "title": "CRACK MAGAZINE — Decoding Mzansi Bass (2026)",
+        "href": "https://crackmagazine.net/article/long-reads/decoding-mzansi-bass/"
+      },
+      {
+        "title": "MIXMAG — The Mix 114: Shannen SP (2026)",
+        "href": "https://mixmag.net/feature/the-mix-114-shannen-sp-tratratrax-mzansi-bass-gqom-3-step-techno"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Ehua & Flore: Pyrexia (2026)",
+        "href": "https://ra.co/news/84991"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Tracks of 2024",
+        "href": "https://crackmagazine.net/article/list-article/best-tracks-2024/"
+      },
+      {
+        "title": "MIXMAG — Verraco profile (2024)",
+        "href": "https://mixmag.net/feature/verraco-cover-feature-interview-dj-tratratrax-colombia"
+      },
+      {
+        "title": "PITCHFORK — Lechuga Zafiro (2024)",
+        "href": "https://pitchfork.com/news/10-new-albums-you-should-listen-to-now-bon-iver-porridge-radio-japandroids/"
+      },
+      {
+        "title": "RESIDENT ADVISOR — Doctor Jeep: Mecha (2024)",
+        "href": "https://ra.co/reviews/36152"
+      },
+      {
+        "title": "CRACK MAGAZINE — Ambie-Tón (2024)",
+        "href": "https://crackmagazine.net/2024/04/tratratrax-sublabel-ambie-ton-ambient/"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue 2 (2024)",
+        "href": "https://djmag.com/news/tratratrax-announces-new-compilation-featuring-siete-catorce-doctor-jeep-surusinghe-more"
+      },
+      {
+        "title": "CRACK MAGAZINE — Best Songs of 2022",
+        "href": "https://crackmagazine.net/article/list-article/best-songs-2022/"
+      },
+      {
+        "title": "BANDCAMP DAILY — Essential Releases (2022)",
+        "href": "https://daily.bandcamp.com/essential-releases/essential-releases-november-18-2022"
+      },
+      {
+        "title": "DJ MAG — no pare, sigue sigue (2022)",
+        "href": "https://djmag.com/news/colombias-tratratrax-label-announces-new-compilation-featuring-nick-leon-nicola-cruz-lila"
+      },
+      {
+        "title": "PITCHFORK — Nick León: Xtasis (2022)",
+        "href": "https://pitchfork.com/reviews/tracks/nick-leon-xtasis/"
+      },
+      {
+        "title": "DJ MAG — Premiere: Nick León: Xtasis (2022)",
+        "href": "https://djmag.com/listen/premiere-nick-leon-xtasis-feat-dj-babatr"
+      }
+    ],
+    "horizontalOverflow": false,
+    "end": {
+      "scrollTop": 1707,
+      "lastTop": 592.4,
+      "lastBottom": 638.8,
+      "lastHeight": 46.4,
+      "archiveBottom": 754,
+      "windowScrollY": 0
+    }
+  }
+]
