@@ -3,16 +3,16 @@ import { UI_EN } from './textos.js';
 export const COPIA = {
   es: {
     catalogo: 'Catálogo', home: 'Home', blog: 'Blog', merca: 'Merca Lab', guardar: 'Guardar cambios', salir: 'Salir',
-    nuevo: 'Nuevo lanzamiento', importarBandcamp: 'Importar de Bandcamp', importar: 'Importar',
+    nuevo: 'Nuevo lanzamiento', nuevoProducto: 'Nuevo producto', importarBandcamp: 'Importar de Bandcamp', importar: 'Importar', importarUrl: 'Importar URL',
     todos: 'Todos', bloqueados: 'No publicables', pendientes: 'Pendientes', listos: 'Listos',
     vista: 'Vista previa', fijo: 'Fijo', aleatorio: 'Aleatorio',
     fijoPie: 'Muestra un lanzamiento.', autoPie: 'Elige entre los marcados.',
     seleccionarTodo: 'Seleccionar todo', quitarTodo: 'Quitar todo', borrar: 'Borrar',
     buscar: 'Buscar…', ayudaCatalogo: 'Arrastra para cambiar el orden. Gris: pendiente. Rojo: bloquea la publicación.',
     guardarCorto: 'Guardar', secciones: 'Secciones', opciones: 'Opciones', publicacion: 'Publicación', guardado: 'Guardado',
-    volver: 'Volver a la lista', vistaCuadricula: 'Ver catálogo en cuadrícula', anadirLanzamiento: 'Añadir un lanzamiento',
+    volver: 'Volver a la lista', vistaCuadricula: 'Ver catálogo en cuadrícula', anadirLanzamiento: 'Añadir un lanzamiento', anadirProducto: 'Añadir un producto',
     elegirPortada: 'Cómo se elige la portada', ayudaCatalogoLabel: 'Ayuda del catálogo',
-    seleccionarLanzamiento: 'Selecciona o crea un lanzamiento.',
+    seleccionarLanzamiento: 'Selecciona o crea un lanzamiento.', seleccionarProducto: 'Selecciona o crea un producto.', bandcampMerchUrl: 'URL de Bandcamp',
     entrar: 'Entrar', contrasena: 'Contraseña', intro: 'Edita y publica el contenido del sitio.',
     mala: 'Contraseña incorrecta.', vacia: 'Escribe la contraseña.', frenado: 'Demasiados intentos. Espera unos minutos.',
     rota: 'Falta configuración del panel.', errorEntrar: 'No se pudo entrar.', faltan: 'Faltan:', revisa: 'Revisa',
@@ -20,16 +20,16 @@ export const COPIA = {
   },
   en: {
     catalogo: 'Catalog', home: 'Home', blog: 'Blog', merca: 'Merch Lab', guardar: 'Save changes', salir: 'Sign out',
-    nuevo: 'New release', importarBandcamp: 'Import from Bandcamp', importar: 'Import',
+    nuevo: 'New release', nuevoProducto: 'New product', importarBandcamp: 'Import from Bandcamp', importar: 'Import', importarUrl: 'Import URL',
     todos: 'All', bloqueados: 'Blocked', pendientes: 'Needs info', listos: 'Ready',
     vista: 'Preview', fijo: 'Fixed', aleatorio: 'Random',
     fijoPie: 'Shows one release.', autoPie: 'Picks from selected releases.',
     seleccionarTodo: 'Select all', quitarTodo: 'Clear all', borrar: 'Delete',
     buscar: 'Search…', ayudaCatalogo: 'Drag to reorder. Gray: needs info. Red: blocks publishing.',
     guardarCorto: 'Save', secciones: 'Sections', opciones: 'Options', publicacion: 'Publishing', guardado: 'Saved',
-    volver: 'Back to list', vistaCuadricula: 'View catalog as grid', anadirLanzamiento: 'Add a release',
+    volver: 'Back to list', vistaCuadricula: 'View catalog as grid', anadirLanzamiento: 'Add a release', anadirProducto: 'Add a product',
     elegirPortada: 'How the cover is chosen', ayudaCatalogoLabel: 'Catalog help',
-    seleccionarLanzamiento: 'Select or create a release.',
+    seleccionarLanzamiento: 'Select or create a release.', seleccionarProducto: 'Select or create a product.', bandcampMerchUrl: 'Bandcamp URL',
     entrar: 'Sign in', contrasena: 'Password', intro: 'Edit and publish the site content.',
     mala: 'Incorrect password.', vacia: 'Enter your password.', frenado: 'Too many attempts. Wait a few minutes.',
     rota: 'The Studio is not configured.', errorEntrar: 'Could not sign in.', faltan: 'Missing:', revisa: 'Check',
@@ -110,7 +110,7 @@ function pintar() {
   const actual = idioma();
   document.documentElement.lang = actual;
   const pagina = location.pathname.split('/').filter(Boolean).at(-1);
-  if (['catalogo', 'home', 'blog'].includes(pagina)) document.title = `${t(pagina)} · TraTraTrax Studio`;
+  if (['catalogo', 'home', 'blog', 'merca'].includes(pagina)) document.title = `${t(pagina)} · TraTraTrax Studio`;
   if (pagina === 'entrar') document.title = `${t('entrar')} · TraTraTrax Studio`;
   document.querySelectorAll('[data-i18n]').forEach((nodo) => { nodo.textContent = t(nodo.dataset.i18n); });
   document.querySelectorAll('[data-i18n-placeholder]').forEach((nodo) => { nodo.placeholder = t(nodo.dataset.i18nPlaceholder); });

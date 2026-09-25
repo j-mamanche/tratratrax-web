@@ -2,14 +2,14 @@
    Ninguna página actual coincide si no tiene el placeholder de prueba. */
 .page:has([data-ttx="merca-lab"]) {
   min-height: var(--viewport-height);
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .page:has([data-ttx="merca-lab"]) .page-layout {
-  max-width: 60%;
+  width: 100%;
+  max-width: 100%;
   padding: 0;
-  padding-top: var(--ttx-ancla, 30rem);
-  align-items: flex-end;
+  align-items: stretch;
 }
 
 .page:has([data-ttx="merca-lab"]) .page-content {
@@ -21,8 +21,4 @@
 .page:has([data-ttx="merca-lab"]) [data-ttx="merca-lab"] {
   display: block;
   width: 100%;
-}
-
-@media (max-width: 819px) {
-  .page:has([data-ttx="merca-lab"]) .page-layout { max-width: 100%; }
 }

@@ -2,6 +2,17 @@
 // son contenido editorial y no se modifican al cambiar de idioma.
 export const UI_EN = {
   'Sin título': 'Untitled', 'sin número': 'no catalog number', 'oculto': 'hidden',
+  'Nuevo producto': 'New product', 'Contenido': 'Content', 'Nombre principal': 'Main name',
+  'Nombre destacado': 'Highlighted name', 'Descripción': 'Description',
+  'Características (una por línea)': 'Details (one per line)',
+  'Compra y disponibilidad': 'Purchase and availability', 'Estado de stock': 'Stock status',
+  'Disponible': 'In stock', 'Pocas unidades': 'Few units', 'Agotado': 'Sold out',
+  'Precio con moneda, p. ej. €35': 'Price with currency, e.g. €35',
+  'Enlace de compra': 'Purchase link', 'Mostrar en la vitrina piloto': 'Show in the pilot shop',
+  'No afecta la tienda actual de Cargo.': 'This does not change the current Cargo shop.',
+  'Imágenes': 'Images', 'Miniatura': 'Thumbnail',
+  'La miniatura aparece en la vitrina. Las fotos aparecen en la ficha; se pueden añadir rutas o subirlas aquí.': 'The thumbnail appears in the shop. Photos appear on the product page; paste image URLs or upload files here.',
+  '+ Añadir foto': '+ Add photo',
   'No se puede guardar. Falta:': 'Cannot save. Missing:', 'Pendiente:': 'Needs attention:',
   'el título': 'title', 'los artistas': 'artists', 'un artista que ya no existe': 'an artist who no longer exists',
   'la fecha': 'date', 'la carátula': 'cover image', 'el link para comprar': 'purchase link', 'los créditos': 'credits',

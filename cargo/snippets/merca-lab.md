@@ -14,6 +14,6 @@ La página debe ser overlay si se quiere probar el mismo gesto de apertura/cierr
 
 Los productos se editan en **Studio → Merca Lab**. `data/merch.json` contiene 18 fichas importadas de Bandcamp, todas ocultas. Solo aparecen en una página de Cargo los productos marcados «Mostrar en la vitrina piloto»; la vista previa de Studio muestra también los borradores. El stock de tarjeta y ficha sale del mismo campo, y el control de compra solo enlaza afuera cuando el producto disponible tiene una URL válida.
 
-Cada tarjeta enlaza a `?ttx-product=<id>` dentro de la página piloto. En la vista previa local se puede abrir esa URL directamente y usar Volver o el historial del navegador. **Hay que comprobar el mismo recorrido en Cargo**, cuya navegación AJAX y sus overlays pueden intervenir en el historial.
+Cada tarjeta abre su ficha dentro del mismo overlay, sin navegar a una URL de Cargo. «Volver a merca» ocupa la banda superior de la ficha. La vista previa local todavía admite `?ttx-product=<id>` para inspeccionar una ficha directa.
 
 Pendientes para decidir antes de sustituir la tienda: comprobar el diseño y la navegación en Cargo real (incluida navegación AJAX y móvil), la convivencia con el nav y el ancla, el uso de imágenes y miniaturas, la migración editorial de cada ficha, y el tratamiento de URLs antiguas. Este piloto no crea ni redirige las páginas individuales existentes.

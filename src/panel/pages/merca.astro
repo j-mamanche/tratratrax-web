@@ -10,15 +10,23 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
 <Marco titulo="Merca Lab" actual="/merca">
   <Fragment slot="carril">
     <div class="carril-seccion">
-      <div class="carril-titulo"><span>Merca Lab</span><span class="cuenta" id="cuenta"></span></div>
-      <p class="parte">Piloto separado de la tienda actual de Cargo.</p>
-      <button class="boton fuerte" id="nuevo" type="button">+ Nuevo producto</button>
-      <div class="campo">
-        <label for="bcMerchUrl">Traer de Bandcamp</label>
-        <input id="bcMerchUrl" type="url" placeholder="https://…bandcamp.com/merch/…" />
-        <button class="boton" id="importarMerch" type="button">Importar URL</button>
-        <p class="parte">Acepta un producto, un álbum con edición física o la lista completa /merch. Quedan ocultos hasta que los revises.</p>
-        <p class="parte" id="parteImportMerch" hidden></p>
+      <div class="carril-titulo"><span data-i18n="merca">Merca Lab</span><span class="cuenta" id="cuenta"></span></div>
+      <div class="fila">
+        <input class="buscador" id="buscar" type="text" placeholder="Buscar…" data-i18n-placeholder="buscar" autocomplete="off" />
+        <div class="menu" style="flex:0 0 auto">
+          <button class="boton fuerte" id="abrirNuevo" type="button" aria-expanded="false" aria-label="Añadir un producto" data-i18n-aria-label="anadirProducto"><span aria-hidden="true">+</span></button>
+          <div class="menu-caja" id="menuNuevo" hidden>
+            <button class="menu-item" id="nuevo" type="button" data-i18n="nuevoProducto">Nuevo producto</button>
+            <button class="menu-item" id="abrirImport" type="button" data-i18n="importarBandcamp">Importar de Bandcamp</button>
+          </div>
+        </div>
+      </div>
+      <div id="cajaImport" hidden>
+        <div class="fila">
+          <input id="bcMerchUrl" type="url" placeholder="URL de Bandcamp" data-i18n-placeholder="bandcampMerchUrl" />
+          <button class="boton" id="importarMerch" type="button" style="flex:0 0 auto"><span class="boton-icon" aria-hidden="true">↓</span> <span data-i18n="importarUrl">Importar URL</span></button>
+        </div>
+        <p class="parte" id="parteImportMerch" hidden style="margin-top:0.5rem"></p>
       </div>
       <div class="lista" id="lista"></div>
     </div>
@@ -29,14 +37,14 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
     <div class="ficha-cabeza">
       <div class="titulo" id="tituloFicha"></div>
       <div class="botonera">
-        <button class="boton" id="verProducto" type="button">Vista previa</button>
-        <button class="boton callado peligro" id="borrar" type="button">Borrar</button>
+        <button class="boton" id="verProducto" type="button" data-i18n="vista">Vista previa</button>
+        <button class="boton callado peligro" id="borrar" type="button" data-i18n="borrar">Borrar</button>
       </div>
     </div>
     <p class="parte" id="parteMerca" hidden></p>
     <div id="formulario"></div>
   </div>
-  <p class="vacio" id="vacio">Selecciona o crea un producto.</p>
+  <p class="vacio" id="vacio" data-i18n="seleccionarProducto">Selecciona o crea un producto.</p>
   <script is:inline type="application/json" id="modelo" set:html={JSON.stringify({
     releases: s.releases, artists: s.artists, home: s.home, about: s.about,
     blog: s.blog, merch: s.merch, shas: s.shas, inicial,
@@ -45,7 +53,9 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
   <script>
     import { abrir, leer, tocar, avisarAlSalir, verVista, alCambiar } from '../lib/borrador.js';
     import { montarBarra } from '../lib/barra.js';
-    import { el, campo, bloque, vaciar, leerIsla, parte } from '../lib/piezas.js';
+    import { el, campo, bloque, vaciar, leerIsla, parte, slugLibre } from '../lib/piezas.js';
+    import { arrastrable, recolocar } from '../lib/arrastrar.js';
+    import { ui, idioma } from '../lib/idioma.js';
     import { subir } from '../lib/material.js';
 
     const modelo = leerIsla('modelo');
@@ -56,6 +66,20 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
     const $ = (id) => document.getElementById(id);
     const elegido = () => (leer().merch ?? []).find((p) => p.id === activo);
     const ordenados = () => [...(leer().merch ?? [])].sort((a, b) => a.order - b.order);
+    const menu = $('menuNuevo');
+    function cerrarMenu() { menu.hidden = true; $('abrirNuevo').setAttribute('aria-expanded', 'false'); }
+    $('abrirNuevo').addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.hidden = !menu.hidden;
+      $('abrirNuevo').setAttribute('aria-expanded', String(!menu.hidden));
+    });
+    addEventListener('click', (e) => { if (!menu.contains(e.target)) cerrarMenu(); });
+    addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarMenu(); });
+    $('abrirImport').addEventListener('click', () => {
+      cerrarMenu();
+      $('cajaImport').hidden = false;
+      $('bcMerchUrl').focus();
+    });
 
     function cambiar(clave, valor) {
       tocar({ merch: leer().merch.map((p) => p.id === activo ? { ...p, [clave]: valor } : p) });
@@ -72,35 +96,35 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
 
     function pintarLista() {
       const items = ordenados();
+      const filtro = $('buscar').value.trim().toLocaleLowerCase();
       $('cuenta').textContent = `${items.length}`;
       const lista = vaciar($('lista'));
-      for (const p of items) {
-        const fila = el('div', { clase: 'fila-item' });
-        if (p.id === activo) fila.setAttribute('aria-current', 'true');
-        const boton = el('button', {
-          type: 'button', clase: 'boton callado',
-          style: 'flex:1;text-align:left;min-width:0;overflow-wrap:anywhere',
+      for (const p of items.filter((x) => !filtro || [x.title, x.subtitle, x.description].join(' ').toLocaleLowerCase().includes(filtro))) {
+        const src = p.thumbnail || p.images?.[0];
+        lista.append(el('div', {
+          clase: 'fila-item', 'data-fila': p.id,
+          'aria-current': p.id === activo ? 'true' : null,
+          'aria-label': [p.title || ui('Sin título'), p.subtitle].filter(Boolean).join(' · '),
           onclick: () => seleccionar(p.id),
-        }, `${p.title || 'Sin título'}${p.visible ? '' : ' · borrador'}`);
-        const arriba = el('button', { type: 'button', clase: 'boton chico', 'aria-label': `Subir ${p.title}`, onclick: () => mover(p.id, -1) }, '↑');
-        const abajo = el('button', { type: 'button', clase: 'boton chico', 'aria-label': `Bajar ${p.title}`, onclick: () => mover(p.id, 1) }, '↓');
-        fila.append(boton, arriba, abajo);
-        lista.append(fila);
+        },
+        filtro ? null : el('span', { 'data-asa': true, clase: 'asa', 'aria-hidden': 'true' }, '⠿'),
+        src ? el('img', { clase: 'miniatura', src: /^https?:/.test(src) ? src : `/${src}`, alt: '', loading: 'lazy' }) : el('span', { clase: 'miniatura' }),
+        el('div', { clase: 'fila-texto' },
+          el('b', {}, p.title || 'Sin título'),
+          el('small', {}, [p.subtitle, p.visible ? null : idioma() === 'en' ? 'hidden' : 'oculto'].filter(Boolean).join(' · ') || '—'),
+        )));
       }
     }
 
-    function mover(id, delta) {
-      const items = ordenados();
-      const i = items.findIndex((p) => p.id === id);
-      const j = i + delta;
-      if (j < 0 || j >= items.length) return;
-      [items[i], items[j]] = [items[j], items[i]];
-      tocar({ merch: items.map((p, order) => ({ ...p, order })) });
+    $('buscar').addEventListener('input', pintarLista);
+    arrastrable($('lista'), { alSoltar(desde, hasta) {
+      tocar({ merch: recolocar(ordenados(), desde, hasta).map((p, order) => ({ ...p, order })) });
       pintarLista();
-    }
+    } });
 
     function seleccionar(id) {
       activo = id;
+      history.replaceState(null, '', id ? `/merca?id=${encodeURIComponent(id)}` : '/merca');
       const p = elegido();
       $('obra').hidden = !p;
       $('vacio').hidden = Boolean(p);
@@ -133,19 +157,19 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
       file.addEventListener('change', async () => {
         const f = file.files?.[0]; file.value = '';
         if (!f) return;
-        parte($('parteMerca'), { texto: `Subiendo ${f.name}…` });
+        parte($('parteMerca'), { texto: { es: `Subiendo ${f.name}…`, en: `Uploading ${f.name}…` } });
         const nombre = `merch-${p.id}-${indice == null ? 'miniatura' : `foto-${indice + 1}`}`;
         try {
           let ruta;
           try { ruta = await subir(f, nombre); }
           catch (e) {
-            if (!e.existe || !confirm(`La imagen ${e.ruta} ya existe. ¿Reemplazarla?`)) throw e;
+            if (!e.existe || !confirm(idioma() === 'en' ? `The image ${e.ruta} already exists. Replace it?` : `La imagen ${e.ruta} ya existe. ¿Reemplazarla?`)) throw e;
             ruta = await subir(f, nombre, { pisar: true });
           }
           if (indice == null) cambiar(clave, ruta);
           else { const a = [...(elegido().images || [])]; a[indice] = ruta; cambiar('images', a); }
           pintarFormulario();
-          parte($('parteMerca'), { tono: 'bien', texto: `Imagen subida: ${ruta}` });
+          parte($('parteMerca'), { tono: 'bien', texto: { es: `Imagen subida: ${ruta}`, en: `Image uploaded: ${ruta}` } });
         } catch (e) { parte($('parteMerca'), { tono: 'mal', texto: e.message }); }
       });
       const quitar = indice == null ? null : el('button', {
@@ -154,7 +178,7 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
       }, 'Quitar');
       return el('div', { clase: 'campo' },
         el('span', {}, etiqueta),
-        el('div', { clase: 'fila' }, texto, el('button', { type: 'button', clase: 'boton', onclick: () => file.click() }, 'Subir…'), quitar, file));
+        el('div', { clase: 'fila merca-fila-imagen' }, texto, el('button', { type: 'button', clase: 'boton', onclick: () => file.click() }, 'Subir…'), quitar, file));
     }
 
     function pintarFormulario() {
@@ -177,23 +201,25 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
         bloque('Compra y disponibilidad', null,
           campo('Estado de stock', estado),
           entrada('Precio con moneda, p. ej. €35', 'price'),
-          entrada('Enlace externo de compra', 'buyUrl', { tipo: 'url' }),
-          entrada('URL original de Bandcamp', 'sourceUrl', { tipo: 'url', nota: 'Se usa para reconocer importaciones repetidas.' }),
+          entrada('Enlace de compra', 'buyUrl', { tipo: 'url' }),
           campo('Mostrar en la vitrina piloto', visible, 'No afecta la tienda actual de Cargo.'),
         ),
         bloque('Imágenes', 'La miniatura aparece en la vitrina. Las fotos aparecen en la ficha; se pueden añadir rutas o subirlas aquí.',
           imagen('Miniatura', 'thumbnail'),
-          ...(p.images || []).map((_, i) => imagen(`Foto ${i + 1}`, 'images', i)),
+          ...(p.images || []).map((_, i) => imagen(`${idioma() === 'en' ? 'Photo' : 'Foto'} ${i + 1}`, 'images', i)),
           el('button', { type: 'button', clase: 'boton', onclick: () => { cambiar('images', [...(elegido().images || []), '']); pintarFormulario(); } }, '+ Añadir foto'),
         ),
       );
     }
 
     $('nuevo').addEventListener('click', () => {
-      const id = `producto-${Date.now().toString(36)}`;
+      cerrarMenu();
+      $('cajaImport').hidden = true;
+      const id = slugLibre('nuevo-producto', new Set(leer().merch.map((p) => p.id)));
       const p = { id, title: '', subtitle: '', description: '', details: [], price: '', buyUrl: '', sourceUrl: '', sourceItemId: '', stock: 'in-stock', thumbnail: '', images: [], order: ordenados().length, visible: false };
       tocar({ merch: [...leer().merch, p] });
       seleccionar(id);
+      $('formulario').querySelector('input')?.focus();
     });
     async function consultar(url, itemId = '', listado = null) {
       const res = await fetch('/api/importar-merch', {
@@ -229,11 +255,11 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
       let agregados = 0;
       let fallos = [];
       try {
-        parte($('parteImportMerch'), { texto: 'Leyendo Bandcamp…' });
+        parte($('parteImportMerch'), { texto: { es: 'Leyendo Bandcamp…', en: 'Reading Bandcamp…' } });
         const data = await consultar(url);
         if (data.listado) {
           for (const [i, item] of data.listado.entries()) {
-            parte($('parteImportMerch'), { texto: `Leyendo producto ${i + 1} de ${data.listado.length}…` });
+            parte($('parteImportMerch'), { texto: { es: `Leyendo producto ${i + 1} de ${data.listado.length}…`, en: `Reading product ${i + 1} of ${data.listado.length}…` } });
             try {
               if ((leer().merch || []).some((x) => x.sourceItemId === item.itemId)) continue;
               const producto = (await consultar(item.url, item.itemId, item)).producto;
@@ -241,15 +267,17 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
             } catch (e) { fallos.push(`${item.title}: ${e.message}`); }
           }
         } else agregados = agregarImportados([data.producto]);
-        parte($('parteImportMerch'), { tono: fallos.length ? 'ojo' : 'bien',
-          texto: `${agregados} producto(s) añadido(s) al borrador.${fallos.length ? ` No se pudieron leer ${fallos.length}: ${fallos.join(' · ')}` : ''}` });
+        parte($('parteImportMerch'), { tono: fallos.length ? 'ojo' : 'bien', texto: {
+          es: `${agregados} producto(s) añadido(s) al borrador.${fallos.length ? ` No se pudieron leer ${fallos.length}: ${fallos.join(' · ')}` : ''}`,
+          en: `${agregados} product(s) added to the draft.${fallos.length ? ` Could not read ${fallos.length}: ${fallos.join(' · ')}` : ''}`,
+        } });
         if (!fallos.length) $('bcMerchUrl').value = '';
       } catch (e) { parte($('parteImportMerch'), { tono: 'mal', texto: e.message }); }
       finally { boton.disabled = false; }
     });
     $('borrar').addEventListener('click', () => {
       const p = elegido();
-      if (!p || !confirm(`¿Borrar «${p.title || p.id}» del piloto?`)) return;
+      if (!p || !confirm(idioma() === 'en' ? `Delete “${p.title || p.id}” from Merch Lab?` : `¿Borrar «${p.title || p.id}» de Merca Lab?`)) return;
       tocar({ merch: leer().merch.filter((x) => x.id !== p.id) });
       seleccionar(null);
     });
@@ -262,6 +290,11 @@ const inicial = Astro.url.searchParams.get('id') ?? '';
       if (mensaje) parte($('parteMerca'), { tono: 'mal', texto: mensaje });
     } });
     alCambiar(() => pintarLista());
+    addEventListener('ttx:idioma', () => { pintarLista(); if (elegido()) { pintarTitulo(); pintarFormulario(); } });
     seleccionar(activo);
   </script>
+  <style is:global>
+    .merca-fila-imagen > input[type='text'] { flex: 1 1 auto; min-width: 0; }
+    .merca-fila-imagen > .boton { flex: 0 0 auto; width: auto; }
+  </style>
 </Marco>

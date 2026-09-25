@@ -31,36 +31,27 @@ registrar('merca-lab', async (host) => {
   const app = nodo('div', 'ttx-merca');
   const banda = nodo('header', 'ttx-merca-banda');
   const nombre = nodo('b', '', 'MERCA');
+  const volverBoton = nodo('button', 'ttx-merca-volver', '← VOLVER A MERCA');
+  volverBoton.type = 'button';
+  volverBoton.hidden = true;
+  volverBoton.addEventListener('click', (event) => { event.stopPropagation(); vitrina(); });
   const cierre = nodo('a', 'ttx-merca-cerrar', 'CIÉRRAME');
   cierre.href = '#';
   cierre.setAttribute('rel', 'close-overlay');
-  banda.append(nombre, cierre);
+  banda.append(nombre, volverBoton, cierre);
   const cuerpo = nodo('div', 'ttx-merca-cuerpo');
   app.append(banda, cuerpo);
   host.replaceChildren(app);
 
-  let actual = null;
   let pararGalerias = () => {};
-  const urlProducto = (id) => {
-    const u = new URL(location.href);
-    if (id) u.searchParams.set('ttx-product', id);
-    else u.searchParams.delete('ttx-product');
-    return u;
-  };
-  const volver = () => {
-    if (history.state?.ttxMerchPilot) history.back();
-    else { history.replaceState(history.state, '', urlProducto(null)); vitrina(); }
-  };
   const modo = (id) => {
     const p = items.find((x) => x.id === id);
     if (!p) return vitrina();
     pararGalerias();
-    actual = p.id;
     app.classList.add('is-detail');
+    nombre.hidden = true;
+    volverBoton.hidden = false;
     cuerpo.replaceChildren();
-    const volverBoton = nodo('button', 'ttx-merca-volver', '← VOLVER A MERCA');
-    volverBoton.type = 'button';
-    volverBoton.addEventListener('click', volver);
     const detalle = nodo('article', 'ttx-merca-detalle');
     const texto = nodo('div', 'ttx-merca-texto');
     const estado = nodo('p', `ttx-merca-estado ttx-merca-${p.stock}`, STOCK[p.stock] || '');
@@ -81,17 +72,20 @@ registrar('merca-lab', async (host) => {
     }
     texto.append(compra);
     const imagenes = (p.images?.length ? p.images : [p.thumbnail]).filter(Boolean);
-    const galerias = [crearGaleria(imagenes, p.title, 0, 2400), crearGaleria(imagenes, p.title, 1, 2600)];
+    const galerias = [crearGaleria(imagenes, p.title, 0, 2400)];
+    if (imagenes.length > 1) galerias.push(crearGaleria(imagenes, p.title, 1, 2600));
+    else galerias.push({ el: nodo('div', 'ttx-merca-imagenes ttx-merca-imagenes-vacia'), parar() {} });
     pararGalerias = () => galerias.forEach((g) => g.parar());
     detalle.append(texto, ...galerias.map((g) => g.el));
-    cuerpo.append(volverBoton, detalle);
+    cuerpo.append(detalle);
     cuerpo.scrollTop = 0;
   };
 
   function vitrina() {
     pararGalerias();
-    actual = null;
     app.classList.remove('is-detail');
+    nombre.hidden = false;
+    volverBoton.hidden = true;
     cuerpo.replaceChildren();
     if (!items.length) {
       cuerpo.append(nodo('p', 'ttx-merca-vacia', mostrarBorradores
@@ -101,8 +95,8 @@ registrar('merca-lab', async (host) => {
     }
     const grid = nodo('div', 'ttx-merca-grid');
     for (const p of items) {
-      const card = nodo('a', `ttx-merca-tarjeta ttx-merca-${p.stock}`);
-      card.href = urlProducto(p.id).href;
+      const card = nodo('button', `ttx-merca-tarjeta ttx-merca-${p.stock}`);
+      card.type = 'button';
       if (p.visible === false) card.dataset.borrador = '';
       const imagen = nodo('span', 'ttx-merca-miniatura');
       const img = nodo('img');
@@ -114,27 +108,16 @@ registrar('merca-lab', async (host) => {
       const caption = nodo('span', 'ttx-merca-caption');
       caption.append(nodo('span', '', [p.title, p.subtitle].filter(Boolean).join(' ')), nodo('span', 'ttx-merca-punto'));
       card.append(imagen, caption);
-      card.addEventListener('click', (event) => {
-        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        event.preventDefault();
-        history.pushState({ ...(history.state || {}), ttxMerchPilot: true }, '', urlProducto(p.id));
-        modo(p.id);
-      });
+      card.addEventListener('click', (event) => { event.stopPropagation(); modo(p.id); });
       grid.append(card);
     }
     cuerpo.append(grid);
   }
 
-  const alHistorial = () => {
-    const id = new URL(location.href).searchParams.get('ttx-product');
-    if (id && items.some((p) => p.id === id)) modo(id);
-    else vitrina();
-  };
-  addEventListener('popstate', alHistorial);
   const inicial = host.dataset.mercaItem || new URL(location.href).searchParams.get('ttx-product');
   if (inicial && items.some((p) => p.id === inicial)) modo(inicial);
   else vitrina();
-  return { destruir() { pararGalerias(); removeEventListener('popstate', alHistorial); actual = null; } };
+  return { destruir() { pararGalerias(); } };
 });
 
 function crearGaleria(imagenes, titulo, inicial, intervalo) {
@@ -151,20 +134,9 @@ function crearGaleria(imagenes, titulo, inicial, intervalo) {
   const mostrar = () => fotos.forEach((img, i) => { img.hidden = i !== indice; });
   el.append(...fotos);
   mostrar();
-  if (fotos.length > 1) {
-    const controles = nodo('div', 'ttx-merca-controles');
-    for (const [label, delta] of [['←', -1], ['→', 1]]) {
-      const b = nodo('button', '', label);
-      b.type = 'button';
-      b.setAttribute('aria-label', delta < 0 ? 'Imagen anterior' : 'Imagen siguiente');
-      b.addEventListener('click', () => { indice = (indice + delta + fotos.length) % fotos.length; mostrar(); });
-      controles.append(b);
-    }
-    el.append(controles);
-  }
   let timer = null;
   if (fotos.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    timer = setInterval(() => { if (!el.matches(':hover')) { indice = (indice + 1) % fotos.length; mostrar(); } }, intervalo);
+    timer = setInterval(() => { indice = (indice + 1) % fotos.length; mostrar(); }, intervalo);
   }
   return { el, parar: () => { if (timer) clearInterval(timer); } };
 }
