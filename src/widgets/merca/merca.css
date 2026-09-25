@@ -1,0 +1,43 @@
+[data-ttx='merca-lab'] { padding: 0; color: #101010; }
+[data-ttx='merca-lab'] .ttx-merca { min-height: 100svh; background: #fff; font-family: 'Diatype Variable', Arial, sans-serif; }
+[data-ttx='merca-lab'] .ttx-merca.is-detail { background: #e5e5e5; }
+[data-ttx='merca-lab'] .ttx-merca-banda { display: flex; justify-content: space-between; gap: 1rem; padding: 1rem; font-size: clamp(12px, .9vw, 16px); line-height: 1.1; }
+[data-ttx='merca-lab'] .ttx-merca-cerrar { color: inherit; text-decoration: none; }
+[data-ttx='merca-lab'] .ttx-merca-cuerpo { padding: 1rem; }
+[data-ttx='merca-lab'] .ttx-merca-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+[data-ttx='merca-lab'] .ttx-merca-tarjeta { display: block; min-width: 0; padding: 0; border: 0; color: inherit; background: none; text-align: left; text-decoration: none; font: inherit; cursor: pointer; }
+[data-ttx='merca-lab'] .ttx-merca-miniatura { display: block; aspect-ratio: 1; overflow: hidden; background: #d4d4d4; }
+[data-ttx='merca-lab'] .ttx-merca-miniatura img { display: block; width: 100%; height: 100%; object-fit: cover; }
+[data-ttx='merca-lab'] .ttx-merca-out-of-stock .ttx-merca-miniatura { opacity: .58; }
+[data-ttx='merca-lab'] .ttx-merca-caption { display: flex; align-items: baseline; gap: .5em; padding: .6rem 0 1.2rem; font-size: clamp(12px, .9vw, 16px); }
+[data-ttx='merca-lab'] .ttx-merca-out-of-stock .ttx-merca-caption { color: rgba(0,0,0,.42); }
+[data-ttx='merca-lab'] .ttx-merca-punto { display: inline-block; flex: none; width: .72rem; height: .72rem; border-radius: 50%; background: #22c55e; }
+[data-ttx='merca-lab'] .ttx-merca-few-units .ttx-merca-punto { background: #facc15; }
+[data-ttx='merca-lab'] .ttx-merca-out-of-stock .ttx-merca-punto { border: 2px solid rgba(0,0,0,.25); background: transparent; }
+[data-ttx='merca-lab'] .ttx-merca-tarjeta[data-borrador] .ttx-merca-caption::after { content: 'BORRADOR'; color: #865c00; font-size: .65em; }
+[data-ttx='merca-lab'] .ttx-merca-volver { margin: 0 0 1rem; border: 0; padding: 0; color: inherit; background: none; font: inherit; font-size: .72rem; cursor: pointer; }
+[data-ttx='merca-lab'] .ttx-merca-detalle { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+[data-ttx='merca-lab'] .ttx-merca-texto { font-size: clamp(12px, .9vw, 16px); line-height: 1.35; }
+[data-ttx='merca-lab'] .ttx-merca-estado { margin-bottom: 1.25rem; color: rgba(0,0,0,.45); font-size: .75em; }
+[data-ttx='merca-lab'] .ttx-merca-estado::before { content: ''; display: inline-block; width: .75em; height: .75em; margin-right: .45em; border-radius: 50%; background: #22c55e; }
+[data-ttx='merca-lab'] .ttx-merca-estado.ttx-merca-few-units::before { background: #facc15; }
+[data-ttx='merca-lab'] .ttx-merca-estado.ttx-merca-out-of-stock::before { background: #ef4444; }
+[data-ttx='merca-lab'] .ttx-merca-texto h1 { font: inherit; font-weight: 400; line-height: 1.1; text-transform: uppercase; }
+[data-ttx='merca-lab'] .ttx-merca-texto h1 strong { font-weight: 700; }
+[data-ttx='merca-lab'] .ttx-merca-descripcion { margin-top: .8rem; max-width: 35ch; }
+[data-ttx='merca-lab'] .ttx-merca-datos { margin-top: 2rem; font-size: .85em; line-height: 1.1; }
+[data-ttx='merca-lab'] .ttx-merca-datos li { margin: .15em 0; }
+[data-ttx='merca-lab'] .ttx-merca-compra { display: inline-block; margin-top: 2rem; color: inherit; text-decoration: none; font-weight: 700; }
+[data-ttx='merca-lab'] .ttx-merca-compra:is(a):hover { text-decoration: underline; }
+[data-ttx='merca-lab'] .ttx-merca-agotado, [data-ttx='merca-lab'] .ttx-merca-sinlink { color: rgba(0,0,0,.4); }
+[data-ttx='merca-lab'] .ttx-merca-imagenes { position: relative; min-height: 14rem; background: #d4d4d4; }
+[data-ttx='merca-lab'] .ttx-merca-foto { display: block; width: 100%; height: auto; max-height: 75svh; object-fit: contain; }
+[data-ttx='merca-lab'] .ttx-merca-foto[hidden] { display: none; }
+[data-ttx='merca-lab'] .ttx-merca-controles { position: absolute; inset: auto 0 0; display: flex; justify-content: space-between; }
+[data-ttx='merca-lab'] .ttx-merca-controles button { border: 0; padding: .4rem .8rem; background: #e5e5e5; color: #101010; cursor: pointer; }
+[data-ttx='merca-lab'] .ttx-merca-vacia { padding: 2rem 0; color: rgba(0,0,0,.5); }
+@media (max-width: 819px) {
+  [data-ttx='merca-lab'] .ttx-merca-grid { grid-template-columns: 1fr; }
+  [data-ttx='merca-lab'] .ttx-merca-detalle { grid-template-columns: 1fr; }
+  [data-ttx='merca-lab'] .ttx-merca-banda, [data-ttx='merca-lab'] .ttx-merca-cuerpo { padding: .75rem; }
+}

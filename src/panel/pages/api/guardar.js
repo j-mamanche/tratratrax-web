@@ -17,7 +17,7 @@ export const prerender = false;
 
 // Artistas antes que releases: un release puede estrenar un artista, y así el
 // archivo que lo nombra nunca queda commiteado antes que el que lo define.
-const ORDEN = ['artists', 'releases', 'home', 'about', 'blog'];
+const ORDEN = ['artists', 'releases', 'home', 'about', 'blog', 'merch'];
 
 export const POST = ({ request }) =>
   atender(async () => {
@@ -37,6 +37,7 @@ export const POST = ({ request }) =>
       artists: actual.artists.valor,
       home: actual.home.valor,
       blog: actual.blog.valor,
+      merch: actual.merch.valor,
     };
     for (const c of cambios) {
       if (c.archivo in propuesto) propuesto[c.archivo] = c.valor;
@@ -49,9 +50,9 @@ export const POST = ({ request }) =>
     // de otro archivo devolviera 422 y bloqueara un cambio perfectamente
     // válido en el blog. Los cambios que sí cruzan esos archivos conservan la
     // revisión completa de siempre.
-    const soloBlog = cambios.length === 1 && cambios[0].archivo === 'blog';
-    const paraRevisar = soloBlog
-      ? { releases: [], artists: [], home: null, blog: propuesto.blog }
+    const soloAislado = cambios.length === 1 && ['blog', 'merch'].includes(cambios[0].archivo);
+    const paraRevisar = soloAislado
+      ? { releases: [], artists: [], home: null, blog: cambios[0].archivo === 'blog' ? propuesto.blog : null, merch: cambios[0].archivo === 'merch' ? propuesto.merch : null }
       : propuesto;
     const { errores, avisos } = revisar(paraRevisar, media);
     if (errores.length) {

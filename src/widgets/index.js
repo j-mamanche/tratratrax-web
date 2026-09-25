@@ -12,6 +12,7 @@ import './home/home.js';
 import './about/about.js';
 import './blog/blog.js';
 import './canas/canas.js';
+import './merca/merca.js';
 
 import { iniciar } from './_runtime/mount.js';
 

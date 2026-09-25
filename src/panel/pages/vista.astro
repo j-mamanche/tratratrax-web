@@ -19,9 +19,10 @@
  */
 export const prerender = false;
 
-const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchParams.get('w'))
+const cual = ['home', 'catalogo', 'about', 'blog', 'merca'].includes(Astro.url.searchParams.get('w'))
   ? Astro.url.searchParams.get('w')
   : 'home';
+const itemMerca = Astro.url.searchParams.get('id') ?? '';
 ---
 
 <html lang="es">
@@ -60,7 +61,7 @@ const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchPara
 
     <!-- El mismo placeholder que se pega en Cargo, con las mismas variables de
          calibración. `--ttx-nav-h` deja abajo el hueco de la barra. -->
-    <div data-ttx={cual} data-catalogo="/vista?w=catalogo" style="--ttx-nav-h: 1.6rem"></div>
+    <div data-ttx={cual === 'merca' ? 'merca-lab' : cual} data-ttx-borradores={cual === 'merca' ? true : null} data-merca-item={cual === 'merca' ? itemMerca : null} data-catalogo="/vista?w=catalogo" style="--ttx-nav-h: 1.6rem"></div>
 
     <div class="chrome">
       <span>2026 © Todos los izquierdos públicos</span>
@@ -69,6 +70,7 @@ const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchPara
         <a href="/vista?w=catalogo" aria-current={cual === 'catalogo' ? 'true' : null} id="vistaCatalogoNav">Catálogo</a> ·
         <a href="/vista?w=about" aria-current={cual === 'about' ? 'true' : null} id="vistaAboutNav">Sobre</a>
         · <a href="/vista?w=blog" aria-current={cual === 'blog' ? 'true' : null}>Blog</a>
+        · <a href="/vista?w=merca" aria-current={cual === 'merca' ? 'true' : null}>Merca Lab</a>
       </span>
       <span id="vistaMenu">Menú: Sobre Catálogo Tienda Blog</span>
     </div>
@@ -82,6 +84,7 @@ const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchPara
         // ventana: el segundo es una copia congelada del momento en que el
         // navegador abrió la pestaña, y se quedaba vieja en cuanto se tocaba
         // algo al otro lado. Ver `lib/borrador.js:ESPEJO`.
+        const cual = (document.querySelector('[data-ttx]')?.getAttribute('data-ttx') || 'home').replace('-lab', '');
         const LLAVE = 'ttx-borrador-vista';
         let borrador = null;
         try {
@@ -113,6 +116,7 @@ const cual = ['home', 'catalogo', 'about', 'blog'].includes(Astro.url.searchPara
           'home.json': () => borrador.home,
           'about.json': () => borrador.about,
           'blog.json': () => borrador.blog,
+          'merch.json': () => borrador.merch,
         };
 
         const original = window.fetch.bind(window);

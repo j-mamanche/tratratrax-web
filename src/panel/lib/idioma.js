@@ -2,7 +2,7 @@ import { UI_EN } from './textos.js';
 
 export const COPIA = {
   es: {
-    catalogo: 'Catálogo', home: 'Home', blog: 'Blog', guardar: 'Guardar cambios', salir: 'Salir',
+    catalogo: 'Catálogo', home: 'Home', blog: 'Blog', merca: 'Merca Lab', guardar: 'Guardar cambios', salir: 'Salir',
     nuevo: 'Nuevo lanzamiento', importarBandcamp: 'Importar de Bandcamp', importar: 'Importar',
     todos: 'Todos', bloqueados: 'No publicables', pendientes: 'Pendientes', listos: 'Listos',
     vista: 'Vista previa', fijo: 'Fijo', aleatorio: 'Aleatorio',
@@ -19,7 +19,7 @@ export const COPIA = {
     errorRepo: 'No se pudo leer el repositorio:', sinBorrador: 'sin borrador · datos publicados', bandcampUrl: 'URL de álbum de Bandcamp',
   },
   en: {
-    catalogo: 'Catalog', home: 'Home', blog: 'Blog', guardar: 'Save changes', salir: 'Sign out',
+    catalogo: 'Catalog', home: 'Home', blog: 'Blog', merca: 'Merch Lab', guardar: 'Save changes', salir: 'Sign out',
     nuevo: 'New release', importarBandcamp: 'Import from Bandcamp', importar: 'Import',
     todos: 'All', bloqueados: 'Blocked', pendientes: 'Needs info', listos: 'Ready',
     vista: 'Preview', fijo: 'Fixed', aleatorio: 'Random',

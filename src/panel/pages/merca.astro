@@ -1,0 +1,267 @@
+---
+/** Editor del piloto. No modifica páginas, tags ni miniaturas de Cargo. */
+import Marco from '../Marco.astro';
+import { estado } from '../lib/servidor.js';
+export const prerender = false;
+const s = await estado();
+const inicial = Astro.url.searchParams.get('id') ?? '';
+---
+
+<Marco titulo="Merca Lab" actual="/merca">
+  <Fragment slot="carril">
+    <div class="carril-seccion">
+      <div class="carril-titulo"><span>Merca Lab</span><span class="cuenta" id="cuenta"></span></div>
+      <p class="parte">Piloto separado de la tienda actual de Cargo.</p>
+      <button class="boton fuerte" id="nuevo" type="button">+ Nuevo producto</button>
+      <div class="campo">
+        <label for="bcMerchUrl">Traer de Bandcamp</label>
+        <input id="bcMerchUrl" type="url" placeholder="https://…bandcamp.com/merch/…" />
+        <button class="boton" id="importarMerch" type="button">Importar URL</button>
+        <p class="parte">Acepta un producto, un álbum con edición física o la lista completa /merch. Quedan ocultos hasta que los revises.</p>
+        <p class="parte" id="parteImportMerch" hidden></p>
+      </div>
+      <div class="lista" id="lista"></div>
+    </div>
+  </Fragment>
+
+  {!s.ok && <p class="parte mal">No se pudo leer el repositorio: {s.error}</p>}
+  <div id="obra" hidden>
+    <div class="ficha-cabeza">
+      <div class="titulo" id="tituloFicha"></div>
+      <div class="botonera">
+        <button class="boton" id="verProducto" type="button">Vista previa</button>
+        <button class="boton callado peligro" id="borrar" type="button">Borrar</button>
+      </div>
+    </div>
+    <p class="parte" id="parteMerca" hidden></p>
+    <div id="formulario"></div>
+  </div>
+  <p class="vacio" id="vacio">Selecciona o crea un producto.</p>
+  <script is:inline type="application/json" id="modelo" set:html={JSON.stringify({
+    releases: s.releases, artists: s.artists, home: s.home, about: s.about,
+    blog: s.blog, merch: s.merch, shas: s.shas, inicial,
+  })} />
+
+  <script>
+    import { abrir, leer, tocar, avisarAlSalir, verVista, alCambiar } from '../lib/borrador.js';
+    import { montarBarra } from '../lib/barra.js';
+    import { el, campo, bloque, vaciar, leerIsla, parte } from '../lib/piezas.js';
+    import { subir } from '../lib/material.js';
+
+    const modelo = leerIsla('modelo');
+    let activo = modelo.inicial || null;
+    delete modelo.inicial;
+    abrir(modelo);
+    avisarAlSalir();
+    const $ = (id) => document.getElementById(id);
+    const elegido = () => (leer().merch ?? []).find((p) => p.id === activo);
+    const ordenados = () => [...(leer().merch ?? [])].sort((a, b) => a.order - b.order);
+
+    function cambiar(clave, valor) {
+      tocar({ merch: leer().merch.map((p) => p.id === activo ? { ...p, [clave]: valor } : p) });
+      if (clave === 'title' || clave === 'subtitle') pintarTitulo();
+    }
+
+    function pintarTitulo() {
+      const p = elegido();
+      vaciar($('tituloFicha')).append(
+        el('b', {}, p?.title || 'Nuevo producto'),
+        el('small', {}, p?.id || ''),
+      );
+    }
+
+    function pintarLista() {
+      const items = ordenados();
+      $('cuenta').textContent = `${items.length}`;
+      const lista = vaciar($('lista'));
+      for (const p of items) {
+        const fila = el('div', { clase: 'fila-item' });
+        if (p.id === activo) fila.setAttribute('aria-current', 'true');
+        const boton = el('button', {
+          type: 'button', clase: 'boton callado',
+          style: 'flex:1;text-align:left;min-width:0;overflow-wrap:anywhere',
+          onclick: () => seleccionar(p.id),
+        }, `${p.title || 'Sin título'}${p.visible ? '' : ' · borrador'}`);
+        const arriba = el('button', { type: 'button', clase: 'boton chico', 'aria-label': `Subir ${p.title}`, onclick: () => mover(p.id, -1) }, '↑');
+        const abajo = el('button', { type: 'button', clase: 'boton chico', 'aria-label': `Bajar ${p.title}`, onclick: () => mover(p.id, 1) }, '↓');
+        fila.append(boton, arriba, abajo);
+        lista.append(fila);
+      }
+    }
+
+    function mover(id, delta) {
+      const items = ordenados();
+      const i = items.findIndex((p) => p.id === id);
+      const j = i + delta;
+      if (j < 0 || j >= items.length) return;
+      [items[i], items[j]] = [items[j], items[i]];
+      tocar({ merch: items.map((p, order) => ({ ...p, order })) });
+      pintarLista();
+    }
+
+    function seleccionar(id) {
+      activo = id;
+      const p = elegido();
+      $('obra').hidden = !p;
+      $('vacio').hidden = Boolean(p);
+      document.body.dataset.vista = p ? 'obra' : 'lista';
+      pintarLista();
+      if (p) { pintarTitulo(); pintarFormulario(); }
+    }
+
+    function entrada(etiqueta, clave, { multilinea = false, tipo = 'text', nota = '' } = {}) {
+      const p = elegido();
+      const control = multilinea
+        ? el('textarea', { value: clave === 'details' || clave === 'images' ? (p[clave] || []).join('\n') : p[clave] || '', rows: 4 })
+        : el('input', { type: tipo, value: p[clave] ?? '' });
+      control.addEventListener('input', () => cambiar(clave,
+        clave === 'details' || clave === 'images'
+          ? control.value.split('\n').map((x) => x.trim()).filter(Boolean)
+          : control.value));
+      return campo(etiqueta, control, nota);
+    }
+
+    function imagen(etiqueta, clave, indice = null) {
+      const p = elegido();
+      const actual = indice == null ? p[clave] || '' : p.images?.[indice] || '';
+      const texto = el('input', { type: 'text', value: actual, placeholder: 'media/… o https://…' });
+      texto.addEventListener('input', () => {
+        if (indice == null) cambiar(clave, texto.value.trim());
+        else { const a = [...(elegido().images || [])]; a[indice] = texto.value.trim(); cambiar('images', a.filter(Boolean)); }
+      });
+      const file = el('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif', hidden: true });
+      file.addEventListener('change', async () => {
+        const f = file.files?.[0]; file.value = '';
+        if (!f) return;
+        parte($('parteMerca'), { texto: `Subiendo ${f.name}…` });
+        const nombre = `merch-${p.id}-${indice == null ? 'miniatura' : `foto-${indice + 1}`}`;
+        try {
+          let ruta;
+          try { ruta = await subir(f, nombre); }
+          catch (e) {
+            if (!e.existe || !confirm(`La imagen ${e.ruta} ya existe. ¿Reemplazarla?`)) throw e;
+            ruta = await subir(f, nombre, { pisar: true });
+          }
+          if (indice == null) cambiar(clave, ruta);
+          else { const a = [...(elegido().images || [])]; a[indice] = ruta; cambiar('images', a); }
+          pintarFormulario();
+          parte($('parteMerca'), { tono: 'bien', texto: `Imagen subida: ${ruta}` });
+        } catch (e) { parte($('parteMerca'), { tono: 'mal', texto: e.message }); }
+      });
+      const quitar = indice == null ? null : el('button', {
+        type: 'button', clase: 'boton callado peligro',
+        onclick: () => { const a = [...(elegido().images || [])]; a.splice(indice, 1); cambiar('images', a); pintarFormulario(); },
+      }, 'Quitar');
+      return el('div', { clase: 'campo' },
+        el('span', {}, etiqueta),
+        el('div', { clase: 'fila' }, texto, el('button', { type: 'button', clase: 'boton', onclick: () => file.click() }, 'Subir…'), quitar, file));
+    }
+
+    function pintarFormulario() {
+      const p = elegido();
+      if (!p) return;
+      const form = vaciar($('formulario'));
+      const estado = el('select');
+      for (const [value, label] of [['in-stock', 'Disponible'], ['few-units', 'Pocas unidades'], ['out-of-stock', 'Agotado']])
+        estado.append(el('option', { value, selected: p.stock === value }, label));
+      estado.addEventListener('change', () => cambiar('stock', estado.value));
+      const visible = el('input', { type: 'checkbox', checked: p.visible });
+      visible.addEventListener('change', () => cambiar('visible', visible.checked));
+      form.append(
+        bloque('Contenido', null,
+          entrada('Nombre principal', 'title'),
+          entrada('Nombre destacado', 'subtitle'),
+          entrada('Descripción', 'description', { multilinea: true }),
+          entrada('Características (una por línea)', 'details', { multilinea: true }),
+        ),
+        bloque('Compra y disponibilidad', null,
+          campo('Estado de stock', estado),
+          entrada('Precio con moneda, p. ej. €35', 'price'),
+          entrada('Enlace externo de compra', 'buyUrl', { tipo: 'url' }),
+          entrada('URL original de Bandcamp', 'sourceUrl', { tipo: 'url', nota: 'Se usa para reconocer importaciones repetidas.' }),
+          campo('Mostrar en la vitrina piloto', visible, 'No afecta la tienda actual de Cargo.'),
+        ),
+        bloque('Imágenes', 'La miniatura aparece en la vitrina. Las fotos aparecen en la ficha; se pueden añadir rutas o subirlas aquí.',
+          imagen('Miniatura', 'thumbnail'),
+          ...(p.images || []).map((_, i) => imagen(`Foto ${i + 1}`, 'images', i)),
+          el('button', { type: 'button', clase: 'boton', onclick: () => { cambiar('images', [...(elegido().images || []), '']); pintarFormulario(); } }, '+ Añadir foto'),
+        ),
+      );
+    }
+
+    $('nuevo').addEventListener('click', () => {
+      const id = `producto-${Date.now().toString(36)}`;
+      const p = { id, title: '', subtitle: '', description: '', details: [], price: '', buyUrl: '', sourceUrl: '', sourceItemId: '', stock: 'in-stock', thumbnail: '', images: [], order: ordenados().length, visible: false };
+      tocar({ merch: [...leer().merch, p] });
+      seleccionar(id);
+    });
+    async function consultar(url, itemId = '', listado = null) {
+      const res = await fetch('/api/importar-merch', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, itemId, listado }),
+      });
+      if (res.status === 401) { location.href = '/entrar?volver=/merca'; throw new Error('Inicia sesión para importar.'); }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Bandcamp respondió ${res.status}.`);
+      return data;
+    }
+    function agregarImportados(productos) {
+      const actuales = [...(leer().merch || [])];
+      const nuevos = [];
+      for (const p of productos) {
+        if (actuales.some((x) => x.sourceItemId && x.sourceItemId === p.sourceItemId) ||
+            actuales.some((x) => x.sourceUrl && x.sourceUrl === p.sourceUrl)) continue;
+        let id = p.id;
+        for (let n = 2; actuales.some((x) => x.id === id); n++) id = `${p.id}-${n}`;
+        const nuevo = { ...p, id, order: actuales.length, visible: false };
+        actuales.push(nuevo); nuevos.push(nuevo);
+      }
+      if (nuevos.length) tocar({ merch: actuales });
+      pintarLista();
+      if (nuevos[0]) seleccionar(nuevos[0].id);
+      return nuevos.length;
+    }
+    $('importarMerch').addEventListener('click', async () => {
+      const url = $('bcMerchUrl').value.trim();
+      if (!url) return;
+      const boton = $('importarMerch');
+      boton.disabled = true;
+      let agregados = 0;
+      let fallos = [];
+      try {
+        parte($('parteImportMerch'), { texto: 'Leyendo Bandcamp…' });
+        const data = await consultar(url);
+        if (data.listado) {
+          for (const [i, item] of data.listado.entries()) {
+            parte($('parteImportMerch'), { texto: `Leyendo producto ${i + 1} de ${data.listado.length}…` });
+            try {
+              if ((leer().merch || []).some((x) => x.sourceItemId === item.itemId)) continue;
+              const producto = (await consultar(item.url, item.itemId, item)).producto;
+              agregados += agregarImportados([producto]);
+            } catch (e) { fallos.push(`${item.title}: ${e.message}`); }
+          }
+        } else agregados = agregarImportados([data.producto]);
+        parte($('parteImportMerch'), { tono: fallos.length ? 'ojo' : 'bien',
+          texto: `${agregados} producto(s) añadido(s) al borrador.${fallos.length ? ` No se pudieron leer ${fallos.length}: ${fallos.join(' · ')}` : ''}` });
+        if (!fallos.length) $('bcMerchUrl').value = '';
+      } catch (e) { parte($('parteImportMerch'), { tono: 'mal', texto: e.message }); }
+      finally { boton.disabled = false; }
+    });
+    $('borrar').addEventListener('click', () => {
+      const p = elegido();
+      if (!p || !confirm(`¿Borrar «${p.title || p.id}» del piloto?`)) return;
+      tocar({ merch: leer().merch.filter((x) => x.id !== p.id) });
+      seleccionar(null);
+    });
+    $('verProducto').addEventListener('click', () => {
+      verVista(`/vista?w=merca&id=${encodeURIComponent(activo)}`);
+    });
+    $('volver')?.addEventListener('click', () => { document.body.dataset.vista = 'lista'; });
+    montarBarra({ alFallar: (errores) => {
+      const mensaje = errores.find((e) => /^merch\[/.test(e));
+      if (mensaje) parte($('parteMerca'), { tono: 'mal', texto: mensaje });
+    } });
+    alCambiar(() => pintarLista());
+    seleccionar(activo);
+  </script>
+</Marco>

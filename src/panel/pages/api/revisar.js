@@ -26,18 +26,19 @@ export const POST = ({ request }) =>
       artists: actual.artists.valor,
       home: actual.home.valor,
       blog: actual.blog.valor,
+      merch: actual.merch.valor,
     };
     for (const cambio of cambios) {
       if (cambio.archivo in propuesto) propuesto[cambio.archivo] = cambio.valor;
     }
 
-    const soloBlog = cambios.length === 1 && cambios[0].archivo === 'blog';
-    const paraRevisar = soloBlog
-      ? { releases: [], artists: [], home: null, blog: propuesto.blog }
+    const soloAislado = cambios.length === 1 && ['blog', 'merch'].includes(cambios[0].archivo);
+    const paraRevisar = soloAislado
+      ? { releases: [], artists: [], home: null, blog: cambios[0].archivo === 'blog' ? propuesto.blog : null, merch: cambios[0].archivo === 'merch' ? propuesto.merch : null }
       : propuesto;
     // La lista completa de media solo hace falta si se tocó un release. Así
     // una tecla en Blog o Home no dispara un árbol entero de GitHub.
-    const media = cambios.some((cambio) => cambio.archivo === 'releases')
+    const media = cambios.some((cambio) => ['releases', 'merch'].includes(cambio.archivo))
       ? await listarMedia(cfg)
       : null;
     const { errores, avisos } = revisar(paraRevisar, media);

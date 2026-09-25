@@ -84,6 +84,30 @@ Qué se pega en Cargo y cómo se calibra sin tocar código:
 
 ## La merca
 
+### Piloto alternativo: Merca Lab
+
+Hay una implementación independiente de la opción de vitrina y fichas dirigidas
+por Studio. Se edita en **Studio → Merca Lab** (`/merca` dentro de Studio), usa
+[`data/merch.json`](data/merch.json) y se puede inspeccionar en
+`/vista?w=merca` o `/preview/merca`. El widget se llama `merca-lab` para que
+ninguna página actual lo monte por accidente. El JSON contiene 18 productos
+traídos de [la merca de Bandcamp](https://tratratrax.bandcamp.com/merch), todos
+con `visible: false`. Studio acepta una URL de producto, una edición física
+en una página de álbum o la URL del listado `/merch`; la importación añade
+borradores y no pisa las fichas ya editadas. También se puede repetir desde
+el repo con `npm run import:merch`. Hay que revisar copys, precios y stock
+antes de publicar, pues Bandcamp puede cambiar. La vista
+previa de Studio permite ver borradores ocultos. El CSS va dentro del mismo
+bundle que los demás widgets; no hay CSS local de Cargo para este piloto.
+
+El [snippet de montaje aislado](cargo/snippets/merca-lab.md) indica cómo
+probarlo en una página **nueva** de Cargo. No se ha pegado allí ni se ha
+cambiado `/merca`, el nav o las fichas actuales. Antes de sustituirlas hay que
+validar la navegación y el diseño dentro de Cargo y decidir qué hacer con sus
+URLs existentes.
+
+### Tienda actual
+
 Es la única pantalla que **no** es un widget: la vitrina y las fichas son
 páginas de Cargo, con su `gallery-grid` y sus `column-set`, para que el
 equipo las edite sin pasar por el repo. Lo que ponemos nosotros es el CSS
@@ -107,11 +131,8 @@ publicar el borrador. Antes de cambiar un tag de stock, el equipo debe
 confirmar el estado; el punto de la grilla, el rótulo de ficha y el control de
 compra requieren revisión individual.
 
-> **No hay preview de la merca.** Hubo un `/preview/merca.astro` que importaba
-> tres snippets que nunca se escribieron (`merca.css`, `merca-grid.html`,
-> `merca-item.html`), así que la ruta daba 500 y `npm run build` fallaba ahí.
-> Se borró. Cuando los snippets existan, el preview se vuelve a escribir — el
-> archivo viejo no vale la pena rescatarlo, era andamio sin nada que sostener.
+La tienda actual de Cargo no tiene una vista previa local fiel de sus páginas
+nativas. `/preview/merca` corresponde únicamente al piloto Merca Lab.
 
 ```
 src/widgets/
@@ -247,7 +268,7 @@ admin.tratratrax.xx  (Netlify, SSR)
                  └ Actions → Pages → Cargo ve el dato nuevo
 ```
 
-Dos pantallas: **catálogo** y **home**. Y `/vista`, que monta **los widgets de
+Cuatro pantallas: **catálogo**, **home**, **blog** y **Merca Lab**. Y `/vista`, que monta **los widgets de
 verdad** sobre el borrador que hay en la pestaña — no una maqueta: el mismo
 `ttx.js` que se pega en Cargo, con el `fetch` cambiado por debajo.
 

@@ -39,7 +39,7 @@ const LLAVE = 'ttx-borrador';
 const ESPEJO = 'ttx-borrador-vista';
 
 /** Los archivos que el panel edita. `about` viaja pero todavía no se toca. */
-export const ARCHIVOS = ['releases', 'artists', 'home', 'about', 'blog'];
+export const ARCHIVOS = ['releases', 'artists', 'home', 'about', 'blog', 'merch'];
 
 const oyentes = new Set();
 
@@ -125,7 +125,7 @@ export function verVista(url) {
 }
 
 export const leer = () =>
-  leerCrudo() ?? { releases: [], artists: [], home: {}, about: null, blog: { ticker: '', items: [] }, shas: {}, base: {} };
+  leerCrudo() ?? { releases: [], artists: [], home: {}, about: null, blog: { ticker: '', items: [] }, merch: [], shas: {}, base: {} };
 
 /** Cambia una parte del borrador. Lo tocado se deduce, no se declara. */
 export function tocar(cambios) {

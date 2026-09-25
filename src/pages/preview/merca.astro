@@ -1,0 +1,19 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TraTraTrax · Merca Lab</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #e5e5e5; font-family: Arial, sans-serif; }
+      .aviso { position: fixed; z-index: 10; bottom: 0; width: 100%; padding: .4rem; background: #111; color: #fff; font: 12px Arial, sans-serif; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <div data-ttx="merca-lab" data-ttx-borradores></div>
+    <div class="aviso">Vista de laboratorio · no reemplaza la tienda de Cargo</div>
+    <script is:inline src={`${base}ttx.js`} data-ttx-datos={`${base}data/`} defer></script>
+  </body>
+</html>

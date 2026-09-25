@@ -16,7 +16,7 @@ export async function estado() {
   try {
     cfg = configDesde(entorno());
   } catch (e) {
-    return { ok: false, error: e.message, releases: [], artists: [], home: {}, shas: {} };
+    return { ok: false, error: e.message, releases: [], artists: [], home: {}, merch: [], shas: {} };
   }
 
   try {
@@ -27,12 +27,14 @@ export async function estado() {
       home: datos.home.valor,
       about: datos.about.valor,
       blog: datos.blog.valor,
+      merch: datos.merch.valor,
       shas: {
         releases: datos.releases.sha,
         artists: datos.artists.sha,
         home: datos.home.sha,
         about: datos.about.sha,
         blog: datos.blog.sha,
+        merch: datos.merch.sha,
       },
     };
 
@@ -43,6 +45,6 @@ export async function estado() {
 
     return { ok: true, repo: cfg.repo, rama: cfg.rama, ...modelo, errores, avisos };
   } catch (e) {
-    return { ok: false, error: e.message, releases: [], artists: [], home: {}, shas: {} };
+    return { ok: false, error: e.message, releases: [], artists: [], home: {}, merch: [], shas: {} };
   }
 }

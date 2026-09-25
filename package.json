@@ -15,6 +15,7 @@
     "preview": "astro preview",
     "validate": "node tools/validate.mjs",
     "import": "node tools/bandcamp-import.mjs",
+    "import:merch": "node tools/merch-import.mjs",
     "predev": "npm run build:widgets",
     "prepreview": "npm run build:widgets"
   },

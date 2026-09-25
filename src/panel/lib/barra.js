@@ -18,8 +18,8 @@ import { idioma, t, ui, traducirError } from './idioma.js';
 import { cambiosDelBorrador, destino, destinoError, textoCambio } from './cambios.js';
 
 const NOMBRES = {
-  es: { releases: 'el catálogo', artists: 'los artistas', home: 'el home', about: 'el about', blog: 'el blog' },
-  en: { releases: 'the catalog', artists: 'the artists', home: 'the home page', about: 'the about page', blog: 'the blog' },
+  es: { releases: 'el catálogo', artists: 'los artistas', home: 'el home', about: 'el about', blog: 'el blog', merch: 'Merca Lab' },
+  en: { releases: 'the catalog', artists: 'the artists', home: 'the home page', about: 'the about page', blog: 'the blog', merch: 'Merch Lab' },
 };
 const nombre = (archivo) => NOMBRES[idioma()][archivo] ?? archivo;
 const en = () => idioma() === 'en';

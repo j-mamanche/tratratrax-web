@@ -9,7 +9,7 @@
  * Correr:  npm run validate
  */
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -17,6 +17,7 @@ import { dirname, join } from 'node:path';
 // que la usa (`format.js`), no copiada aquí: si se escriben dos veces, un día
 // el validador aprueba un home que el sitio no va a poder pintar.
 import { cumpleHome } from '../src/widgets/_runtime/format.js';
+import { revisarMerch } from '../src/lib/merch.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
@@ -92,6 +93,14 @@ const ids = new Set();
 const catalogs = new Map();
 const usedArtists = new Set();
 const today = new Date().toISOString().slice(0, 10);
+
+// La merca experimental tiene el mismo validador en Studio y en el build.
+function archivosMedia(dir = join(root, 'media'), prefix = 'media') {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? archivosMedia(join(dir, e.name), `${prefix}/${e.name}`) : [`${prefix}/${e.name}`]);
+}
+for (const mensaje of revisarMerch(load('merch.json') ?? [], new Set(archivosMedia()))) errors.push(mensaje);
 
 for (const [i, r] of releases.entries()) {
   const at = `releases[${i}] "${r.album ?? '¿?'}"`;
@@ -360,27 +369,6 @@ if (existsSync(join(root, 'data', 'about.json'))) {
 
       if (dj.relleno) warn(at, 'marcado como `relleno`: el emblema es material de prueba');
     }
-  }
-}
-
-// ─── merch.json ──────────────────────────────────────────────────────────────
-
-const STOCK = ['in', 'few', 'out'];
-if (existsSync(join(root, 'data', 'merch.json'))) {
-  const merch = load('merch.json') ?? [];
-  const merchSlugs = new Set();
-  for (const [i, m] of merch.entries()) {
-    const at = `merch[${i}] "${m.title ?? '¿?'}"`;
-    if (!m.slug) err(at, 'falta `slug`');
-    else if (merchSlugs.has(m.slug)) err(at, `slug duplicado "${m.slug}"`);
-    else merchSlugs.add(m.slug);
-
-    if (!m.title) err(at, 'falta `title`');
-    if (!STOCK.includes(m.stock)) err(at, `stock inválido "${m.stock}" — debe ser ${STOCK.join(' | ')}`);
-    if (!m.url) warn(at, 'sin `url` (link externo a la tienda)');
-    else if (!isHttpUrl(m.url)) err(at, `url no válida: "${m.url}"`);
-    if (typeof m.order !== 'number') err(at, 'falta `order`');
-    if (typeof m.visible !== 'boolean') err(at, 'falta `visible`');
   }
 }
 

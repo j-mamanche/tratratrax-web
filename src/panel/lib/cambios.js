@@ -24,6 +24,8 @@ const campos = {
   'highlight.article': 'artículo', 'highlight.image': 'imagen', 'highlight.imageAlt': 'texto alternativo',
   'ticker.label': 'etiqueta', 'ticker.text': 'texto', 'ticker.url': 'enlace',
   modo: 'modo', release: 'lanzamiento', azar: 'selección aleatoria',
+  subtitle: 'nombre destacado', description: 'descripción', details: 'características',
+  price: 'precio', buyUrl: 'enlace de compra', stock: 'stock', thumbnail: 'miniatura', images: 'fotos',
 };
 const etiqueta = (ruta) => campos[ruta] ?? ruta;
 const titulo = (x, tipo) => x?.[tipo === 'releases' ? 'album' : tipo === 'artists' ? 'display' : 'title'] || identidad(x) || 'sin título';
@@ -60,6 +62,7 @@ export function cambiosDelBorrador(estado) {
   const lista = [];
   entidades(lista, 'releases', base('releases') ?? [], estado.releases ?? []);
   entidades(lista, 'artists', base('artists') ?? [], estado.artists ?? []);
+  entidades(lista, 'merch', base('merch') ?? [], estado.merch ?? []);
   const viejoBlog = base('blog') ?? {};
   const blog = estado.blog ?? {};
   entidades(lista, 'blog', viejoBlog.items ?? [], blog.items ?? []);
@@ -80,7 +83,7 @@ export function cambiosDelBorrador(estado) {
 }
 
 export function textoCambio(c, ingles = false) {
-  const tipo = c.tipo === 'releases' ? 'Release' : c.tipo === 'artists' ? (ingles ? 'Artist' : 'Artista') : c.tipo === 'blog' && c.id ? (ingles ? 'Article' : 'Artículo') : '';
+  const tipo = c.tipo === 'releases' ? 'Release' : c.tipo === 'artists' ? (ingles ? 'Artist' : 'Artista') : c.tipo === 'merch' ? (ingles ? 'Product' : 'Producto') : c.tipo === 'blog' && c.id ? (ingles ? 'Article' : 'Artículo') : '';
   const nombre = tipo ? `${tipo} «${c.nombre}»` : c.nombre;
   const accion = ingles
     ? { creado: 'created', editado: 'edited', ocultado: 'hidden', mostrado: 'shown', reordenado: 'reordered', eliminado: 'deleted' }[c.accion]
@@ -100,12 +103,17 @@ export function destino(c) {
     if (release && c.accion !== 'eliminado') { q.set('id', release); q.set('campo', 'artists'); }
     else { q.delete('campo'); q.set('eliminado', `artista ${c.nombre}`); }
   }
-  const ruta = c.tipo === 'blog' ? '/blog' : c.tipo === 'home' ? '/home' : '/catalogo';
+  const ruta = c.tipo === 'blog' ? '/blog' : c.tipo === 'merch' ? '/merca' : c.tipo === 'home' ? '/home' : '/catalogo';
   return `${ruta}${q.size ? `?${q}` : ''}`;
 }
 
 /** Los mensajes actuales del validador se convierten en destinos estables. */
 export function destinoError(mensaje, estado) {
+  let merch = /^merch\[(\d+)\]/.exec(mensaje);
+  if (merch) {
+    const p = estado.merch?.[Number(merch[1])];
+    return p?.id ? destino({ tipo: 'merch', id: p.id, accion: 'editado' }) : '/merca';
+  }
   let m = /^blog items\[(\d+)\]/.exec(mensaje);
   if (m) {
     const item = estado.blog?.items?.[Number(m[1])];

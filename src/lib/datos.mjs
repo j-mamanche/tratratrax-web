@@ -19,6 +19,7 @@
  */
 
 import { leer, leerJson, escribir, serializar, Choque } from './github.mjs';
+import { revisarMerch } from './merch.mjs';
 
 export { Choque };
 
@@ -28,6 +29,7 @@ export const ARCHIVOS = {
   home: 'data/home.json',
   about: 'data/about.json',
   blog: 'data/blog.json',
+  merch: 'data/merch.json',
 };
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -54,7 +56,7 @@ const esHttp = (s) => {
  * y vuelve con él.
  */
 export async function cargarTodo(cfg) {
-  const [releases, artists, home, about, blog] = await Promise.all(
+  const [releases, artists, home, about, blog, merch] = await Promise.all(
     Object.values(ARCHIVOS).map((r) => leerJson(cfg, r)),
   );
 
@@ -64,6 +66,7 @@ export async function cargarTodo(cfg) {
     home: home ?? { sha: null, valor: { modo: 'auto' } },
     about: about ?? { sha: null, valor: null },
     blog: blog ?? { sha: null, valor: { ticker: '', items: [] } },
+    merch: merch ?? { sha: null, valor: [] },
   };
 }
 
@@ -109,9 +112,10 @@ function revisarMedia(errores, donde, campo, ruta, media) {
  * Devuelve `{ errores, avisos }`: los errores impiden guardar, los avisos se
  * pintan al lado del campo.
  */
-export function revisar({ releases = [], artists = [], home = null, blog = null }, media = null) {
+export function revisar({ releases = [], artists = [], home = null, blog = null, merch = null }, media = null) {
   const errores = [];
   const avisos = [];
+  if (merch !== null) errores.push(...revisarMerch(merch, media));
 
   // ── artistas ──
   const slugs = new Set();
